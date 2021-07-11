@@ -1,6 +1,6 @@
 {
   "name": "@rx-effects/react",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Reactive state and effects management. Tooling for React.js",
   "publishConfig": {
     "access": "public"
@@ -50,7 +50,7 @@
     "watch": "rollup -c --watch"
   },
   "dependencies": {
-    "rx-effects": "0.0.4"
+    "rx-effects": "0.0.5"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
