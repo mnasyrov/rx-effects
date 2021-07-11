@@ -1,0 +1,53 @@
+{
+  "name": "rx-effects",
+  "description": "Reactive state and effects management",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Mikhail Nasyrov (https://github.com/mnasyrov)",
+  "homepage": "https://github.com/mnasyrov/rx-effects",
+  "bugs": {
+    "url": "https://github.com/mnasyrov/rx-effects/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mnasyrov/rx-effects.git"
+  },
+  "keywords": [
+    "state",
+    "effect",
+    "management",
+    "state-management",
+    "reactive",
+    "rxjs",
+    "rx",
+    "effector"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.module.js",
+  "jsnext:main": "dist/index.module.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "docs",
+    "lib",
+    "src",
+    "LICENSE",
+    "mod.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "shx rm -rf dist lib",
+    "test-deno": "deno test test-deno",
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
+  },
+  "peerDependencies": {
+    "rxjs": ">=7.0.0"
+  }
+}

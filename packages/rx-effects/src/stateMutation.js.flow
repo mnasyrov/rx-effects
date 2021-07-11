@@ -1,0 +1,7 @@
+// @flow strict
+
+export type StateMutation<State> = (state: State) => State;
+
+declare export function pipeStateMutations<State>(
+  mutations: Array<StateMutation<State>>,
+): StateMutation<State>;

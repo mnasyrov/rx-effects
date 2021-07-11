@@ -1,0 +1,30 @@
+// @flow strict
+
+import { Observable } from 'rxjs';
+import { StateMutation } from './stateMutation';
+import { StateQuery } from './stateQuery';
+
+export type StateReader<State> = $ReadOnly<
+  StateQuery<State> & {
+    select: <R>(
+      selector: (state: State) => R,
+      compare?: (v1: R, v2: R) => boolean,
+    ) => Observable<R>,
+    query: <R>(
+      selector: (state: State) => R,
+      compare?: (v1: R, v2: R) => boolean,
+    ) => StateQuery<R>,
+  },
+>;
+
+export type StateStore<State> = $ReadOnly<
+  StateReader<State> & {
+    setState: (state: State) => void,
+    update: (mutation: StateMutation<State>) => void,
+  },
+>;
+
+declare export function createStateStore<State>(
+  initialState: State,
+  stateCompare?: (s1: State, s2: State) => boolean,
+): StateStore<State>;

@@ -1,0 +1,13 @@
+// @flow strict
+
+import { Observable } from 'rxjs';
+
+export type StateQuery<T> = $ReadOnly<{
+  get: () => T,
+  value$: Observable<T>,
+}>;
+
+declare export function mapStateQuery<T, R>(
+  query: StateQuery<T>,
+  mapper: (value: T) => R,
+): StateQuery<R>;

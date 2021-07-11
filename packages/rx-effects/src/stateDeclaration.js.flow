@@ -1,0 +1,16 @@
+// @flow strict
+
+import type { StateStore } from './stateStore';
+
+export type StateFactory<State: { ... }> = (values?: $Shape<State>) => State;
+
+export type StateDeclaration<State: { ... }> = {
+  +initialState: State,
+  +createState: StateFactory<State>,
+  createStore(initialState?: State): StateStore<State>,
+};
+
+declare export function declareState<State: { ... }>(
+  stateFactory: StateFactory<State>,
+  stateCompare?: (State, State) => boolean,
+): StateDeclaration<State>;

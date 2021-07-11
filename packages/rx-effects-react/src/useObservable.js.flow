@@ -1,0 +1,9 @@
+// @flow strict
+
+import { Observable } from 'rxjs';
+
+declare function useObservable<T>(
+  source$: Observable<T>,
+  initialValue: T,
+  compare?: (v1: T, v2: T) => boolean,
+): T;

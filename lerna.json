@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "hoist": "**",
+  "forceLocal": true,
+  "command": {
+    "bootstrap": {
+      "npmClientArgs": ["--save-exact"]
+    },
+    "run": {
+      "stream": true
+    },
+    "version": {
+      "allowBranch": "main",
+      "conventionalCommits": true,
+      "exact": true,
+      "message": "chore(release): publish"
+    }
+  }
+}

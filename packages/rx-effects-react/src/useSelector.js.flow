@@ -1,0 +1,10 @@
+// @flow strict
+
+import { Observable } from 'rxjs';
+
+declare export function useSelector<S, R>(
+  state$: Observable<S>,
+  initialState: S,
+  selector: (state: S) => R,
+  compare?: (v1: R, v2: R) => boolean,
+): R;
