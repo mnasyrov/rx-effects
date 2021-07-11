@@ -21,13 +21,13 @@
 #### Type parameters
 
 | Name |
-| :------ |
-| `T` |
+| :--- |
+| `T`  |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name           | Type             |
+| :------------- | :--------------- |
 | `initialValue` | () => `T` \| `T` |
 
 #### Returns
@@ -36,9 +36,9 @@
 
 #### Defined in
 
-[useConst.ts:5](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects-react/src/useConst.ts#L5)
+[useConst.ts:5](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects-react/src/useConst.ts#L5)
 
-___
+---
 
 ### useObservable
 
@@ -47,16 +47,16 @@ ___
 #### Type parameters
 
 | Name |
-| :------ |
-| `T` |
+| :--- |
+| `T`  |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `source$` | `Observable`<`T`\> |
-| `initialValue` | `T` |
-| `compare?` | (`v1`: `T`, `v2`: `T`) => `boolean` |
+| Name           | Type                                |
+| :------------- | :---------------------------------- |
+| `source$`      | `Observable`<`T`\>                  |
+| `initialValue` | `T`                                 |
+| `compare?`     | (`v1`: `T`, `v2`: `T`) => `boolean` |
 
 #### Returns
 
@@ -64,9 +64,9 @@ ___
 
 #### Defined in
 
-[useObservable.ts:4](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects-react/src/useObservable.ts#L4)
+[useObservable.ts:4](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects-react/src/useObservable.ts#L4)
 
-___
+---
 
 ### useObserver
 
@@ -75,14 +75,14 @@ ___
 #### Type parameters
 
 | Name |
-| :------ |
-| `T` |
+| :--- |
+| `T`  |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `source$` | `Observable`<`T`\> |
+| Name             | Type                                                     |
+| :--------------- | :------------------------------------------------------- |
+| `source$`        | `Observable`<`T`\>                                       |
 | `observerOrNext` | `Partial`<`Observer`<`T`\>\> \| (`value`: `T`) => `void` |
 
 #### Returns
@@ -91,9 +91,9 @@ ___
 
 #### Defined in
 
-[useObserver.ts:5](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects-react/src/useObserver.ts#L5)
+[useObserver.ts:5](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects-react/src/useObserver.ts#L5)
 
-___
+---
 
 ### useSelector
 
@@ -102,18 +102,18 @@ ___
 #### Type parameters
 
 | Name |
-| :------ |
-| `S` |
-| `R` |
+| :--- |
+| `S`  |
+| `R`  |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `state$` | `Observable`<`S`\> |
-| `initialState` | `S` |
-| `selector` | (`state`: `S`) => `R` |
-| `compare` | (`v1`: `R`, `v2`: `R`) => `boolean` |
+| Name           | Type                                |
+| :------------- | :---------------------------------- |
+| `state$`       | `Observable`<`S`\>                  |
+| `initialState` | `S`                                 |
+| `selector`     | (`state`: `S`) => `R`               |
+| `compare`      | (`v1`: `R`, `v2`: `R`) => `boolean` |
 
 #### Returns
 
@@ -121,9 +121,9 @@ ___
 
 #### Defined in
 
-[useSelector.ts:4](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects-react/src/useSelector.ts#L4)
+[useSelector.ts:4](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects-react/src/useSelector.ts#L4)
 
-___
+---
 
 ### useStateQuery
 
@@ -132,13 +132,13 @@ ___
 #### Type parameters
 
 | Name |
-| :------ |
-| `T` |
+| :--- |
+| `T`  |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name    | Type               |
+| :------ | :----------------- |
 | `query` | `StateQuery`<`T`\> |
 
 #### Returns
@@ -147,4 +147,4 @@ ___
 
 #### Defined in
 
-[useStateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects-react/src/useStateQuery.ts#L4)
+[useStateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects-react/src/useStateQuery.ts#L4)

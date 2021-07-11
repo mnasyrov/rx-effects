@@ -1,7 +1,7 @@
 {
   "name": "@rx-effects/react",
   "description": "Reactive state and effects management. Tooling for React.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "author": "Mikhail Nasyrov (https://github.com/mnasyrov)",
   "homepage": "https://github.com/mnasyrov/rx-effects",
@@ -47,7 +47,7 @@
     "watch": "rollup -c --watch"
   },
   "dependencies": {
-    "rx-effects": "0.0.1"
+    "rx-effects": "0.0.2"
   },
   "peerDependencies": {
     "react": ">=17.0.0",

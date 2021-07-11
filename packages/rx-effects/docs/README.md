@@ -39,7 +39,7 @@ rx-effects
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `Event` |
 
@@ -55,7 +55,7 @@ rx-effects
 
 ##### Parameters
 
-| Name | Type |
+| Name    | Type    |
 | :------ | :------ |
 | `event` | `Event` |
 
@@ -65,15 +65,15 @@ rx-effects
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                   |
+| :------- | :--------------------- |
 | `event$` | `Observable`<`Event`\> |
 
 #### Defined in
 
-[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/action.ts#L3)
+[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/action.ts#L3)
 
-___
+---
 
 ### Effect
 
@@ -81,17 +81,17 @@ ___
 
 #### Type parameters
 
-| Name | Type |
-| :------ | :------ |
-| `Event` | `Event` |
-| `Result` | `void` |
+| Name        | Type    |
+| :---------- | :------ |
+| `Event`     | `Event` |
+| `Result`    | `void`  |
 | `ErrorType` | `Error` |
 
 #### Defined in
 
-[effect.ts:14](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/effect.ts#L14)
+[effect.ts:14](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/effect.ts#L14)
 
-___
+---
 
 ### EffectHandler
 
@@ -99,9 +99,9 @@ ___
 
 #### Type parameters
 
-| Name |
-| :------ |
-| `Event` |
+| Name     |
+| :------- |
+| `Event`  |
 | `Result` |
 
 #### Type declaration
@@ -110,7 +110,7 @@ ___
 
 ##### Parameters
 
-| Name | Type |
+| Name    | Type    |
 | :------ | :------ |
 | `event` | `Event` |
 
@@ -120,9 +120,9 @@ ___
 
 #### Defined in
 
-[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/effect.ts#L27)
+[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/effect.ts#L27)
 
-___
+---
 
 ### EffectScope
 
@@ -130,9 +130,9 @@ ___
 
 #### Defined in
 
-[effectScope.ts:4](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/effectScope.ts#L4)
+[effectScope.ts:4](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/effectScope.ts#L4)
 
-___
+---
 
 ### StateDeclaration
 
@@ -140,23 +140,23 @@ ___
 
 #### Type parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name    | Type                                   |
+| :------ | :------------------------------------- |
 | `State` | extends `Record`<`string`, `unknown`\> |
 
 #### Type declaration
 
-| Name | Type |
-| :------ | :------ |
-| `createState` | [`StateFactory`](README.md#statefactory)<`State`\> |
-| `createStore` | (`initialState?`: `State`) => [`StateStore`](README.md#statestore)<`State`\> |
-| `initialState` | `State` |
+| Name           | Type                                                                         |
+| :------------- | :--------------------------------------------------------------------------- |
+| `createState`  | [`StateFactory`](README.md#statefactory)<`State`\>                           |
+| `createStore`  | (`initialState?`: `State`) => [`StateStore`](README.md#statestore)<`State`\> |
+| `initialState` | `State`                                                                      |
 
 #### Defined in
 
-[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateDeclaration.ts#L7)
+[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateDeclaration.ts#L7)
 
-___
+---
 
 ### StateFactory
 
@@ -164,8 +164,8 @@ ___
 
 #### Type parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name    | Type                                   |
+| :------ | :------------------------------------- |
 | `State` | extends `Record`<`string`, `unknown`\> |
 
 #### Type declaration
@@ -174,8 +174,8 @@ ___
 
 ##### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name      | Type                |
+| :-------- | :------------------ |
 | `values?` | `Partial`<`State`\> |
 
 ##### Returns
@@ -184,9 +184,9 @@ ___
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateDeclaration.ts#L3)
 
-___
+---
 
 ### StateMutation
 
@@ -194,7 +194,7 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `State` |
 
@@ -204,7 +204,7 @@ ___
 
 ##### Parameters
 
-| Name | Type |
+| Name    | Type    |
 | :------ | :------ |
 | `state` | `State` |
 
@@ -214,9 +214,9 @@ ___
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateMutation.ts#L1)
 
-___
+---
 
 ### StateQuery
 
@@ -225,44 +225,44 @@ ___
 #### Type parameters
 
 | Name |
-| :------ |
-| `T` |
+| :--- |
+| `T`  |
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateQuery.ts#L4)
 
-___
+---
 
 ### StateReader
 
-Ƭ **StateReader**<`State`\>: `Readonly`<[`StateQuery`](README.md#statequery)<`State`\> & { `query`: <R\>(`selector`: (`state`: `State`) => `R`, `compare?`: (`v1`: `R`, `v2`: `R`) => `boolean`) => [`StateQuery`](README.md#statequery)<`R`\> ; `select`: <R\>(`selector`: (`state`: `State`) => `R`, `compare?`: (`v1`: `R`, `v2`: `R`) => `boolean`) => `Observable`<`R`\>  }\>
+Ƭ **StateReader**<`State`\>: `Readonly`<[`StateQuery`](README.md#statequery)<`State`\> & { `query`: <R\>(`selector`: (`state`: `State`) => `R`, `compare?`: (`v1`: `R`, `v2`: `R`) => `boolean`) => [`StateQuery`](README.md#statequery)<`R`\> ; `select`: <R\>(`selector`: (`state`: `State`) => `R`, `compare?`: (`v1`: `R`, `v2`: `R`) => `boolean`) => `Observable`<`R`\> }\>
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `State` |
 
 #### Defined in
 
-[stateStore.ts:6](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateStore.ts#L6)
+[stateStore.ts:6](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateStore.ts#L6)
 
-___
+---
 
 ### StateStore
 
-Ƭ **StateStore**<`State`\>: `Readonly`<[`StateReader`](README.md#statereader)<`State`\> & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\>) => `void`  }\>
+Ƭ **StateStore**<`State`\>: `Readonly`<[`StateReader`](README.md#statereader)<`State`\> & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\>) => `void` }\>
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `State` |
 
 #### Defined in
 
-[stateStore.ts:19](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateStore.ts#L19)
+[stateStore.ts:19](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateStore.ts#L19)
 
 ## Functions
 
@@ -272,7 +272,7 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `Event` |
 
@@ -282,9 +282,9 @@ ___
 
 #### Defined in
 
-[action.ts:11](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/action.ts#L11)
+[action.ts:11](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/action.ts#L11)
 
-___
+---
 
 ### createEffect
 
@@ -292,18 +292,18 @@ ___
 
 #### Type parameters
 
-| Name | Type |
-| :------ | :------ |
-| `Event` | `Event` |
-| `Result` | `void` |
+| Name        | Type    |
+| :---------- | :------ |
+| `Event`     | `Event` |
+| `Result`    | `void`  |
 | `ErrorType` | `Error` |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `handler` | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\> |
-| `scopeSubscriptions?` | `Subscription` |
+| Name                  | Type                                                           |
+| :-------------------- | :------------------------------------------------------------- |
+| `handler`             | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\> |
+| `scopeSubscriptions?` | `Subscription`                                                 |
 
 #### Returns
 
@@ -311,9 +311,9 @@ ___
 
 #### Defined in
 
-[effect.ts:31](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/effect.ts#L31)
+[effect.ts:31](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/effect.ts#L31)
 
-___
+---
 
 ### createEffectScope
 
@@ -325,9 +325,9 @@ ___
 
 #### Defined in
 
-[effectScope.ts:13](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/effectScope.ts#L13)
+[effectScope.ts:13](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/effectScope.ts#L13)
 
-___
+---
 
 ### createResetStoreEffect
 
@@ -335,16 +335,16 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `State` |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `store` | [`StateStore`](README.md#statestore)<`State`\> |
-| `nextState` | `State` |
+| Name        | Type                                           |
+| :---------- | :--------------------------------------------- |
+| `store`     | [`StateStore`](README.md#statestore)<`State`\> |
+| `nextState` | `State`                                        |
 
 #### Returns
 
@@ -352,9 +352,9 @@ ___
 
 #### Defined in
 
-[stateUtils.ts:17](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateUtils.ts#L17)
+[stateUtils.ts:17](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateUtils.ts#L17)
 
-___
+---
 
 ### createStateStore
 
@@ -362,15 +362,15 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `State` |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `initialState` | `State` |
+| Name           | Type                                        |
+| :------------- | :------------------------------------------ |
+| `initialState` | `State`                                     |
 | `stateCompare` | (`s1`: `State`, `s2`: `State`) => `boolean` |
 
 #### Returns
@@ -379,9 +379,9 @@ ___
 
 #### Defined in
 
-[stateStore.ts:26](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateStore.ts#L26)
+[stateStore.ts:26](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateStore.ts#L26)
 
-___
+---
 
 ### createUpdateStoreEffect
 
@@ -389,16 +389,16 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `Event` |
 | `State` |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `store` | [`StateStore`](README.md#statestore)<`State`\> |
+| Name      | Type                                            |
+| :-------- | :---------------------------------------------- |
+| `store`   | [`StateStore`](README.md#statestore)<`State`\>  |
 | `reducer` | (`state`: `State`, `event`: `Event`) => `State` |
 
 #### Returns
@@ -407,9 +407,9 @@ ___
 
 #### Defined in
 
-[stateUtils.ts:8](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateUtils.ts#L8)
+[stateUtils.ts:8](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateUtils.ts#L8)
 
-___
+---
 
 ### declareState
 
@@ -417,16 +417,16 @@ ___
 
 #### Type parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name    | Type                                   |
+| :------ | :------------------------------------- |
 | `State` | extends `Record`<`string`, `unknown`\> |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `stateFactory` | [`StateFactory`](README.md#statefactory)<`State`\> |
-| `stateCompare?` | (`s1`: `State`, `s2`: `State`) => `boolean` |
+| Name            | Type                                               |
+| :-------------- | :------------------------------------------------- |
+| `stateFactory`  | [`StateFactory`](README.md#statefactory)<`State`\> |
+| `stateCompare?` | (`s1`: `State`, `s2`: `State`) => `boolean`        |
 
 #### Returns
 
@@ -434,9 +434,9 @@ ___
 
 #### Defined in
 
-[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateDeclaration.ts#L13)
+[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateDeclaration.ts#L13)
 
-___
+---
 
 ### mapStateQuery
 
@@ -445,16 +445,16 @@ ___
 #### Type parameters
 
 | Name |
-| :------ |
-| `T` |
-| `R` |
+| :--- |
+| `T`  |
+| `R`  |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `query` | [`StateQuery`](README.md#statequery)<`T`\> |
-| `mapper` | (`value`: `T`) => `R` |
+| Name     | Type                                       |
+| :------- | :----------------------------------------- |
+| `query`  | [`StateQuery`](README.md#statequery)<`T`\> |
+| `mapper` | (`value`: `T`) => `R`                      |
 
 #### Returns
 
@@ -462,9 +462,9 @@ ___
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateQuery.ts#L9)
 
-___
+---
 
 ### pipeStateMutations
 
@@ -472,14 +472,14 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `State` |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name        | Type                                                   |
+| :---------- | :----------------------------------------------------- |
 | `mutations` | [`StateMutation`](README.md#statemutation)<`State`\>[] |
 
 #### Returns
@@ -488,9 +488,9 @@ ___
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateMutation.ts#L3)
 
-___
+---
 
 ### withQuery
 
@@ -498,17 +498,17 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `Event` |
 | `Value` |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                                                             |
+| :------- | :--------------------------------------------------------------- |
 | `action` | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> |
-| `query` | [`StateQuery`](README.md#statequery)<`Value`\> |
+| `query`  | [`StateQuery`](README.md#statequery)<`Value`\>                   |
 
 #### Returns
 
@@ -516,9 +516,9 @@ ___
 
 #### Defined in
 
-[stateUtils.ts:33](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateUtils.ts#L33)
+[stateUtils.ts:33](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateUtils.ts#L33)
 
-___
+---
 
 ### withStore
 
@@ -526,17 +526,17 @@ ___
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `Event` |
 | `State` |
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Name     | Type                                                             |
+| :------- | :--------------------------------------------------------------- |
 | `action` | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> |
-| `store` | [`StateStore`](README.md#statestore)<`State`\> |
+| `store`  | [`StateStore`](README.md#statestore)<`State`\>                   |
 
 #### Returns
 
@@ -544,4 +544,4 @@ ___
 
 #### Defined in
 
-[stateUtils.ts:24](https://github.com/mnasyrov/rx-effects/blob/6dcd67c/packages/rx-effects/src/stateUtils.ts#L24)
+[stateUtils.ts:24](https://github.com/mnasyrov/rx-effects/blob/146e6a7/packages/rx-effects/src/stateUtils.ts#L24)
