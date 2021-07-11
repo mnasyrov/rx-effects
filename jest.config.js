@@ -6,7 +6,7 @@ import fastGlob from 'fast-glob';
 
 const typescript = {
   displayName: 'Typescript',
-  roots: fastGlob.sync(['packages/*/src'], {onlyDirectories: true}),
+  roots: fastGlob.sync(['packages/*/src'], { onlyDirectories: true }),
   preset: 'ts-jest',
   globals: {
     'ts-jest': {
@@ -18,11 +18,6 @@ const typescript = {
   },
 };
 
-const flow = {
-  displayName: 'Flow',
-  roots: fastGlob.sync(['packages/*/test-flow'], {onlyDirectories: true}),
-};
-
 export default {
-  projects: [typescript, flow],
+  projects: [typescript],
 };

@@ -1,4 +1,5 @@
 {
+  "exclude": ["**/mod.ts"],
   "compilerOptions": {
     "noEmit": true,
     "target": "ES2019",

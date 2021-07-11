@@ -1,3 +1,0 @@
-// @flow strict
-
-declare export function useConst<T>(initialValue: (() => T) | T): T;

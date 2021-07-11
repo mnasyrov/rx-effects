@@ -46,15 +46,15 @@ type StateStore<State> = Readonly<StateReader<State> & {
     update: (mutation: StateMutation<State>) => void;
 }>;
 declare function createStateStore<State>(initialState: State, stateCompare?: (s1: State, s2: State) => boolean): StateStore<State>;
-type StateFactory<State extends object> = (values?: Partial<State>) => State;
-type StateDeclaration<State extends object> = {
+type StateFactory<State extends Record<string, unknown>> = (values?: Partial<State>) => State;
+type StateDeclaration<State extends Record<string, unknown>> = {
     initialState: State;
     createState: StateFactory<State>;
     createStore: (initialState?: State) => StateStore<State>;
 };
-declare function declareState<State extends object>(stateFactory: StateFactory<State>, stateCompare?: (s1: State, s2: State) => boolean): StateDeclaration<State>;
+declare function declareState<State extends Record<string, unknown>>(stateFactory: StateFactory<State>, stateCompare?: (s1: State, s2: State) => boolean): StateDeclaration<State>;
 declare function createUpdateStoreEffect<Event, State>(store: StateStore<State>, reducer: (state: State, event: Event) => State): Effect<Event>;
-declare function createResetStoreEffect<State>(store: StateStore<State>, nextState: State): Effect<void>;
+declare function createResetStoreEffect<State>(store: StateStore<State>, nextState: State): Effect<unknown>;
 declare function withStore<Event, State>(action: Observable<Event> | Action<Event>, store: StateStore<State>): Observable<[
     Event,
     State

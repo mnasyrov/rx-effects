@@ -1,5 +1,0 @@
-// @flow strict
-
-import { StateQuery } from 'rx-effects';
-
-declare export function useStateQuery<T>(query: StateQuery<T>): T;

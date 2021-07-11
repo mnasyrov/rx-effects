@@ -1,8 +1,0 @@
-// @flow strict
-
-import { Observable, Observer, Subscription } from 'rxjs';
-
-declare export function useObserver<T>(
-  source$: Observable<T>,
-  observerOrNext: $Shape<Observer<T>> | ((value: T) => void),
-): Subscription;
