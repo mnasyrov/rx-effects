@@ -14,7 +14,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "import", "jest", "react-hooks", "eslint-comments"],
-  "ignorePatterns": ["*.js.flow"],
+  "ignorePatterns": ["*.js.flow", "**/test-deno/*" ,"**/test-flow/*"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off"
   }

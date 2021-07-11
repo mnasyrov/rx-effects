@@ -17,7 +17,7 @@ export function createUpdateStoreEffect<Event, State>(
 export function createResetStoreEffect<State>(
   store: StateStore<State>,
   nextState: State,
-): Effect<void> {
+): Effect<unknown> {
   return createEffect(() => store.set(nextState));
 }
 

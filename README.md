@@ -14,7 +14,7 @@ Reactive state and effects management. Leverages RxJS.
 
 `// TODO: Documentation`
 
-Inspired by MVC, RxJS, [Akita](https://github.com/datorama/akita) and [Effector](https://github.com/effector/effector). 
+Inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [RxJS](https://github.com/ReactiveX/rxjs), [Akita](https://github.com/datorama/akita) and [Effector](https://github.com/effector/effector). 
 
 
 ## License

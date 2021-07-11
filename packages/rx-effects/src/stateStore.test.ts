@@ -1,6 +1,6 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen } from 'rxjs/operators';
-import { createStateStore, StateStore } from './stateStore';
+import { createStateStore } from './stateStore';
 
 describe('StateStore', () => {
   type State = { value: number; data?: string };

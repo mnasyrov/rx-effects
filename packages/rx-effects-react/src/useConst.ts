@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 import { useRef } from 'react';
 
 export function useConst<T>(initialValue: (() => T) | T): T {

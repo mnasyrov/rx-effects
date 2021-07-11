@@ -10,6 +10,7 @@ export function useObserver<T>(
 
   useEffect(() => {
     if (!hookSubscriptions.closed) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore: subscribe cannot infer the right type.
       const subscription = source$.subscribe(observerOrNext);
       hookSubscriptions.add(subscription);
