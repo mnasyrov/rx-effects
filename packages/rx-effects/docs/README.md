@@ -71,7 +71,7 @@ rx-effects
 
 #### Defined in
 
-[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/action.ts#L3)
+[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/action.ts#L3)
 
 ---
 
@@ -89,7 +89,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:14](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/effect.ts#L14)
+[effect.ts:14](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/effect.ts#L14)
 
 ---
 
@@ -120,7 +120,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/effect.ts#L27)
+[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
@@ -130,7 +130,7 @@ rx-effects
 
 #### Defined in
 
-[effectScope.ts:4](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/effectScope.ts#L4)
+[effectScope.ts:4](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/effectScope.ts#L4)
 
 ---
 
@@ -154,7 +154,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateDeclaration.ts#L7)
+[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateDeclaration.ts#L7)
 
 ---
 
@@ -184,7 +184,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateDeclaration.ts#L3)
 
 ---
 
@@ -214,7 +214,7 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateMutation.ts#L1)
 
 ---
 
@@ -230,7 +230,7 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateQuery.ts#L4)
 
 ---
 
@@ -246,7 +246,7 @@ rx-effects
 
 #### Defined in
 
-[stateStore.ts:6](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateStore.ts#L6)
+[stateStore.ts:6](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateStore.ts#L6)
 
 ---
 
@@ -262,7 +262,7 @@ rx-effects
 
 #### Defined in
 
-[stateStore.ts:19](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateStore.ts#L19)
+[stateStore.ts:19](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateStore.ts#L19)
 
 ## Functions
 
@@ -282,7 +282,7 @@ rx-effects
 
 #### Defined in
 
-[action.ts:11](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/action.ts#L11)
+[action.ts:11](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/action.ts#L11)
 
 ---
 
@@ -311,7 +311,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:31](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/effect.ts#L31)
+[effect.ts:31](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/effect.ts#L31)
 
 ---
 
@@ -325,7 +325,7 @@ rx-effects
 
 #### Defined in
 
-[effectScope.ts:13](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/effectScope.ts#L13)
+[effectScope.ts:13](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/effectScope.ts#L13)
 
 ---
 
@@ -352,7 +352,7 @@ rx-effects
 
 #### Defined in
 
-[stateUtils.ts:17](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateUtils.ts#L17)
+[stateUtils.ts:17](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateUtils.ts#L17)
 
 ---
 
@@ -379,7 +379,7 @@ rx-effects
 
 #### Defined in
 
-[stateStore.ts:26](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateStore.ts#L26)
+[stateStore.ts:26](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateStore.ts#L26)
 
 ---
 
@@ -407,7 +407,7 @@ rx-effects
 
 #### Defined in
 
-[stateUtils.ts:8](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateUtils.ts#L8)
+[stateUtils.ts:8](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateUtils.ts#L8)
 
 ---
 
@@ -434,7 +434,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateDeclaration.ts#L13)
+[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateDeclaration.ts#L13)
 
 ---
 
@@ -462,7 +462,7 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -488,7 +488,7 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateMutation.ts#L3)
 
 ---
 
@@ -516,7 +516,7 @@ rx-effects
 
 #### Defined in
 
-[stateUtils.ts:33](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateUtils.ts#L33)
+[stateUtils.ts:33](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateUtils.ts#L33)
 
 ---
 
@@ -544,4 +544,4 @@ rx-effects
 
 #### Defined in
 
-[stateUtils.ts:24](https://github.com/mnasyrov/rx-effects/blob/62ed420/packages/rx-effects/src/stateUtils.ts#L24)
+[stateUtils.ts:24](https://github.com/mnasyrov/rx-effects/blob/a036049/packages/rx-effects/src/stateUtils.ts#L24)
