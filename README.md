@@ -2,7 +2,7 @@
 
 <img alt="rocket" src="rocket.svg" width="120" />
 
-Reactive state and effects management. Leverages RxJS.
+Reactive state and effects management with RxJS.
 
 [![npm](https://img.shields.io/npm/v/rx-effects.svg)](https://www.npmjs.com/package/rx-effects)
 [![downloads](https://img.shields.io/npm/dt/rx-effects.svg)](https://www.npmjs.com/package/rx-effects)
@@ -14,8 +14,7 @@ Reactive state and effects management. Leverages RxJS.
 
 `// TODO: Documentation`
 
-Inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [RxJS](https://github.com/ReactiveX/rxjs), [Akita](https://github.com/datorama/akita) and [Effector](https://github.com/effector/effector). 
-
+Inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [RxJS](https://github.com/ReactiveX/rxjs), [Akita](https://github.com/datorama/akita) and [Effector](https://github.com/effector/effector).
 
 ## License
 

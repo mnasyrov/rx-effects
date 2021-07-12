@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@rx-effects/root",
+  "name": "rx-effects-root",
   "version": "0.0.1",
   "license": "MIT",
   "author": "Mikhail Nasyrov (https://github.com/mnasyrov)",

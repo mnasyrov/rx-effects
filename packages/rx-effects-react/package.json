@@ -1,10 +1,7 @@
 {
-  "name": "@rx-effects/react",
+  "name": "rx-effects-react",
   "version": "0.0.5",
   "description": "Reactive state and effects management. Tooling for React.js",
-  "publishConfig": {
-    "access": "public"
-  },
   "license": "MIT",
   "author": "Mikhail Nasyrov (https://github.com/mnasyrov)",
   "homepage": "https://github.com/mnasyrov/rx-effects",
