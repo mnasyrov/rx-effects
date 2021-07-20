@@ -11,24 +11,24 @@ import { Action } from './action';
 import { StateQuery } from './stateQuery';
 import { createStateStore } from './stateStore';
 
-export type Effect<Event, Result = void, ErrorType = Error> = Readonly<{
-  result$: Observable<Result>;
-  done$: Observable<{ event: Event; result: Result }>;
-  error$: Observable<{ event: Event; error: ErrorType }>;
-  final$: Observable<Event>;
-  pending: StateQuery<boolean>;
-  pendingCount: StateQuery<number>;
+export type Effect<Event, Result = void, ErrorType = Error> = {
+  readonly result$: Observable<Result>;
+  readonly done$: Observable<{ event: Event; result: Result }>;
+  readonly error$: Observable<{ event: Event; error: ErrorType }>;
+  readonly final$: Observable<Event>;
+  readonly pending: StateQuery<boolean>;
+  readonly pendingCount: StateQuery<number>;
 
-  handle: ((event$: Observable<Event>) => Subscription) &
+  readonly handle: ((event$: Observable<Event>) => Subscription) &
     ((action: Action<Event>) => Subscription);
-  destroy: () => void;
-}>;
+  readonly destroy: () => void;
+};
 
 export type EffectHandler<Event, Result> = (
   event: Event,
 ) => Result | Promise<Result> | Observable<Result>;
 
-export function createEffect<Event, Result = void, ErrorType = Error>(
+export function createEffect<Event = void, Result = void, ErrorType = Error>(
   handler: EffectHandler<Event, Result>,
   scopeSubscriptions?: Subscription,
 ): Effect<Event, Result, ErrorType> {
@@ -79,16 +79,14 @@ export function createEffect<Event, Result = void, ErrorType = Error>(
     try {
       const handlerResult = handler(event);
 
-      if (handlerResult) {
-        if ('then' in handlerResult) {
-          executePromise(event, handlerResult);
-          return;
-        }
+      if (handlerResult instanceof Promise) {
+        executePromise(event, handlerResult);
+        return;
+      }
 
-        if (handlerResult instanceof Observable) {
-          executeObservable(event, handlerResult);
-          return;
-        }
+      if (handlerResult instanceof Observable) {
+        executeObservable(event, handlerResult);
+        return;
       }
 
       pendingCount.update(decreaseCount);
@@ -112,7 +110,9 @@ export function createEffect<Event, Result = void, ErrorType = Error>(
   };
 
   function handle(source: Observable<Event> | Action<Event>): Subscription {
-    const observable = source instanceof Observable ? source : source.event$;
+    const observable = (
+      source instanceof Observable ? source : source.event$
+    ) as Observable<Event>;
 
     const subscription = observable.subscribe(observer);
     subscriptions.add(subscription);

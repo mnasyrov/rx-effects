@@ -1,6 +1,6 @@
 import { firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
-import { createAction, Action } from './action';
+import { Action, createAction } from './action';
 import { Effect } from './effect';
 import { createEffectScope, EffectScope } from './effectScope';
 import { declareState, StateDeclaration } from './stateDeclaration';
@@ -26,22 +26,23 @@ function createCalculatorEffects(
   scope: EffectScope,
   store: CalculatorStore,
 ): {
-  incrementEffect: Effect<unknown>;
+  incrementEffect: Effect<void>;
+  decrementEffect: Effect<void>;
   sumEffect: Effect<number>;
-  decrementEffect: Effect<unknown>;
-  subtractEffect: Effect<number>;
-  resetEffect: Effect<unknown>;
+  subtractEffect: Effect<number, number>;
+  resetEffect: Effect<void>;
 } {
   const incrementEffect = scope.createEffect(() => store.update(addValue(1)));
   const decrementEffect = scope.createEffect(() => store.update(addValue(-1)));
 
-  const sumEffect = scope.createEffect<number>((value) =>
+  const sumEffect = scope.createEffect((value: number) =>
     store.update(addValue(value)),
   );
 
-  const subtractEffect = scope.createEffect<number>((value) =>
-    store.update(addValue(-value)),
-  );
+  const subtractEffect = scope.createEffect((value: number) => {
+    store.update(addValue(-value));
+    return -value;
+  });
 
   const resetEffect = createResetStoreEffect(
     store,
@@ -77,11 +78,11 @@ function createCalculatorController(
 } {
   const scope = createEffectScope();
 
-  const incrementAction = createAction();
-  const decrementAction = createAction();
+  const incrementAction = createAction<void>();
+  const decrementAction = createAction<void>();
   const sumAction = createAction<number>();
   const subtractAction = createAction<number>();
-  const resetAction = createAction();
+  const resetAction = createAction<void>();
 
   const {
     incrementEffect,

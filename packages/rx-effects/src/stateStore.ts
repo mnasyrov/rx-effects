@@ -3,25 +3,22 @@ import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 import { StateMutation } from './stateMutation';
 import { StateQuery } from './stateQuery';
 
-export type StateReader<State> = Readonly<
-  StateQuery<State> & {
-    select: <R>(
-      selector: (state: State) => R,
-      compare?: (v1: R, v2: R) => boolean,
-    ) => Observable<R>;
-    query: <R>(
-      selector: (state: State) => R,
-      compare?: (v1: R, v2: R) => boolean,
-    ) => StateQuery<R>;
-  }
->;
+export type StateReader<State> = StateQuery<State> & {
+  readonly select: <R>(
+    selector: (state: State) => R,
+    compare?: (v1: R, v2: R) => boolean,
+  ) => Observable<R>;
 
-export type StateStore<State> = Readonly<
-  StateReader<State> & {
-    set: (state: State) => void;
-    update: (mutation: StateMutation<State>) => void;
-  }
->;
+  readonly query: <R>(
+    selector: (state: State) => R,
+    compare?: (v1: R, v2: R) => boolean,
+  ) => StateQuery<R>;
+};
+
+export type StateStore<State> = StateReader<State> & {
+  readonly set: (state: State) => void;
+  readonly update: (mutation: StateMutation<State>) => void;
+};
 
 export function createStateStore<State>(
   initialState: State,
