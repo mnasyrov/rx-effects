@@ -1,15 +1,13 @@
-import {
-  identity,
-  merge,
-  Observable,
-  Observer,
-  Subject,
-  Subscription,
-} from 'rxjs';
+import { from, identity, merge, Observable, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Action } from './action';
 import { StateQuery } from './stateQuery';
 import { createStateStore } from './stateStore';
+
+export type HandlerOptions<ErrorType = Error> = {
+  onSourceCompleted?: () => void;
+  onSourceFailed?: (error: ErrorType) => void;
+};
 
 export type Effect<Event, Result = void, ErrorType = Error> = {
   readonly result$: Observable<Result>;
@@ -19,8 +17,15 @@ export type Effect<Event, Result = void, ErrorType = Error> = {
   readonly pending: StateQuery<boolean>;
   readonly pendingCount: StateQuery<number>;
 
-  readonly handle: ((event$: Observable<Event>) => Subscription) &
-    ((action: Action<Event>) => Subscription);
+  readonly handle: ((
+    action: Action<Event>,
+    options?: undefined,
+  ) => Subscription) &
+    ((
+      source$: Observable<Event>,
+      options?: HandlerOptions<ErrorType>,
+    ) => Subscription);
+
   readonly destroy: () => void;
 };
 
@@ -45,47 +50,17 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
   const increaseCount = (count: number): number => count + 1;
   const decreaseCount = (count: number): number => count - 1;
 
-  function executePromise(event: Event, promise: Promise<Result>): void {
-    promise
-      .then((result) => {
-        pendingCount.update(decreaseCount);
-        done$.next({ event, result });
-      })
-      .catch((error) => {
-        pendingCount.update(decreaseCount);
-        error$.next({ event, error });
-      });
-  }
-
-  function executeObservable(
-    event: Event,
-    observable: Observable<Result>,
-  ): void {
-    observable.subscribe({
-      next: (result) => {
-        pendingCount.update(decreaseCount);
-        done$.next({ event, result });
-      },
-      error: (error) => {
-        pendingCount.update(decreaseCount);
-        error$.next({ event, error });
-      },
-    });
-  }
-
-  function execute(event: Event): void {
+  function applyHandler(event: Event): void {
     pendingCount.update(increaseCount);
 
     try {
       const handlerResult = handler(event);
 
-      if (handlerResult instanceof Promise) {
-        executePromise(event, handlerResult);
-        return;
-      }
-
-      if (handlerResult instanceof Observable) {
-        executeObservable(event, handlerResult);
+      if (
+        handlerResult instanceof Promise ||
+        handlerResult instanceof Observable
+      ) {
+        subscriptions.add(executeObservable(event, from(handlerResult)));
         return;
       }
 
@@ -97,24 +72,37 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
     }
   }
 
-  const observer: Observer<Event> = {
-    next: (event) => execute(event),
-    error: (error) => {
-      done$.error(error);
-      error$.error(error);
-    },
-    complete: () => {
-      done$.complete();
-      error$.complete();
-    },
-  };
+  function executeObservable(
+    event: Event,
+    observable: Observable<Result>,
+  ): Subscription {
+    return observable.subscribe({
+      next: (result) => {
+        done$.next({ event, result });
+      },
+      complete: () => {
+        pendingCount.update(decreaseCount);
+      },
+      error: (error) => {
+        pendingCount.update(decreaseCount);
+        error$.next({ event, error });
+      },
+    });
+  }
 
-  function handle(source: Observable<Event> | Action<Event>): Subscription {
+  function handle<SourceErrorType = Error>(
+    source: Observable<Event> | Action<Event>,
+    options?: HandlerOptions<SourceErrorType>,
+  ): Subscription {
     const observable = (
       source instanceof Observable ? source : source.event$
     ) as Observable<Event>;
 
-    const subscription = observable.subscribe(observer);
+    const subscription = observable.subscribe({
+      next: (event) => applyHandler(event),
+      error: (error) => options?.onSourceFailed?.(error),
+      complete: () => options?.onSourceCompleted?.(),
+    });
     subscriptions.add(subscription);
 
     return subscription;

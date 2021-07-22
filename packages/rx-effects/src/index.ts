@@ -5,4 +5,4 @@ export * from './stateDeclaration';
 export * from './stateMutation';
 export * from './stateQuery';
 export * from './stateStore';
-export * from './stateUtils';
+export * from './stateEffects';

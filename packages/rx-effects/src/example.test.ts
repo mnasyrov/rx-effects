@@ -6,7 +6,7 @@ import { createEffectScope, EffectScope } from './effectScope';
 import { declareState, StateDeclaration } from './stateDeclaration';
 import { StateMutation } from './stateMutation';
 import { StateStore } from './stateStore';
-import { createResetStoreEffect } from './stateUtils';
+import { createResetStoreEffect } from './stateEffects';
 
 // Example usage of RxEffects: a calculator which has actions: increment,
 // decrement, add, subtract and reset.
