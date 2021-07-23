@@ -74,4 +74,24 @@ describe('useObserver()', () => {
     expect(listener).toBeCalledWith(1);
     expect(result.current.closed).toBe(true);
   });
+
+  it("should not subscribe a new observer in case hook's subscription was unsubscribed", () => {
+    const source$ = new BehaviorSubject(1);
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+
+    const { result, rerender } = renderHook(
+      ({ listener }) => useObserver(source$, listener),
+      { initialProps: { listener: listener1 } },
+    );
+
+    result.current.unsubscribe();
+    rerender({ listener: listener2 });
+    source$.next(2);
+
+    expect(listener1).toBeCalledTimes(1);
+    expect(listener1).toBeCalledWith(1);
+
+    expect(listener2).toBeCalledTimes(0);
+  });
 });
