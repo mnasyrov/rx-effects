@@ -35,15 +35,13 @@
   "files": [
     "dist",
     "docs",
-    "lib",
     "src",
     "LICENSE",
     "mod.ts",
     "README.md"
   ],
   "scripts": {
-    "clean": "shx rm -rf dist lib",
-    "test-deno": "deno test test-deno",
+    "clean": "shx rm -rf dist",
     "build": "rollup -c",
     "watch": "rollup -c --watch"
   },

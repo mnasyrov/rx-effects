@@ -20,7 +20,6 @@
     "lint:eslint": "eslint \"packages/*/{src,test*}/**\"",
     "lint:tsc": "tsc --noEmit --jsx react",
     "test": "jest",
-    "test-deno": "lerna run test-deno",
     "build": "lerna run build",
     "watch": "lerna run --parallel watch",
     "docs": "node scripts/docs.js",

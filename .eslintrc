@@ -32,12 +32,6 @@
         "plugin:react-hooks/recommended",
         "prettier"
       ]
-    },
-    {
-      "files": ["**/test-deno/*"],
-      "rules": {
-        "import/no-unresolved": "off"
-      }
     }
   ]
 }
