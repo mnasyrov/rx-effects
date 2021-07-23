@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.7](https://github.com/mnasyrov/rx-effects/compare/v0.0.6...v0.0.7) (2021-07-23)
+
+### Bug Fixes
+
+- Types for actions and effects ([49235fe](https://github.com/mnasyrov/rx-effects/commit/49235fe80728a3803a16251d4c163f002b4bb29f))
+
 ## [0.0.6](https://github.com/mnasyrov/rx-effects/compare/v0.0.5...v0.0.6) (2021-07-12)
 
 **Note:** Version bump only for package rx-effects-root
