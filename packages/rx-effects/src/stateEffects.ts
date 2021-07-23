@@ -5,7 +5,7 @@ import { createEffect, Effect } from './effect';
 import { StateQuery } from './stateQuery';
 import { StateStore } from './stateStore';
 
-export function createUpdateStoreEffect<Event, State>(
+export function createReduceStoreEffect<Event, State>(
   store: StateStore<State>,
   reducer: (state: State, event: Event) => State,
 ): Effect<Event> {
