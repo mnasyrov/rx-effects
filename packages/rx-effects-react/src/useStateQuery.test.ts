@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/react-hooks';
-import { createStateStore, StateQuery } from 'rx-effects';
+import { createStore, StateQuery } from 'rx-effects';
 import { monitorSubscriptionCount } from './test/testUtils';
 import { useStateQuery } from './useStateQuery';
 
 describe('useStateQuery()', () => {
   it('should render with a current value and watch for value changes', () => {
-    const store = createStateStore(1);
+    const store = createStore(1);
     let subscriptionCount = 0;
 
     const query: StateQuery<number> = {

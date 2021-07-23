@@ -1,5 +1,5 @@
 import { pipeStateMutations, StateMutation } from './stateMutation';
-import { createStateStore, StateStore } from './stateStore';
+import { createStore, Store } from './store';
 
 describe('pipeStateMutations()', () => {
   type State = { value: number };
@@ -11,7 +11,7 @@ describe('pipeStateMutations()', () => {
       (state) => ({ value: state.value * 2 }),
     ]);
 
-    const store: StateStore<State> = createStateStore<State>({ value: 0 });
+    const store: Store<State> = createStore<State>({ value: 0 });
     store.update(composedMutation);
     expect(store.get().value).toBe(22);
   });

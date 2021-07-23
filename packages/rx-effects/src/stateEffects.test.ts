@@ -6,13 +6,13 @@ import {
   withQuery,
   withStore,
 } from './stateEffects';
-import { createStateStore } from './stateStore';
+import { createStore } from './store';
 
 describe('createReduceStoreEffect()', () => {
   it('should create an effect which reduce the store with a handled event', () => {
     type Actions = 'increase' | 'decrease';
 
-    const store = createStateStore<number>(0);
+    const store = createStore<number>(0);
 
     const reducerEffect = createReduceStoreEffect<Actions, number>(
       store,
@@ -44,7 +44,7 @@ describe('createReduceStoreEffect()', () => {
 
 describe('createResetStoreEffect()', () => {
   it('should create an effect which resets the store by an event', () => {
-    const store = createStateStore<number>(0);
+    const store = createStore<number>(0);
 
     const action = createAction();
     createResetStoreEffect(store, 0).handle(action);
@@ -59,7 +59,7 @@ describe('createResetStoreEffect()', () => {
 
 describe('withStore()', () => {
   it('should create an effect which passes an event and currnt state to the handler', () => {
-    const store = createStateStore<number>(0);
+    const store = createStore<number>(0);
     const sumAction = createAction<number>();
 
     const sumEffect = createEffect<[number, number]>(([arg, value]) =>
@@ -77,7 +77,7 @@ describe('withStore()', () => {
 
 describe('withQuery()', () => {
   it('should create an effect which passes an event and currnt state to the handler', () => {
-    const store = createStateStore({ value: 0 });
+    const store = createStore({ value: 0 });
     const sumAction = createAction<number>();
 
     const sumEffect = createEffect<[number, number]>(([arg, prevValue]) =>

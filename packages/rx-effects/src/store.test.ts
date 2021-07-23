@@ -1,18 +1,18 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen } from 'rxjs/operators';
-import { createStateStore } from './stateStore';
+import { createStore } from './store';
 
-describe('StateStore', () => {
+describe('Store', () => {
   type State = { value: number; data?: string };
 
   describe('createStateStore()', () => {
     it('should create a store with the provided initial state', () => {
-      const store = createStateStore<State>({ value: 1 });
+      const store = createStore<State>({ value: 1 });
       expect(store.get().value).toBe(1);
     });
 
     it('should use a custom "stateCompare" predicate', async () => {
-      const store = createStateStore<State>(
+      const store = createStore<State>(
         { value: 1, data: 'a' },
         (s1, s2) => s1.value === s2.value,
       );
@@ -31,7 +31,7 @@ describe('StateStore', () => {
 
   describe('state$', () => {
     it('should return an observable for the current state and its further changes', async () => {
-      const store = createStateStore<State>({ value: 1 });
+      const store = createStore<State>({ value: 1 });
 
       const changes = await collectChanges(store.value$, () => {
         store.set({ value: 2 });
@@ -44,14 +44,14 @@ describe('StateStore', () => {
 
   describe('get()', () => {
     it('should return a current state of the store', () => {
-      const store = createStateStore<State>({ value: 1 });
+      const store = createStore<State>({ value: 1 });
       expect(store.get()).toEqual({ value: 1 });
     });
   });
 
   describe('set()', () => {
     it('should set a new state to the store', () => {
-      const store = createStateStore<State>({ value: 1 });
+      const store = createStore<State>({ value: 1 });
       store.set({ value: 2 });
       expect(store.get()).toEqual({ value: 2 });
     });
@@ -59,7 +59,7 @@ describe('StateStore', () => {
 
   describe('update()', () => {
     it('should apply a mutation to the store', () => {
-      const store = createStateStore<State>({ value: 1 });
+      const store = createStore<State>({ value: 1 });
       store.update((state) => ({ value: state.value + 10 }));
       expect(store.get()).toEqual({ value: 11 });
     });
@@ -67,7 +67,7 @@ describe('StateStore', () => {
 
   describe('select()', () => {
     it('should return an observable for the selected value and its further changes', async () => {
-      const store = createStateStore<State>({ value: 1 });
+      const store = createStore<State>({ value: 1 });
       const value$ = store.select((state) => state.value);
 
       const changes = await collectChanges(value$, () => {
@@ -79,7 +79,7 @@ describe('StateStore', () => {
     });
 
     it('should use the provided valueCompare', async () => {
-      const store = createStateStore<State>({ value: 1, data: 'a,1' });
+      const store = createStore<State>({ value: 1, data: 'a,1' });
       const data$ = store.select(
         (state) => state.data,
         (v1, v2) => (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],
@@ -96,7 +96,7 @@ describe('StateStore', () => {
 
   describe('query()', () => {
     it('should return a query for the selected value of the state', async () => {
-      const store = createStateStore<State>({ value: 1 });
+      const store = createStore<State>({ value: 1 });
 
       const query = store.query((state) => state.value);
       expect(query.get()).toEqual(1);
@@ -111,7 +111,7 @@ describe('StateStore', () => {
     });
 
     it('should use the provided valueCompare', async () => {
-      const store = createStateStore<State>({ value: 1, data: 'a,1' });
+      const store = createStore<State>({ value: 1, data: 'a,1' });
       const query = store.query(
         (state) => state.data,
         (v1, v2) => (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],

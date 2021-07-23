@@ -3,10 +3,10 @@ import { withLatestFrom } from 'rxjs/operators';
 import { Action } from './action';
 import { createEffect, Effect } from './effect';
 import { StateQuery } from './stateQuery';
-import { StateStore } from './stateStore';
+import { Store } from './store';
 
 export function createReduceStoreEffect<Event, State>(
-  store: StateStore<State>,
+  store: Store<State>,
   reducer: (state: State, event: Event) => State,
 ): Effect<Event> {
   return createEffect((event) =>
@@ -15,7 +15,7 @@ export function createReduceStoreEffect<Event, State>(
 }
 
 export function createResetStoreEffect<State>(
-  store: StateStore<State>,
+  store: Store<State>,
   nextState: State,
 ): Effect<void> {
   return createEffect(() => store.set(nextState));
@@ -23,7 +23,7 @@ export function createResetStoreEffect<State>(
 
 export function withStore<Event, State>(
   action: Observable<Event> | Action<Event>,
-  store: StateStore<State>,
+  store: Store<State>,
 ): Observable<[Event, State]> {
   const observable = action instanceof Observable ? action : action.event$;
 

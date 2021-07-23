@@ -5,7 +5,7 @@ import { Effect } from './effect';
 import { createEffectScope, EffectScope } from './effectScope';
 import { declareState, StateDeclaration } from './stateDeclaration';
 import { StateMutation } from './stateMutation';
-import { StateStore } from './stateStore';
+import { Store } from './store';
 import { createResetStoreEffect } from './stateEffects';
 
 // Example usage of RxEffects: a calculator which has actions: increment,
@@ -13,7 +13,7 @@ import { createResetStoreEffect } from './stateEffects';
 
 type CalculatorState = { value: number };
 type CalculatorStateMutation = StateMutation<CalculatorState>;
-type CalculatorStore = StateStore<CalculatorState>;
+type CalculatorStore = Store<CalculatorState>;
 
 const CALCULATOR_STATE: StateDeclaration<CalculatorState> = declareState(
   () => ({ value: 0 }),

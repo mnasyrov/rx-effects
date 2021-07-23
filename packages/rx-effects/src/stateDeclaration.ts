@@ -1,4 +1,4 @@
-import { createStateStore, StateStore } from './stateStore';
+import { createStore, Store } from './store';
 
 export type StateFactory<State extends Record<string, unknown>> = (
   values?: Partial<State>,
@@ -7,7 +7,7 @@ export type StateFactory<State extends Record<string, unknown>> = (
 export type StateDeclaration<State extends Record<string, unknown>> = {
   initialState: State;
   createState: StateFactory<State>;
-  createStore: (initialState?: State) => StateStore<State>;
+  createStore: (initialState?: State) => Store<State>;
 };
 
 export function declareState<State extends Record<string, unknown>>(
@@ -15,8 +15,8 @@ export function declareState<State extends Record<string, unknown>>(
   stateCompare?: (s1: State, s2: State) => boolean,
 ): StateDeclaration<State> {
   const initialState = stateFactory();
-  const storeFactory = (state: State = initialState): StateStore<State> =>
-    createStateStore(state, stateCompare);
+  const storeFactory = (state: State = initialState): Store<State> =>
+    createStore(state, stateCompare);
 
   return {
     initialState,

@@ -15,15 +15,15 @@ export type StateReader<State> = StateQuery<State> & {
   ) => StateQuery<R>;
 };
 
-export type StateStore<State> = StateReader<State> & {
+export type Store<State> = StateReader<State> & {
   readonly set: (state: State) => void;
   readonly update: (mutation: StateMutation<State>) => void;
 };
 
-export function createStateStore<State>(
+export function createStore<State>(
   initialState: State,
   stateCompare: (s1: State, s2: State) => boolean = Object.is,
-): StateStore<State> {
+): Store<State> {
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
   const state$ = store$.pipe(
     distinctUntilChanged(stateCompare),

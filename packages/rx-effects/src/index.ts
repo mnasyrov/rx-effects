@@ -4,5 +4,5 @@ export * from './effectScope';
 export * from './stateDeclaration';
 export * from './stateMutation';
 export * from './stateQuery';
-export * from './stateStore';
+export * from './store';
 export * from './stateEffects';

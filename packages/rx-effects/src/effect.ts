@@ -2,7 +2,7 @@ import { from, identity, merge, Observable, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Action } from './action';
 import { StateQuery } from './stateQuery';
-import { createStateStore } from './stateStore';
+import { createStore } from './store';
 
 export type HandlerOptions<ErrorType = Error> = {
   onSourceCompleted?: () => void;
@@ -46,7 +46,7 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
   const done$ = new Subject<{ event: Event; result: Result }>();
   const error$ = new Subject<{ event: Event; error: ErrorType }>();
 
-  const pendingCount = createStateStore<number>(0);
+  const pendingCount = createStore<number>(0);
   const increaseCount = (count: number): number => count + 1;
   const decreaseCount = (count: number): number => count - 1;
 
