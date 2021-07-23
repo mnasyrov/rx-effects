@@ -4,10 +4,12 @@ import {
   mapTo,
   Observable,
   of,
+  Subject,
+  tap,
   throwError,
   timer,
 } from 'rxjs';
-import { take, toArray } from 'rxjs/operators';
+import { switchMap, take, toArray } from 'rxjs/operators';
 import { createAction } from './action';
 import { createEffect } from './effect';
 
@@ -157,19 +159,70 @@ describe('Effect', () => {
         { onSourceFailed },
       );
 
-      await expect(onSourceFailed).nthCalledWith(1, new Error('test error'));
+      expect(onSourceFailed).nthCalledWith(1, new Error('test error'));
     });
 
-    // it('should execute an observable in case the handler returns it', async () => {
-    //   const effect = createEffect<number, number>((value: number) =>
-    //     firstValueFrom(timer(10).pipe(mapTo(value))),
-    //   );
-    //
-    //   const resultPromise = getFirstValues(effect.result$, 3);
-    //   effect.handle(of(3));
-    //
-    //   await expect(resultPromise).toEqual([30, 31, 32]);
-    // });
+    it('should execute an observable in case the handler returns it', async () => {
+      const effect = createEffect<number, number>((value: number) =>
+        timer(10).pipe(mapTo(value)),
+      );
+
+      const resultPromise = getFirstValues(effect.result$, 3);
+      effect.handle(from([1, 2, 3]));
+
+      expect(effect.pending.get()).toBe(true);
+      expect(await resultPromise).toEqual([1, 2, 3]);
+      expect(effect.pending.get()).toBe(false);
+    });
+
+    it('should catch error of the observable handler', async () => {
+      const effect = createEffect<number, number>((value: number) =>
+        timer(10).pipe(
+          switchMap(() => from([value * 2, value * 3, value * 5])),
+          tap((result) => {
+            if (result === 6) {
+              throw new Error('test error');
+            }
+          }),
+        ),
+      );
+
+      const resultPromise = getFirstValues(effect.result$, 4);
+      const pendingCountPromise = getFirstValues(effect.pendingCount.value$, 5);
+      const errorPromise = firstValueFrom(effect.error$);
+
+      effect.handle(from([1, 2]));
+      expect(effect.pendingCount.get()).toBe(2);
+
+      expect(await resultPromise).toEqual([2, 3, 5, 4]);
+      expect(effect.pendingCount.get()).toBe(0);
+
+      expect(await pendingCountPromise).toEqual([0, 1, 2, 1, 0]);
+
+      expect(await errorPromise).toEqual({
+        event: 2,
+        error: new Error('test error'),
+      });
+    });
+  });
+
+  describe('destroy()', () => {
+    it('should cancel all internal subscriptions', () => {
+      const listener = jest.fn();
+      const action = createAction<number>();
+
+      const effect = createEffect(listener);
+      effect.handle(action);
+
+      action(1);
+      action(2);
+      effect.destroy();
+      action(3);
+
+      expect(listener).toBeCalledTimes(2);
+      expect(listener).nthCalledWith(1, 1);
+      expect(listener).nthCalledWith(2, 2);
+    });
   });
 });
 
