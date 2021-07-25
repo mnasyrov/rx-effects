@@ -6,6 +6,7 @@ import {
   of,
   tap,
   throwError,
+  timeout,
   timer,
 } from 'rxjs';
 import { switchMap, take, toArray } from 'rxjs/operators';
@@ -164,12 +165,27 @@ describe('Effect', () => {
       const effect = createEffect((value: number) => value * 2);
 
       const onSourceFailed = jest.fn();
-      effect.handle(throwError(new Error('test error')), {
-        onSourceFailed,
-      });
+      effect.handle(
+        throwError(() => new Error('test error')),
+        {
+          onSourceFailed,
+        },
+      );
 
       expect(onSourceFailed).toBeCalledTimes(1);
       expect(onSourceFailed).toBeCalledWith(new Error('test error'));
+    });
+
+    it('should do nothing in case the event source throws an error and onSourceFailed callback is not provided', async () => {
+      const effect = createEffect((value: number) => value * 2);
+
+      const finalPromise = firstValueFrom(effect.final$.pipe(timeout(10)));
+
+      expect(() =>
+        effect.handle(throwError(() => new Error('test error'))),
+      ).not.toThrowError();
+
+      await expect(finalPromise).rejects.toThrowError('Timeout has occurred');
     });
 
     it('should handle error from the source', async () => {
