@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs';
 import { createAction } from './action';
 import { createEffect } from './effect';
 import {
@@ -58,7 +59,7 @@ describe('createResetStoreEffect()', () => {
 });
 
 describe('withStore()', () => {
-  it('should create an effect which passes an event and currnt state to the handler', () => {
+  it('should create an effect with an action which passes an event and currnt state to the handler', () => {
     const store = createStore<number>(0);
     const sumAction = createAction<number>();
 
@@ -73,10 +74,26 @@ describe('withStore()', () => {
     sumAction(5);
     expect(store.get()).toBe(8);
   });
+
+  it('should create an effect with an observable which passes an event and currnt state to the handler', () => {
+    const store = createStore<number>(0);
+    const sumAction = new Subject<number>();
+
+    const sumEffect = createEffect<[number, number]>(([arg, value]) =>
+      store.set(arg + value),
+    );
+    sumEffect.handle(withStore(sumAction, store));
+
+    sumAction.next(3);
+    expect(store.get()).toBe(3);
+
+    sumAction.next(5);
+    expect(store.get()).toBe(8);
+  });
 });
 
 describe('withQuery()', () => {
-  it('should create an effect which passes an event and currnt state to the handler', () => {
+  it('should create an effect with action which passes an event and currnt state to the handler', () => {
     const store = createStore({ value: 0 });
     const sumAction = createAction<number>();
 
@@ -94,6 +111,27 @@ describe('withQuery()', () => {
     expect(store.get()).toEqual({ value: 3 });
 
     sumAction(5);
+    expect(store.get()).toEqual({ value: 8 });
+  });
+
+  it('should create an effect with an observable which passes an event and currnt state to the handler', () => {
+    const store = createStore({ value: 0 });
+    const sumAction = new Subject<number>();
+
+    const sumEffect = createEffect<[number, number]>(([arg, prevValue]) =>
+      store.set({ value: arg + prevValue }),
+    );
+    sumEffect.handle(
+      withQuery(
+        sumAction,
+        store.query((state) => state.value),
+      ),
+    );
+
+    sumAction.next(3);
+    expect(store.get()).toEqual({ value: 3 });
+
+    sumAction.next(5);
     expect(store.get()).toEqual({ value: 8 });
   });
 });
