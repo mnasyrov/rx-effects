@@ -2,7 +2,7 @@
 
 <img alt="rocket" src="rocket.svg" width="120" />
 
-Reactive state and effects management with RxJS.
+Reactive state and effect management with RxJS.
 
 [![npm](https://img.shields.io/npm/v/rx-effects.svg)](https://www.npmjs.com/package/rx-effects)
 [![downloads](https://img.shields.io/npm/dt/rx-effects.svg)](https://www.npmjs.com/package/rx-effects)
