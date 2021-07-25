@@ -149,6 +149,29 @@ describe('Effect', () => {
       expect(await final).toBe(1);
     });
 
+    it('should handle completion of the observable', async () => {
+      const effect = createEffect((value: number) => value * 2);
+
+      const onSourceCompleted = jest.fn();
+      effect.handle(of(1), {
+        onSourceCompleted,
+      });
+
+      expect(onSourceCompleted).toBeCalledTimes(1);
+    });
+
+    it('should handle an error of the observable', async () => {
+      const effect = createEffect((value: number) => value * 2);
+
+      const onSourceFailed = jest.fn();
+      effect.handle(throwError(new Error('test error')), {
+        onSourceFailed,
+      });
+
+      expect(onSourceFailed).toBeCalledTimes(1);
+      expect(onSourceFailed).toBeCalledWith(new Error('test error'));
+    });
+
     it('should handle error from the source', async () => {
       const effect = createEffect((value: number) => value * 2);
 
