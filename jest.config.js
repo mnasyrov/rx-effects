@@ -4,9 +4,9 @@
 
 import fastGlob from 'fast-glob';
 
-const typescript = {
-  displayName: 'Typescript',
+export default {
   roots: fastGlob.sync(['packages/*/src'], { onlyDirectories: true }),
+  collectCoverageFrom: ['packages/*/src/**/{!(index|testUtils),}.ts'],
   preset: 'ts-jest',
   globals: {
     'ts-jest': {
@@ -16,8 +16,4 @@ const typescript = {
       },
     },
   },
-};
-
-export default {
-  projects: [typescript],
 };
