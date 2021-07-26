@@ -1,4 +1,4 @@
-# RxEffects.js
+# RxEffects: rx-effects
 
 <img alt="rocket" src="https://raw.githubusercontent.com/mnasyrov/rx-effects/main/rocket.svg" width="120" />
 
