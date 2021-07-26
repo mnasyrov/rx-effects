@@ -23,14 +23,10 @@ rx-effects
 - [createAction](README.md#createaction)
 - [createEffect](README.md#createeffect)
 - [createEffectScope](README.md#createeffectscope)
-- [createReduceStoreEffect](README.md#createreducestoreeffect)
-- [createResetStoreEffect](README.md#createresetstoreeffect)
 - [createStore](README.md#createstore)
 - [declareState](README.md#declarestate)
 - [mapStateQuery](README.md#mapstatequery)
 - [pipeStateMutations](README.md#pipestatemutations)
-- [withQuery](README.md#withquery)
-- [withStore](README.md#withstore)
 
 ## Type aliases
 
@@ -46,7 +42,7 @@ rx-effects
 
 #### Defined in
 
-[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/action.ts#L3)
+[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/action.ts#L3)
 
 ---
 
@@ -77,7 +73,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/effect.ts#L12)
+[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L12)
 
 ---
 
@@ -108,7 +104,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:32](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/effect.ts#L32)
+[effect.ts:32](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L32)
 
 ---
 
@@ -126,7 +122,7 @@ rx-effects
 
 #### Defined in
 
-[effectScope.ts:4](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/effectScope.ts#L4)
+[effectScope.ts:4](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effectScope.ts#L4)
 
 ---
 
@@ -149,7 +145,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/effect.ts#L7)
+[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L7)
 
 ---
 
@@ -173,7 +169,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateDeclaration.ts#L7)
+[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateDeclaration.ts#L7)
 
 ---
 
@@ -203,7 +199,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateDeclaration.ts#L3)
 
 ---
 
@@ -233,7 +229,7 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateMutation.ts#L1)
 
 ---
 
@@ -256,7 +252,7 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateQuery.ts#L4)
 
 ---
 
@@ -272,7 +268,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:6](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/store.ts#L6)
+[store.ts:6](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/store.ts#L6)
 
 ---
 
@@ -288,7 +284,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:18](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/store.ts#L18)
+[store.ts:18](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/store.ts#L18)
 
 ## Functions
 
@@ -308,7 +304,7 @@ rx-effects
 
 #### Defined in
 
-[action.ts:10](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/action.ts#L10)
+[action.ts:10](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/action.ts#L10)
 
 ---
 
@@ -337,7 +333,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:36](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/effect.ts#L36)
+[effect.ts:36](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L36)
 
 ---
 
@@ -351,62 +347,7 @@ rx-effects
 
 #### Defined in
 
-[effectScope.ts:13](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/effectScope.ts#L13)
-
----
-
-### createReduceStoreEffect
-
-▸ **createReduceStoreEffect**<`Event`, `State`\>(`store`, `reducer`): [`Effect`](README.md#effect)<`Event`\>
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `Event` |
-| `State` |
-
-#### Parameters
-
-| Name      | Type                                            |
-| :-------- | :---------------------------------------------- |
-| `store`   | [`Store`](README.md#store)<`State`\>            |
-| `reducer` | (`state`: `State`, `event`: `Event`) => `State` |
-
-#### Returns
-
-[`Effect`](README.md#effect)<`Event`\>
-
-#### Defined in
-
-[stateEffects.ts:8](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateEffects.ts#L8)
-
----
-
-### createResetStoreEffect
-
-▸ **createResetStoreEffect**<`State`\>(`store`, `nextState`): [`Effect`](README.md#effect)<`void`\>
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `State` |
-
-#### Parameters
-
-| Name        | Type                                 |
-| :---------- | :----------------------------------- |
-| `store`     | [`Store`](README.md#store)<`State`\> |
-| `nextState` | `State`                              |
-
-#### Returns
-
-[`Effect`](README.md#effect)<`void`\>
-
-#### Defined in
-
-[stateEffects.ts:17](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateEffects.ts#L17)
+[effectScope.ts:13](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effectScope.ts#L13)
 
 ---
 
@@ -433,7 +374,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:23](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/store.ts#L23)
+[store.ts:23](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/store.ts#L23)
 
 ---
 
@@ -460,7 +401,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateDeclaration.ts#L13)
+[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateDeclaration.ts#L13)
 
 ---
 
@@ -488,7 +429,7 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -514,60 +455,4 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateMutation.ts#L3)
-
----
-
-### withQuery
-
-▸ **withQuery**<`Event`, `Value`\>(`action`, `query`): `Observable`<[`Event`, `Value`]\>
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `Event` |
-| `Value` |
-
-#### Parameters
-
-| Name     | Type                                                             |
-| :------- | :--------------------------------------------------------------- |
-| `action` | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> |
-| `query`  | [`StateQuery`](README.md#statequery)<`Value`\>                   |
-
-#### Returns
-
-`Observable`<[`Event`, `Value`]\>
-
-#### Defined in
-
-[stateEffects.ts:33](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateEffects.ts#L33)
-
----
-
-### withStore
-
-▸ **withStore**<`Event`, `State`\>(`action`, `store`): `Observable`<[`Event`, `State`]\>
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `Event` |
-| `State` |
-
-#### Parameters
-
-| Name     | Type                                                             |
-| :------- | :--------------------------------------------------------------- |
-| `action` | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> |
-| `store`  | [`Store`](README.md#store)<`State`\>                             |
-
-#### Returns
-
-`Observable`<[`Event`, `State`]\>
-
-#### Defined in
-
-[stateEffects.ts:24](https://github.com/mnasyrov/rx-effects/blob/c58665a/packages/rx-effects/src/stateEffects.ts#L24)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateMutation.ts#L3)
