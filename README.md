@@ -21,8 +21,8 @@ Reactive state and effect management with RxJS.
 
 ## Packages
 
-- [`rx-effects`](packages/rx-effects/README.md) – core state and effect management, [API](packages/rx-effects/docs)
-- [`rx-effects-react`](packages/rx-effects-react/README.md) – tooling for React.js, [API](packages/rx-effects-react/docs)
+- [`rx-effects`](packages/rx-effects/README.md) – core state and effect management ([API](packages/rx-effects/docs))
+- [`rx-effects-react`](packages/rx-effects-react/README.md) – tooling for React.js ([API](packages/rx-effects-react/docs))
 
 ## Installation
 
