@@ -1,6 +1,6 @@
 # RxEffects.js
 
-<img alt="rocket" src="rocket.svg" width="120" />
+<img alt="rocket" src="https://raw.githubusercontent.com/mnasyrov/rx-effects/main/rocket.svg" width="120" />
 
 Reactive state and effect management with RxJS.
 
@@ -10,24 +10,15 @@ Reactive state and effect management with RxJS.
 [![licence](https://img.shields.io/github/license/mnasyrov/rx-effects.svg)](https://github.com/mnasyrov/rx-effects/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/mnasyrov/rx-effects/badge.svg)](https://coveralls.io/github/mnasyrov/rx-effects)
 
-## Features
+## Documentation
 
-- Declarative effects
-- Reactive state store
-- Effect container
-- Typescript typings
-- Framework agnostic
-- Simple and functional API
-
-## Packages
-
-- [`rx-effects`](packages/rx-effects/README.md) – core state and effect management, [API](packages/rx-effects/docs)
-- [`rx-effects-react`](packages/rx-effects-react/README.md) – tooling for React.js, [API](packages/rx-effects-react/docs)
+- [General docs](https://github.com/mnasyrov/rx-effects#readme)
+- [API docs](docs/README.md)
 
 ## Installation
 
 ```
-npm install rx-effects --save
+npm install rx-effects rx-effects-react --save
 ```
 
 ## Usage

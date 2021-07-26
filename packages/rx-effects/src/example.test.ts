@@ -6,7 +6,6 @@ import { createEffectScope, EffectScope } from './effectScope';
 import { declareState, StateDeclaration } from './stateDeclaration';
 import { StateMutation } from './stateMutation';
 import { Store } from './store';
-import { createResetStoreEffect } from './stateEffects';
 
 // Example usage of RxEffects: a calculator which has actions: increment,
 // decrement, add, subtract and reset.
@@ -44,9 +43,8 @@ function createCalculatorEffects(
     return -value;
   });
 
-  const resetEffect = createResetStoreEffect(
-    store,
-    CALCULATOR_STATE.initialState,
+  const resetEffect = scope.createEffect(() =>
+    store.set(CALCULATOR_STATE.initialState),
   );
 
   return {
