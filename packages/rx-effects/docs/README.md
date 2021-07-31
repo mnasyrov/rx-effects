@@ -10,6 +10,7 @@ rx-effects
 - [Effect](README.md#effect)
 - [EffectHandler](README.md#effecthandler)
 - [EffectScope](README.md#effectscope)
+- [EffectState](README.md#effectstate)
 - [HandlerOptions](README.md#handleroptions)
 - [StateDeclaration](README.md#statedeclaration)
 - [StateFactory](README.md#statefactory)
@@ -25,6 +26,7 @@ rx-effects
 - [createEffectScope](README.md#createeffectscope)
 - [createStore](README.md#createstore)
 - [declareState](README.md#declarestate)
+- [handleAction](README.md#handleaction)
 - [mapStateQuery](README.md#mapstatequery)
 - [pipeStateMutations](README.md#pipestatemutations)
 
@@ -42,13 +44,13 @@ rx-effects
 
 #### Defined in
 
-[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/action.ts#L3)
+[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/action.ts#L3)
 
 ---
 
 ### Effect
 
-Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: `Object`
+Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `destroy`: () => `void` ; `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => `Subscription` }
 
 #### Type parameters
 
@@ -58,22 +60,9 @@ rx-effects
 | `Result`    | `void`  |
 | `ErrorType` | `Error` |
 
-#### Type declaration
-
-| Name           | Type                                                                                                                                                                                                                          |
-| :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `destroy`      | () => `void`                                                                                                                                                                                                                  |
-| `done$`        | `Observable`<`Object`\>                                                                                                                                                                                                       |
-| `error$`       | `Observable`<`Object`\>                                                                                                                                                                                                       |
-| `final$`       | `Observable`<`Event`\>                                                                                                                                                                                                        |
-| `handle`       | (`action`: [`Action`](README.md#action)<`Event`\>, `options?`: `undefined`) => `Subscription` & (`source$`: `Observable`<`Event`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => `Subscription` |
-| `pending`      | [`StateQuery`](README.md#statequery)<`boolean`\>                                                                                                                                                                              |
-| `pendingCount` | [`StateQuery`](README.md#statequery)<`number`\>                                                                                                                                                                               |
-| `result$`      | `Observable`<`Result`\>                                                                                                                                                                                                       |
-
 #### Defined in
 
-[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L12)
+[effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L25)
 
 ---
 
@@ -104,7 +93,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:32](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L32)
+[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L7)
 
 ---
 
@@ -114,15 +103,45 @@ rx-effects
 
 #### Type declaration
 
-| Name           | Type                                                                                                                                                                    |
-| :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `add`          | (`teardown`: `TeardownLogic`) => `void`                                                                                                                                 |
-| `createEffect` | <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> |
-| `destroy`      | () => `void`                                                                                                                                                            |
+| Name           | Type                                                                                                                                                                                                                                                                                                                        |
+| :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `add`          | (`teardown`: `TeardownLogic`) => `void`                                                                                                                                                                                                                                                                                     |
+| `createEffect` | <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>                                                                                                                                                     |
+| `destroy`      | () => `void`                                                                                                                                                                                                                                                                                                                |
+| `handleAction` | <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> |
 
 #### Defined in
 
-[effectScope.ts:4](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effectScope.ts#L4)
+[effectScope.ts:6](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effectScope.ts#L6)
+
+---
+
+### EffectState
+
+Ƭ **EffectState**<`Event`, `Result`, `ErrorType`\>: `Object`
+
+#### Type parameters
+
+| Name        | Type    |
+| :---------- | :------ |
+| `Event`     | `Event` |
+| `Result`    | `void`  |
+| `ErrorType` | `Error` |
+
+#### Type declaration
+
+| Name           | Type                                             |
+| :------------- | :----------------------------------------------- |
+| `done$`        | `Observable`<`Object`\>                          |
+| `error$`       | `Observable`<`Object`\>                          |
+| `final$`       | `Observable`<`Event`\>                           |
+| `pending`      | [`StateQuery`](README.md#statequery)<`boolean`\> |
+| `pendingCount` | [`StateQuery`](README.md#statequery)<`number`\>  |
+| `result$`      | `Observable`<`Result`\>                          |
+
+#### Defined in
+
+[effect.ts:16](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L16)
 
 ---
 
@@ -145,7 +164,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L7)
+[effect.ts:11](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L11)
 
 ---
 
@@ -169,7 +188,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateDeclaration.ts#L7)
+[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateDeclaration.ts#L7)
 
 ---
 
@@ -199,7 +218,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateDeclaration.ts#L3)
 
 ---
 
@@ -229,7 +248,7 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateMutation.ts#L1)
 
 ---
 
@@ -252,7 +271,7 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateQuery.ts#L4)
 
 ---
 
@@ -268,7 +287,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:6](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/store.ts#L6)
+[store.ts:6](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/store.ts#L6)
 
 ---
 
@@ -284,7 +303,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:18](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/store.ts#L18)
+[store.ts:18](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/store.ts#L18)
 
 ## Functions
 
@@ -304,13 +323,13 @@ rx-effects
 
 #### Defined in
 
-[action.ts:10](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/action.ts#L10)
+[action.ts:10](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/action.ts#L10)
 
 ---
 
 ### createEffect
 
-▸ **createEffect**<`Event`, `Result`, `ErrorType`\>(`handler`, `scopeSubscriptions?`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+▸ **createEffect**<`Event`, `Result`, `ErrorType`\>(`handler`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
 
 #### Type parameters
 
@@ -322,10 +341,9 @@ rx-effects
 
 #### Parameters
 
-| Name                  | Type                                                           |
-| :-------------------- | :------------------------------------------------------------- |
-| `handler`             | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\> |
-| `scopeSubscriptions?` | `Subscription`                                                 |
+| Name      | Type                                                           |
+| :-------- | :------------------------------------------------------------- |
+| `handler` | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\> |
 
 #### Returns
 
@@ -333,7 +351,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:36](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effect.ts#L36)
+[effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L38)
 
 ---
 
@@ -347,7 +365,7 @@ rx-effects
 
 #### Defined in
 
-[effectScope.ts:13](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/effectScope.ts#L13)
+[effectScope.ts:21](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effectScope.ts#L21)
 
 ---
 
@@ -374,7 +392,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:23](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/store.ts#L23)
+[store.ts:23](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/store.ts#L23)
 
 ---
 
@@ -401,7 +419,37 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateDeclaration.ts#L13)
+[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateDeclaration.ts#L13)
+
+---
+
+### handleAction
+
+▸ **handleAction**<`Event`, `Result`, `ErrorType`\>(`source`, `handler`, `options?`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+
+#### Type parameters
+
+| Name        | Type    |
+| :---------- | :------ |
+| `Event`     | `Event` |
+| `Result`    | `void`  |
+| `ErrorType` | `Error` |
+
+#### Parameters
+
+| Name       | Type                                                             |
+| :--------- | :--------------------------------------------------------------- |
+| `source`   | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> |
+| `handler`  | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>   |
+| `options?` | [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>       |
+
+#### Returns
+
+[`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+
+#### Defined in
+
+[handleAction.ts:5](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/handleAction.ts#L5)
 
 ---
 
@@ -429,7 +477,7 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -455,4 +503,4 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/98c3cf6/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateMutation.ts#L3)

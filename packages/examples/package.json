@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "rx-effects-examples",
+  "version": "0.0.8",
+  "type": "module",
+  "sideEffects": false,
+  "dependencies": {
+    "rx-effects": "0.0.8",
+    "rx-effects-react": "0.0.8"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "rxjs": ">=7.0.0"
+  }
+}
