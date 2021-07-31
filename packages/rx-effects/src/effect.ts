@@ -4,44 +4,41 @@ import { Action } from './action';
 import { StateQuery } from './stateQuery';
 import { createStore } from './store';
 
+export type EffectHandler<Event, Result> = (
+  event: Event,
+) => Result | Promise<Result> | Observable<Result>;
+
 export type HandlerOptions<ErrorType = Error> = {
   onSourceCompleted?: () => void;
   onSourceFailed?: (error: ErrorType) => void;
 };
 
-export type Effect<Event, Result = void, ErrorType = Error> = {
+export type EffectState<Event, Result = void, ErrorType = Error> = {
   readonly result$: Observable<Result>;
   readonly done$: Observable<{ event: Event; result: Result }>;
   readonly error$: Observable<{ event: Event; error: ErrorType }>;
   readonly final$: Observable<Event>;
   readonly pending: StateQuery<boolean>;
   readonly pendingCount: StateQuery<number>;
+};
 
-  readonly handle: ((
-    action: Action<Event>,
-    options?: undefined,
-  ) => Subscription) &
-    ((
-      source$: Observable<Event>,
-      options?: HandlerOptions<ErrorType>,
-    ) => Subscription);
+export type Effect<Event, Result = void, ErrorType = Error> = EffectState<
+  Event,
+  Result,
+  ErrorType
+> & {
+  readonly handle: (
+    source: Action<Event> | Observable<Event>,
+    options?: HandlerOptions<ErrorType>,
+  ) => Subscription;
 
   readonly destroy: () => void;
 };
 
-export type EffectHandler<Event, Result> = (
-  event: Event,
-) => Result | Promise<Result> | Observable<Result>;
-
 export function createEffect<Event = void, Result = void, ErrorType = Error>(
   handler: EffectHandler<Event, Result>,
-  scopeSubscriptions?: Subscription,
 ): Effect<Event, Result, ErrorType> {
   const subscriptions = new Subscription();
-
-  if (scopeSubscriptions) {
-    scopeSubscriptions.add(subscriptions);
-  }
 
   const done$ = new Subject<{ event: Event; result: Result }>();
   const error$ = new Subject<{ event: Event; error: ErrorType }>();
