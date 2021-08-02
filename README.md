@@ -24,7 +24,7 @@ Reactive state and effect management with RxJS.
 
 ## Overview
 
-The library provides a way to declare actions and effects, states and stores. The core package is framework-agnostic which can be used independent in libraries, web and node.js apps, including micro-frontends architecture.
+The library provides a way to declare actions and effects, states and stores. The core package is framework-agnostic which can be used independently in libraries, backend and frontend apps, including micro-frontends architecture.
 
 The library is inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [RxJS](https://github.com/ReactiveX/rxjs), [Akita](https://github.com/datorama/akita) and [Effector](https://github.com/effector/effector).
 
@@ -50,7 +50,15 @@ Please find the full documentation by the links below.
 npm install rx-effects rx-effects-react --save
 ```
 
-## Usage Example
+## Usage
+
+### Concepts
+
+`// TODO`
+
+### Example
+
+Below is an implementation of the pizza shop, which allows order pizza from the menu and to submit the cart. The controller orchestrate the state store and side effects. The component renders the state and reacts on user events.
 
 ```ts
 // pizzaShop.ts

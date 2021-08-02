@@ -1,5 +1,10 @@
 import { Observable, Subject } from 'rxjs';
 
+/**
+ * Action is an event emitter
+
+ * @field event$ - Observable for emitted events.
+ */
 export type Action<Event> = {
   readonly event$: Observable<Event>;
   (event: Event): void;
