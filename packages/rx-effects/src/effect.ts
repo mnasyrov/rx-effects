@@ -114,6 +114,10 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
     pendingCount: pendingCount.query(identity),
 
     handle,
-    destroy: () => subscriptions.unsubscribe(),
+    destroy: () => {
+      subscriptions.unsubscribe();
+      done$.complete();
+      error$.complete();
+    },
   };
 }

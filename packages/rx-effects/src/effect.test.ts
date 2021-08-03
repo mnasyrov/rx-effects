@@ -2,6 +2,7 @@ import {
   firstValueFrom,
   from,
   mapTo,
+  materialize,
   Observable,
   of,
   tap,
@@ -260,6 +261,24 @@ describe('Effect', () => {
       expect(listener).toBeCalledTimes(2);
       expect(listener).nthCalledWith(1, 1);
       expect(listener).nthCalledWith(2, 2);
+    });
+
+    it('should completes result observables', async () => {
+      const effect = createEffect(jest.fn());
+
+      const donePromise = firstValueFrom(effect.done$.pipe(materialize()));
+      const resultPromise = firstValueFrom(effect.result$.pipe(materialize()));
+      const errorPromise = firstValueFrom(effect.error$.pipe(materialize()));
+      const finalPromise = firstValueFrom(effect.final$.pipe(materialize()));
+
+      effect.destroy();
+
+      const completedEvent = { hasValue: false, kind: 'C' };
+
+      expect(await donePromise).toEqual(completedEvent);
+      expect(await resultPromise).toEqual(completedEvent);
+      expect(await errorPromise).toEqual(completedEvent);
+      expect(await finalPromise).toEqual(completedEvent);
     });
   });
 });
