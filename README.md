@@ -10,18 +10,6 @@ Reactive state and effect management with RxJS.
 [![licence](https://img.shields.io/github/license/mnasyrov/rx-effects.svg)](https://github.com/mnasyrov/rx-effects/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/mnasyrov/rx-effects/badge.svg)](https://coveralls.io/github/mnasyrov/rx-effects)
 
-## Table of Contents
-
-<!-- toc -->
-
-- [Overview](#overview)
-- [Features](#features)
-- [Packages](#packages)
-- [Installation](#installation)
-- [Usage Example](#usage-example)
-
-<!-- tocstop -->
-
 ## Overview
 
 The library provides a way to describe business and application logic using MVC-like architecture. Core elements include actions and effects, states and stores. All of them are optionated and can be used separately. The core package is framework-agnostic and can be used in different cases: libraries, server apps, web, SPA and micro-frontends apps.
@@ -39,24 +27,25 @@ The library is inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93vie
 
 ### Packages
 
-Please find the full documentation by the links below.
+List of packages and documentations:
 
 - [**rx-effects**][rx-effects/docs] – The core, state and effect management: [Documentation][rx-effects/docs], [API][rx-effects/api]
 - [**rx-effects-react**][rx-effects-react/docs] – Tooling for React.js: [Documentation][rx-effects-react/docs], [API][rx-effects-react/api]
 
-## Installation
+## Usage
+
+### Installation
 
 ```
 npm install rx-effects rx-effects-react --save
 ```
-
-## Usage
 
 ### Concepts
 
 The main idea is to use the classic MVC pattern with event-based models (state stores) and reactive controllers (actions and effects). The view subscribes to model changes (state queries) of the controller and requests the controller to do some actions.
 
 ![Diagram](docs/concept-diagram.svg)
+<img alt="concept-diagram" src="./docs/concept-diagram.svg" width="200" />
 
 Core elements:
 

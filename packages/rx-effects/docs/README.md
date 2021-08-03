@@ -7,6 +7,7 @@ rx-effects
 ### Type aliases
 
 - [Action](README.md#action)
+- [Controller](README.md#controller)
 - [Effect](README.md#effect)
 - [EffectHandler](README.md#effecthandler)
 - [EffectScope](README.md#effectscope)
@@ -27,7 +28,8 @@ rx-effects
 - [createStore](README.md#createstore)
 - [declareState](README.md#declarestate)
 - [handleAction](README.md#handleaction)
-- [mapStateQuery](README.md#mapstatequery)
+- [mapQuery](README.md#mapquery)
+- [mergeQueries](README.md#mergequeries)
 - [pipeStateMutations](README.md#pipestatemutations)
 
 ## Type aliases
@@ -35,6 +37,10 @@ rx-effects
 ### Action
 
 Ƭ **Action**<`Event`\>: (`event`: `Event`) => `void` & `Event` extends `undefined` \| `void` ? (`event?`: `Event`) => `void` : (`event`: `Event`) => `void`
+
+Action is an event emitter
+
+**`field`** event$ - Observable for emitted events.
 
 #### Type parameters
 
@@ -44,7 +50,33 @@ rx-effects
 
 #### Defined in
 
-[action.ts:3](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/action.ts#L3)
+[action.ts:8](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/action.ts#L8)
+
+---
+
+### Controller
+
+Ƭ **Controller**<`ControllerProps`\>: `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>
+
+Business logic controller
+
+**`example`**
+
+```ts
+type LoggerController = Controller<{
+  log: (message: string) => void;
+}>;
+```
+
+#### Type parameters
+
+| Name              | Type               |
+| :---------------- | :----------------- |
+| `ControllerProps` | extends `Object`{} |
+
+#### Defined in
+
+[controller.ts:14](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/controller.ts#L14)
 
 ---
 
@@ -62,7 +94,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L25)
+[effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/effect.ts#L25)
 
 ---
 
@@ -93,26 +125,17 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L7)
+[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/effect.ts#L7)
 
 ---
 
 ### EffectScope
 
-Ƭ **EffectScope**: `Object`
-
-#### Type declaration
-
-| Name           | Type                                                                                                                                                                                                                                                                                                                        |
-| :------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `add`          | (`teardown`: `TeardownLogic`) => `void`                                                                                                                                                                                                                                                                                     |
-| `createEffect` | <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>                                                                                                                                                     |
-| `destroy`      | () => `void`                                                                                                                                                                                                                                                                                                                |
-| `handleAction` | <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> |
+Ƭ **EffectScope**: [`Controller`](README.md#controller)<`Object`\>
 
 #### Defined in
 
-[effectScope.ts:6](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effectScope.ts#L6)
+[effectScope.ts:7](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/effectScope.ts#L7)
 
 ---
 
@@ -141,13 +164,13 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:16](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L16)
+[effect.ts:16](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/effect.ts#L16)
 
 ---
 
 ### HandlerOptions
 
-Ƭ **HandlerOptions**<`ErrorType`\>: `Object`
+Ƭ **HandlerOptions**<`ErrorType`\>: `Readonly`<`Object`\>
 
 #### Type parameters
 
@@ -155,22 +178,15 @@ rx-effects
 | :---------- | :------ |
 | `ErrorType` | `Error` |
 
-#### Type declaration
-
-| Name                 | Type                             |
-| :------------------- | :------------------------------- |
-| `onSourceCompleted?` | () => `void`                     |
-| `onSourceFailed?`    | (`error`: `ErrorType`) => `void` |
-
 #### Defined in
 
-[effect.ts:11](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L11)
+[effect.ts:11](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/effect.ts#L11)
 
 ---
 
 ### StateDeclaration
 
-Ƭ **StateDeclaration**<`State`\>: `Object`
+Ƭ **StateDeclaration**<`State`\>: `Readonly`<`Object`\>
 
 #### Type parameters
 
@@ -178,17 +194,9 @@ rx-effects
 | :------ | :------------------------------------- |
 | `State` | extends `Record`<`string`, `unknown`\> |
 
-#### Type declaration
-
-| Name           | Type                                                               |
-| :------------- | :----------------------------------------------------------------- |
-| `createState`  | [`StateFactory`](README.md#statefactory)<`State`\>                 |
-| `createStore`  | (`initialState?`: `State`) => [`Store`](README.md#store)<`State`\> |
-| `initialState` | `State`                                                            |
-
 #### Defined in
 
-[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateDeclaration.ts#L7)
+[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateDeclaration.ts#L7)
 
 ---
 
@@ -218,7 +226,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateDeclaration.ts#L3)
 
 ---
 
@@ -248,7 +256,7 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateMutation.ts#L1)
 
 ---
 
@@ -271,7 +279,7 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateQuery.ts#L4)
 
 ---
 
@@ -287,7 +295,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:6](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/store.ts#L6)
+[store.ts:6](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/store.ts#L6)
 
 ---
 
@@ -303,7 +311,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:18](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/store.ts#L18)
+[store.ts:18](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/store.ts#L18)
 
 ## Functions
 
@@ -323,7 +331,7 @@ rx-effects
 
 #### Defined in
 
-[action.ts:10](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/action.ts#L10)
+[action.ts:15](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/action.ts#L15)
 
 ---
 
@@ -351,7 +359,7 @@ rx-effects
 
 #### Defined in
 
-[effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effect.ts#L38)
+[effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/effect.ts#L38)
 
 ---
 
@@ -365,7 +373,7 @@ rx-effects
 
 #### Defined in
 
-[effectScope.ts:21](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/effectScope.ts#L21)
+[effectScope.ts:25](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/effectScope.ts#L25)
 
 ---
 
@@ -392,7 +400,7 @@ rx-effects
 
 #### Defined in
 
-[store.ts:23](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/store.ts#L23)
+[store.ts:23](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/store.ts#L23)
 
 ---
 
@@ -419,7 +427,7 @@ rx-effects
 
 #### Defined in
 
-[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateDeclaration.ts#L13)
+[stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateDeclaration.ts#L13)
 
 ---
 
@@ -449,13 +457,13 @@ rx-effects
 
 #### Defined in
 
-[handleAction.ts:5](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/handleAction.ts#L5)
+[handleAction.ts:5](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/handleAction.ts#L5)
 
 ---
 
-### mapStateQuery
+### mapQuery
 
-▸ **mapStateQuery**<`T`, `R`\>(`query`, `mapper`): [`StateQuery`](README.md#statequery)<`R`\>
+▸ **mapQuery**<`T`, `R`\>(`query`, `mapper`): [`StateQuery`](README.md#statequery)<`R`\>
 
 #### Type parameters
 
@@ -477,7 +485,36 @@ rx-effects
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateQuery.ts#L9)
+
+---
+
+### mergeQueries
+
+▸ **mergeQueries**<`Queries`, `Values`, `Result`\>(`queries`, `merger`): [`StateQuery`](README.md#statequery)<`Result`\>
+
+#### Type parameters
+
+| Name      | Type                                                                                        |
+| :-------- | :------------------------------------------------------------------------------------------ |
+| `Queries` | extends [`StateQuery`](README.md#statequery)<`unknown`\>[]                                  |
+| `Values`  | extends { [K in string \| number \| symbol]: Queries[K] extends StateQuery<V\> ? V : never} |
+| `Result`  | `Result`                                                                                    |
+
+#### Parameters
+
+| Name      | Type                             |
+| :-------- | :------------------------------- |
+| `queries` | `Queries`                        |
+| `merger`  | (`values`: `Values`) => `Result` |
+
+#### Returns
+
+[`StateQuery`](README.md#statequery)<`Result`\>
+
+#### Defined in
+
+[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateQuery.ts#L19)
 
 ---
 
@@ -503,4 +540,4 @@ rx-effects
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/22056a0/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/e306eba/packages/rx-effects/src/stateMutation.ts#L3)
