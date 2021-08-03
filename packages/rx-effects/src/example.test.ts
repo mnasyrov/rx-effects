@@ -1,6 +1,7 @@
 import { firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import { Action, createAction } from './action';
+import { Controller } from './controller';
 import { Effect } from './effect';
 import { createEffectScope, EffectScope } from './effectScope';
 import { declareState, StateDeclaration } from './stateDeclaration';
@@ -62,18 +63,18 @@ type ControllerEvents =
   | { type: 'added'; value: number }
   | { type: 'subtracted'; value: number };
 
-function createCalculatorController(
-  store: CalculatorStore,
-  eventBus: Action<ControllerEvents>,
-): {
-  destroy: () => void;
-
+type CalculatorController = Controller<{
   increment: () => void;
   decrement: () => void;
   sum: (value: number) => void;
   subtract: (value: number) => void;
   reset: () => void;
-} {
+}>;
+
+function createCalculatorController(
+  store: CalculatorStore,
+  eventBus: Action<ControllerEvents>,
+): CalculatorController {
   const scope = createEffectScope();
 
   const incrementAction = createAction<void>();

@@ -8,10 +8,10 @@ export type EffectHandler<Event, Result> = (
   event: Event,
 ) => Result | Promise<Result> | Observable<Result>;
 
-export type HandlerOptions<ErrorType = Error> = {
+export type HandlerOptions<ErrorType = Error> = Readonly<{
   onSourceCompleted?: () => void;
   onSourceFailed?: (error: ErrorType) => void;
-};
+}>;
 
 export type EffectState<Event, Result = void, ErrorType = Error> = {
   readonly result$: Observable<Result>;

@@ -1,6 +1,7 @@
 export * from './action';
 export * from './effect';
 export * from './effectScope';
+export * from './controller';
 export * from './handleAction';
 export * from './stateDeclaration';
 export * from './stateMutation';

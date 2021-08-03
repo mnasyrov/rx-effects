@@ -4,11 +4,11 @@ export type StateFactory<State extends Record<string, unknown>> = (
   values?: Partial<State>,
 ) => State;
 
-export type StateDeclaration<State extends Record<string, unknown>> = {
+export type StateDeclaration<State extends Record<string, unknown>> = Readonly<{
   initialState: State;
   createState: StateFactory<State>;
   createStore: (initialState?: State) => Store<State>;
-};
+}>;
 
 export function declareState<State extends Record<string, unknown>>(
   stateFactory: StateFactory<State>,

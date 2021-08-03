@@ -1,22 +1,26 @@
 import { Observable, Subscription, TeardownLogic } from 'rxjs';
 import { Action } from './action';
+import { Controller } from './controller';
 import { createEffect, Effect, EffectHandler, HandlerOptions } from './effect';
 import { handleAction } from './handleAction';
 
-export type EffectScope = {
-  readonly add: (teardown: TeardownLogic) => void;
-  readonly destroy: () => void;
+export type EffectScope = Controller<{
+  add: (teardown: TeardownLogic) => void;
 
-  readonly createEffect: <Event = void, Result = void, ErrorType = Error>(
+  createController: <ControllerProps>(
+    factory: () => Controller<ControllerProps>,
+  ) => Controller<ControllerProps>;
+
+  createEffect: <Event = void, Result = void, ErrorType = Error>(
     handler: EffectHandler<Event, Result>,
   ) => Effect<Event, Result, ErrorType>;
 
-  readonly handleAction: <Event, Result = void, ErrorType = Error>(
+  handleAction: <Event, Result = void, ErrorType = Error>(
     source: Observable<Event> | Action<Event>,
     handler: EffectHandler<Event, Result>,
     options?: HandlerOptions<ErrorType>,
   ) => Effect<Event, Result, ErrorType>;
-};
+}>;
 
 export function createEffectScope(): EffectScope {
   const subscriptions = new Subscription();
@@ -28,6 +32,15 @@ export function createEffectScope(): EffectScope {
 
     destroy() {
       subscriptions.unsubscribe();
+    },
+
+    createController<ControllerProps>(
+      factory: () => Controller<ControllerProps>,
+    ) {
+      const controller = factory();
+      subscriptions.add(controller.destroy);
+
+      return controller;
     },
 
     createEffect<Event, Result, ErrorType>(
