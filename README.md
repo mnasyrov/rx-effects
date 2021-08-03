@@ -44,8 +44,7 @@ npm install rx-effects rx-effects-react --save
 
 The main idea is to use the classic MVC pattern with event-based models (state stores) and reactive controllers (actions and effects). The view subscribes to model changes (state queries) of the controller and requests the controller to do some actions.
 
-![Diagram](docs/concept-diagram.svg)
-<img alt="concept-diagram" src="./docs/concept-diagram.svg" width="200" />
+<img alt="concept-diagram" src="docs/concept-diagram.svg" width="400" />
 
 Core elements:
 
