@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="794px" preserveAspectRatio="none" style="width:626px;height:794px;background:#FFFFFF;" version="1.1" viewBox="0 0 626 794" width="626px" zoomAndPan="magnify"><defs><filter height="300%" id="f19j37slmgpqxx" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="4.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="8.0" dy="8.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[e320b41f2d43b11d6de1346cab4ea5fc]
+cluster View--><rect fill="#FFFFFF" filter="url(#f19j37slmgpqxx)" height="194" style="stroke:#000000;stroke-width:3.0;" width="344" x="168.6628" y="14"/><text fill="#000000" font-family="sans-serif" font-size="28" font-weight="bold" lengthAdjust="spacing" textLength="70" x="305.6628" y="45.0703">View</text><!--MD5=[1f2cfc53d9d308f53762fd0fcbaa4873]
+cluster Controller--><rect fill="#FFFFFF" filter="url(#f19j37slmgpqxx)" height="174" style="stroke:#000000;stroke-width:3.0;" width="508" x="94.6628" y="306"/><text fill="#000000" font-family="sans-serif" font-size="28" font-weight="bold" lengthAdjust="spacing" textLength="146" x="275.6628" y="337.0703">Controller</text><!--MD5=[15636c1ca4a123c16a2a1a8e90aca7a9]
+cluster Model--><rect fill="#FFFFFF" filter="url(#f19j37slmgpqxx)" height="192" style="stroke:#000000;stroke-width:3.0;" width="252" x="288.6628" y="578"/><text fill="#000000" font-family="sans-serif" font-size="28" font-weight="bold" lengthAdjust="spacing" textLength="88" x="370.6628" y="609.0703">Model</text><!--MD5=[245d2f63106c9e261e62f339c1a83039]
+entity Component--><rect fill="#FEFECE" filter="url(#f19j37slmgpqxx)" height="92.9766" style="stroke:#A80036;stroke-width:3.0;" width="278" x="201.6628" y="84"/><rect fill="#FEFECE" height="20" style="stroke:#A80036;stroke-width:3.0;" width="30" x="439.6628" y="94"/><rect fill="#FEFECE" height="4" style="stroke:#A80036;stroke-width:3.0;" width="8" x="435.6628" y="98"/><rect fill="#FEFECE" height="4" style="stroke:#A80036;stroke-width:3.0;" width="8" x="435.6628" y="106"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="198" x="231.6628" y="151.0703">UI Component</text><!--MD5=[10aabbbd6c5e08f8fe6e22efc6aa6dfb]
+entity Effects--><rect fill="#FEFECE" filter="url(#f19j37slmgpqxx)" height="64.9766" style="stroke:#A80036;stroke-width:3.0;" width="122" x="135.6628" y="384"/><rect fill="#FEFECE" height="64.9766" style="stroke:#A80036;stroke-width:3.0;" width="122" x="127.6628" y="376"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="90" x="143.6628" y="419.0703">Effects</text><!--MD5=[7ec6a17fd95cec70bd67f5570cd8ecbe]
+entity Queries--><rect fill="#FEFECE" filter="url(#f19j37slmgpqxx)" height="64.9766" style="stroke:#A80036;stroke-width:3.0;" width="138" x="431.6628" y="384"/><rect fill="#FEFECE" height="64.9766" style="stroke:#A80036;stroke-width:3.0;" width="138" x="423.6628" y="376"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="106" x="439.6628" y="419.0703">Queries</text><!--MD5=[5ae79695dcaadcd84dbd6fcdb28f3d61]
+entity Store--><path d="M320.6628,668 C320.6628,648 414.6628,648 414.6628,648 C414.6628,648 508.6628,648 508.6628,668 L508.6628,718.9766 C508.6628,738.9766 414.6628,738.9766 414.6628,738.9766 C414.6628,738.9766 320.6628,738.9766 320.6628,718.9766 L320.6628,668 " fill="#FEFECE" filter="url(#f19j37slmgpqxx)" style="stroke:#000000;stroke-width:3.0;"/><path d="M320.6628,668 C320.6628,688 414.6628,688 414.6628,688 C414.6628,688 508.6628,688 508.6628,668 " fill="none" style="stroke:#000000;stroke-width:3.0;"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="148" x="340.6628" y="723.0703">State Store</text><!--MD5=[a6db0c926898241e7c594507fb3ca544]
+entity Backend--><path d="M35.2824,666.6171 C39.404,655.6898 49.3235,654.6923 55.91,664.1191 C63.698,652.0637 72.1904,651.1207 81.1983,662.8206 C84.8631,648.7533 96.2697,645.1202 106.1621,656.7771 C115.2449,647.98 122.563,650.9272 126.4129,662.087 C133.3882,649.5098 146.0795,648.4571 152.5158,662.6132 C159.6349,652.6863 167.2934,652.3335 173.7635,663.274 C189.657,670.7436 194.1953,681.694 181.5501,695.9618 C197.4537,707.2148 193.2016,720.2346 177.9601,727.9975 C171.5671,739.723 164.0096,742.6314 153.8984,731.9991 C148.3558,744.9877 140.0061,745.5044 130.1088,736.7675 C124.7599,750.0671 114.397,753.1232 104.6405,741.2219 C95.889,750.2315 85.0194,748.9719 80.7969,736.2523 C71.2817,745.8999 58.8328,743.4963 55.8875,729.369 C47.9809,742.1958 38.2363,740.4934 31.7934,727.9774 C17.6059,722.3471 14.4943,707.6475 25.477,696.9011 C12,683.0059 20.094,671.231 35.2824,666.6171 " fill="#FEFECE" filter="url(#f19j37slmgpqxx)" style="stroke:#000000;stroke-width:3.0;"/><text fill="#000000" font-family="sans-serif" font-size="28" lengthAdjust="spacing" textLength="114" x="45.6628" y="704.0703">Backend</text><!--MD5=[791ebf0225d1fc36d60509a5ca7d4ef8]
+link Component to Effects--><path d="M282.3428,176.06 C262.5228,193.86 242.0228,215.9 228.6628,240 C207.1828,278.74 198.5028,328.96 195.0028,364.74 " fill="none" id="Component-to-Effects" style="stroke:#A80036;stroke-width:2.0;"/><polygon fill="#A80036" points="194.0828,375.36,203.595,358.1113,194.9393,365.3967,187.6538,356.741,194.0828,375.36" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="96" x="230.6628" y="267.1367">Actions</text><!--MD5=[152ddd55d23e426dd3e5b50ceaa6c89f]
+reverse link Component to Queries--><path d="M370.2828,184.78 C401.7828,240.9 450.6628,328.02 477.4628,375.8 " fill="none" id="Component-backto-Queries" style="stroke:#A80036;stroke-width:2.0;"/><polygon fill="#A80036" points="365.3828,176.04,367.2074,195.653,370.2732,184.7626,381.1636,187.8284,365.3828,176.04" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="126" x="420.6628" y="267.1367">Rendering</text><!--MD5=[08644a26232756430c3b64a7a9e3c078]
+link Effects to Store--><path d="M220.3228,448.52 C258.8828,496.62 329.0428,584.16 373.6828,639.86 " fill="none" id="Effects-to-Store" style="stroke:#A80036;stroke-width:2.0;"/><polygon fill="#A80036" points="380.0628,647.84,375.0398,628.7935,373.8054,640.0397,362.5592,638.8053,380.0628,647.84" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="102" x="298.6628" y="539.1367">Updates</text><!--MD5=[79f991dc7faa0b3ab64cabbadf346680]
+link Effects to Backend--><path d="M137.7228,455.64 C121.3228,471.32 105.4028,490.58 96.6628,512 C80.5428,551.48 83.4228,600 89.5628,636.58 " fill="none" id="Effects-Backend" style="stroke:#A80036;stroke-width:2.0;"/><polygon fill="#A80036" points="91.3628,646.56,96.0432,627.4264,89.5891,636.7186,80.2969,630.2644,91.3628,646.56" style="stroke:#A80036;stroke-width:2.0;"/><polygon fill="#A80036" points="145.7828,448.24,127.127,454.5616,138.4315,455.0192,137.9738,466.3237,145.7828,448.24" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="124" x="98.6628" y="539.1367">Async API</text><!--MD5=[ebcb4864e32e69bbefa15ffebac4a713]
+link Effects to Queries--><path d="M257.8828,412 C303.3228,412 364.3228,412 413.3028,412 " fill="none" id="Effects-to-Queries" style="stroke:#A80036;stroke-width:2.0;"/><polygon fill="#A80036" points="423.5628,412,405.5628,404,413.5628,412,405.5628,420,423.5628,412" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="92" x="294.6628" y="399.1367">Results</text><!--MD5=[e986d7267094fd265151840525666825]
+link Store to Queries--><path d="M427.4428,647.84 C442.7028,596.3 468.0828,510.58 483.5028,458.48 " fill="none" id="Store-to-Queries" style="stroke:#A80036;stroke-width:2.0;"/><polygon fill="#A80036" points="486.4428,448.52,473.6816,463.5251,483.6165,458.1123,489.0293,468.0472,486.4428,448.52" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="26" lengthAdjust="spacing" textLength="58" x="466.6628" y="539.1367">Data</text><!--MD5=[41158fbd3d6932e05a2c1f82af882c2b]
+@startuml
+
+rectangle View {
+  [Component] as "UI Component"
+}
+
+rectangle Controller {
+  collections Effects
+  collections Queries
+}
+
+rectangle Model {
+  database Store as "State Store"
+}
+
+cloud Backend
+
+Component - -> Effects : Actions
+Component <- - Queries : Rendering
+
+Effects - -> Store : Updates
+Effects <- -> Backend : Async API
+
+Effects -> Queries : Results
+
+Store - -> Queries : Data
+
+
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 19:40:07 NOVT 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: RU
+--></g></svg>

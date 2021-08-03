@@ -2,13 +2,19 @@ import React, { FC, useEffect } from 'react';
 import { useConst, useObservable, useStateQuery } from 'rx-effects-react';
 import { createPizzaShopController } from './pizzaShop';
 
-export const PizzaShop: FC = () => {
+export const PizzaShopComponent: FC = () => {
+  // Creates the controller and destroy it on unmounting the component
   const controller = useConst(() => createPizzaShopController());
-  useEffect(() => controller.destroyController, [controller]);
+  useEffect(() => controller.destroy, [controller]);
 
+  // The same creation can be achieved by using `useController()` helper:
+  // const controller = useController(createPizzaShopController);
+
+  // Using the controller
   const { ordersQuery, addPizza, removePizza, submitCart, submitState } =
     controller;
 
+  // Subscribing to state data and the effect stata
   const orders = useStateQuery(ordersQuery);
   const isPending = useStateQuery(submitState.pending);
   const submitError = useObservable(submitState.error$, undefined);

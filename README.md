@@ -24,11 +24,11 @@ Reactive state and effect management with RxJS.
 
 ## Overview
 
-The library provides a way to declare actions and effects, states and stores. The core package is framework-agnostic which can be used independently in libraries, backend and frontend apps, including micro-frontends architecture.
+The library provides a way to describe business and application logic using MVC-like architecture. Core elements include actions and effects, states and stores. All of them are optionated and can be used separately. The core package is framework-agnostic and can be used in different cases: libraries, server apps, web, SPA and micro-frontends apps.
 
-The library is inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [RxJS](https://github.com/ReactiveX/rxjs), [Akita](https://github.com/datorama/akita) and [Effector](https://github.com/effector/effector).
+The library is inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [RxJS](https://github.com/ReactiveX/rxjs), [Akita](https://github.com/datorama/akita), [JetState](https://github.com/mnasyrov/jetstate) and [Effector](https://github.com/effector/effector).
 
-## Features
+### Features
 
 - Framework-agnostic
 - Functional API
@@ -37,7 +37,7 @@ The library is inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93vie
 - Effect container
 - Typescript typings
 
-## Packages
+### Packages
 
 Please find the full documentation by the links below.
 
@@ -54,7 +54,20 @@ npm install rx-effects rx-effects-react --save
 
 ### Concepts
 
-`// TODO`
+The main idea is to use the classic MVC pattern with event-based models (state stores) and reactive controllers (actions and effects). The view subscribes to model changes (state queries) of the controller and requests the controller to do some actions.
+
+![Diagram](docs/concept-diagram.svg)
+
+Core elements:
+
+- `State` – a data model.
+- `StateQuery` – a getter and subscriber for data of the state.
+- `StateMutation` – a pure function which changes the state.
+- `Store` – a state storage, it provides methods to update and subscribe the state.
+- `Action` – an event emitter.
+- `Effect` – a piece of business logic which handles the action and makes state changes and side effects.
+- `EffectScope` – a controller-like boundary for effects and business logic
+- `Controller` – a controller type for effects and business logic
 
 ### Example
 
@@ -64,6 +77,7 @@ Below is an implementation of the pizza shop, which allows order pizza from the 
 // pizzaShop.ts
 
 import {
+  Controller,
   createAction,
   createEffectScope,
   declareState,
@@ -73,8 +87,10 @@ import {
 } from 'rx-effects';
 import { delay, filter, map, mapTo, of } from 'rxjs';
 
+// The state
 type CartState = { orders: Array<string> };
 
+// State mutation can be exported and tested separately
 const addPizzaToCart =
   (name: string): StateMutation<CartState> =>
   (state) => ({ ...state, orders: [...state.orders, name] });
@@ -86,57 +102,70 @@ const removePizzaFromCart =
     orders: state.orders.filter((order) => order !== name),
   });
 
+// Declaring the state. `declareState()` returns a few factories for the store.
 const CART_STATE = declareState<CartState>(() => ({ orders: [] }));
 
-export type PizzaShopController = {
+// Declaring the controller.
+// It should provide methods for triggering the actions,
+// and queries or observables for subscribing to data.
+export type PizzaShopController = Controller<{
   ordersQuery: StateQuery<Array<string>>;
 
   addPizza: (name: string) => void;
   removePizza: (name: string) => void;
   submitCart: () => void;
   submitState: EffectState<Array<string>>;
-
-  destroyController: () => void;
-};
+}>;
 
 export function createPizzaShopController(): PizzaShopController {
+  // Creates the state store
   const store = CART_STATE.createStore();
 
+  // Creates queries for the state data
+  const ordersQuery = store.query((state) => state.orders);
+
+  // Introduces actions
   const addPizza = createAction<string>();
   const removePizza = createAction<string>();
   const submitCart = createAction();
 
+  // Creates the scope for effects to track internal subscriptions
   const scope = createEffectScope();
 
+  // Handle simple actions
   scope.handleAction(addPizza, (order) => store.update(addPizzaToCart(order)));
 
   scope.handleAction(removePizza, (name) =>
     store.update(removePizzaFromCart(name)),
   );
 
+  // Create a effect in a general way
   const submitEffect = scope.createEffect<Array<string>>((orders) => {
     // Sending an async request to a server
     return of(orders).pipe(delay(1000), mapTo(undefined));
   });
 
+  // Effect can handle `Observable` and `Action`. It allows to filter action events
+  // and transform data which is passed to effect's handler.
   submitEffect.handle(
     submitCart.event$.pipe(
-      map(() => store.get().orders),
+      map(() => ordersQuery.get()),
       filter((orders) => !submitEffect.pending.get() && orders.length > 0),
     ),
   );
 
+  // Effect's results can be used as actions
   scope.handleAction(submitEffect.done$, () =>
     store.set(CART_STATE.initialState),
   );
 
   return {
-    ordersQuery: store.query((state) => state.orders),
+    ordersQuery,
     addPizza,
     removePizza,
     submitCart,
     submitState: submitEffect,
-    destroyController: () => scope.destroy(),
+    destroy: () => scope.destroy(),
   };
 }
 ```
@@ -148,13 +177,19 @@ import React, { FC, useEffect } from 'react';
 import { useConst, useObservable, useStateQuery } from 'rx-effects-react';
 import { createPizzaShopController } from './pizzaShop';
 
-export const PizzaShop: FC = () => {
+export const PizzaShopComponent: FC = () => {
+  // Creates the controller and destroy it on unmounting the component
   const controller = useConst(() => createPizzaShopController());
-  useEffect(() => controller.destroyController, [controller]);
+  useEffect(() => controller.destroy, [controller]);
 
+  // The same creation can be achieved by using `useController()` helper:
+  // const controller = useController(createPizzaShopController);
+
+  // Using the controller
   const { ordersQuery, addPizza, removePizza, submitCart, submitState } =
     controller;
 
+  // Subscribing to state data and the effect stata
   const orders = useStateQuery(ordersQuery);
   const isPending = useStateQuery(submitState.pending);
   const submitError = useObservable(submitState.error$, undefined);

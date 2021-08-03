@@ -1,0 +1,29 @@
+@startuml
+
+rectangle View {
+  [Component] as "UI Component"
+}
+
+rectangle Controller {
+  collections Effects
+  collections Queries
+}
+
+rectangle Model {
+  database Store as "State Store"
+}
+
+cloud Backend
+
+Component --> Effects : Actions
+Component <-- Queries : Rendering
+
+Effects --> Store : Updates
+Effects <--> Backend : Async API
+
+Effects -> Queries : Results
+
+Store --> Queries : Data
+
+
+@enduml
