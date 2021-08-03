@@ -118,6 +118,7 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
       subscriptions.unsubscribe();
       done$.complete();
       error$.complete();
+      pendingCount.destroy();
     },
   };
 }

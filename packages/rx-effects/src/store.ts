@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
+import { Controller } from './controller';
 import { StateMutation } from './stateMutation';
 import { StateQuery } from './stateQuery';
 
@@ -15,20 +16,18 @@ export type StateReader<State> = StateQuery<State> & {
   ) => StateQuery<R>;
 };
 
-export type Store<State> = StateReader<State> & {
-  readonly set: (state: State) => void;
-  readonly update: (mutation: StateMutation<State>) => void;
-};
+export type Store<State> = StateReader<State> &
+  Controller<{
+    set: (state: State) => void;
+    update: (mutation: StateMutation<State>) => void;
+  }>;
 
 export function createStore<State>(
   initialState: State,
   stateCompare: (s1: State, s2: State) => boolean = Object.is,
 ): Store<State> {
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
-  const state$ = store$.pipe(
-    distinctUntilChanged(stateCompare),
-    shareReplay({ refCount: true, bufferSize: 1 }),
-  );
+  const state$ = store$.asObservable();
 
   return {
     value$: state$,
@@ -38,13 +37,18 @@ export function createStore<State>(
     },
 
     set(nextState: State) {
-      store$.next(nextState);
+      const prevState = store$.value;
+      if (!stateCompare(prevState, nextState)) {
+        store$.next(nextState);
+      }
     },
 
     update(mutation: StateMutation<State>) {
       const prevState = store$.value;
       const nextState = mutation(prevState);
-      store$.next(nextState);
+      if (!stateCompare(prevState, nextState)) {
+        store$.next(nextState);
+      }
     },
 
     select<R>(
@@ -62,6 +66,10 @@ export function createStore<State>(
         get: () => selector(store$.value),
         value$: this.select(selector, valueCompare),
       };
+    },
+
+    destroy() {
+      store$.complete();
     },
   };
 }

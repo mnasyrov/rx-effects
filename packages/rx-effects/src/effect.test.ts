@@ -270,15 +270,37 @@ describe('Effect', () => {
       const resultPromise = firstValueFrom(effect.result$.pipe(materialize()));
       const errorPromise = firstValueFrom(effect.error$.pipe(materialize()));
       const finalPromise = firstValueFrom(effect.final$.pipe(materialize()));
+      const pendingPromise = firstValueFrom(
+        effect.pending.value$.pipe(materialize(), toArray()),
+      );
+      const pendingCountPromise = firstValueFrom(
+        effect.pendingCount.value$.pipe(materialize(), toArray()),
+      );
 
       effect.destroy();
 
       const completedEvent = { hasValue: false, kind: 'C' };
-
       expect(await donePromise).toEqual(completedEvent);
       expect(await resultPromise).toEqual(completedEvent);
       expect(await errorPromise).toEqual(completedEvent);
       expect(await finalPromise).toEqual(completedEvent);
+
+      expect(await pendingPromise).toEqual([
+        {
+          hasValue: true,
+          kind: 'N',
+          value: false,
+        },
+        completedEvent,
+      ]);
+      expect(await pendingCountPromise).toEqual([
+        {
+          hasValue: true,
+          kind: 'N',
+          value: 0,
+        },
+        completedEvent,
+      ]);
     });
   });
 });
