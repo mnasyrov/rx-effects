@@ -1,5 +1,5 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
-import { bufferWhen } from 'rxjs/operators';
+import { bufferWhen, toArray } from 'rxjs/operators';
 import { createStore } from './store';
 
 describe('Store', () => {
@@ -62,6 +62,16 @@ describe('Store', () => {
       const store = createStore<State>({ value: 1 });
       store.update((state) => ({ value: state.value + 10 }));
       expect(store.get()).toEqual({ value: 11 });
+    });
+
+    it('should not apply a mutation if the new state is the same', async () => {
+      const store = createStore<State>({ value: 1 });
+
+      const statePromise = firstValueFrom(store.value$.pipe(toArray()));
+      store.update((state) => state);
+      store.destroy();
+
+      expect(await statePromise).toEqual([{ value: 1 }]);
     });
   });
 
