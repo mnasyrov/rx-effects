@@ -50,7 +50,7 @@ Action is an event emitter
 
 #### Defined in
 
-[action.ts:8](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/action.ts#L8)
+[action.ts:8](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/action.ts#L8)
 
 ---
 
@@ -76,7 +76,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[controller.ts:14](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/controller.ts#L14)
+[controller.ts:14](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/controller.ts#L14)
 
 ---
 
@@ -94,7 +94,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/effect.ts#L25)
+[effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L25)
 
 ---
 
@@ -125,7 +125,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/effect.ts#L7)
+[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L7)
 
 ---
 
@@ -154,7 +154,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:16](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/effect.ts#L16)
+[effect.ts:16](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L16)
 
 ---
 
@@ -170,7 +170,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:11](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/effect.ts#L11)
+[effect.ts:11](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L11)
 
 ---
 
@@ -180,7 +180,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[scope.ts:9](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/scope.ts#L9)
+[scope.ts:9](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/scope.ts#L9)
 
 ---
 
@@ -196,7 +196,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateDeclaration.ts:5](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateDeclaration.ts#L5)
+[stateDeclaration.ts:5](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateDeclaration.ts#L5)
 
 ---
 
@@ -226,7 +226,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateDeclaration.ts#L3)
 
 ---
 
@@ -256,7 +256,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateMutation.ts#L1)
 
 ---
 
@@ -279,7 +279,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateQuery.ts#L4)
 
 ---
 
@@ -295,7 +295,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[store.ts:7](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/store.ts#L7)
+[store.ts:7](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/store.ts#L7)
 
 ---
 
@@ -311,7 +311,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[store.ts:19](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/store.ts#L19)
+[store.ts:19](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/store.ts#L19)
 
 ## Functions
 
@@ -331,7 +331,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[action.ts:15](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/action.ts#L15)
+[action.ts:15](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/action.ts#L15)
 
 ---
 
@@ -359,7 +359,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/effect.ts#L38)
+[effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L38)
 
 ---
 
@@ -373,7 +373,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[scope.ts:37](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/scope.ts#L37)
+[scope.ts:37](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/scope.ts#L37)
 
 ---
 
@@ -400,7 +400,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[store.ts:25](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/store.ts#L25)
+[store.ts:25](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/store.ts#L25)
 
 ---
 
@@ -427,7 +427,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateDeclaration.ts:11](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateDeclaration.ts#L11)
+[stateDeclaration.ts:11](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateDeclaration.ts#L11)
 
 ---
 
@@ -457,7 +457,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[handleAction.ts:5](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/handleAction.ts#L5)
+[handleAction.ts:5](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/handleAction.ts#L5)
 
 ---
 
@@ -485,7 +485,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -514,7 +514,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateQuery.ts#L19)
+[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateQuery.ts#L19)
 
 ---
 
@@ -540,4 +540,4 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/d7e6b77/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateMutation.ts#L3)
