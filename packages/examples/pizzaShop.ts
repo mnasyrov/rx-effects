@@ -1,7 +1,7 @@
 import {
   Controller,
   createAction,
-  createEffectScope,
+  createScope,
   declareState,
   EffectState,
   StateMutation,
@@ -52,7 +52,7 @@ export function createPizzaShopController(): PizzaShopController {
   const submitCart = createAction();
 
   // Creates the scope for effects to track internal subscriptions
-  const scope = createEffectScope();
+  const scope = createScope();
 
   // Handle simple actions
   scope.handleAction(addPizza, (order) => store.update(addPizzaToCart(order)));

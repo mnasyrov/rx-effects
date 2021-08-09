@@ -2,10 +2,10 @@ import {
   Action,
   Controller,
   createAction,
-  createEffectScope,
+  createScope,
   declareState,
   Effect,
-  EffectScope,
+  Scope,
   StateDeclaration,
   StateMutation,
   Store,
@@ -20,15 +20,15 @@ type CalculatorState = { value: number };
 type CalculatorStateMutation = StateMutation<CalculatorState>;
 type CalculatorStore = Store<CalculatorState>;
 
-const CALCULATOR_STATE: StateDeclaration<CalculatorState> = declareState(
-  () => ({ value: 0 }),
-);
+const CALCULATOR_STATE: StateDeclaration<CalculatorState> = declareState({
+  value: 0,
+});
 
 const addValue: (value: number) => CalculatorStateMutation =
   (value) => (state) => ({ ...state, value: state.value + value });
 
 function createCalculatorEffects(
-  scope: EffectScope,
+  scope: Scope,
   store: CalculatorStore,
 ): {
   incrementEffect: Effect<void>;
@@ -80,7 +80,7 @@ function createCalculatorController(
   store: CalculatorStore,
   eventBus: Action<ControllerEvents>,
 ): CalculatorController {
-  const scope = createEffectScope();
+  const scope = createScope();
 
   const incrementAction = createAction<void>();
   const decrementAction = createAction<void>();
@@ -137,7 +137,7 @@ function createCalculatorController(
 describe('Example usage of RxEffects: Calculator', () => {
   it('should increment the value', async () => {
     const store = CALCULATOR_STATE.createStore();
-    const scope = createEffectScope();
+    const scope = createScope();
     const incrementAction = createAction();
 
     const { incrementEffect } = createCalculatorEffects(scope, store);
@@ -151,7 +151,7 @@ describe('Example usage of RxEffects: Calculator', () => {
 
   it('should unsubscribe effects on scope.destroy()', async () => {
     const store = CALCULATOR_STATE.createStore({ value: 10 });
-    const scope = createEffectScope();
+    const scope = createScope();
     const decrementAction = createAction();
 
     const { decrementEffect } = createCalculatorEffects(scope, store);

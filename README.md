@@ -54,7 +54,7 @@ Core elements:
 - `Store` – a state storage, it provides methods to update and subscribe the state.
 - `Action` – an event emitter.
 - `Effect` – a piece of business logic which handles the action and makes state changes and side effects.
-- `EffectScope` – a controller-like boundary for effects and business logic
+- `Scope` – a controller-like boundary for effects and business logic
 - `Controller` – a controller type for effects and business logic
 
 ### Example
@@ -67,7 +67,7 @@ Below is an implementation of the pizza shop, which allows order pizza from the 
 import {
   Controller,
   createAction,
-  createEffectScope,
+  createScope,
   declareState,
   EffectState,
   StateMutation,
@@ -118,7 +118,7 @@ export function createPizzaShopController(): PizzaShopController {
   const submitCart = createAction();
 
   // Creates the scope for effects to track internal subscriptions
-  const scope = createEffectScope();
+  const scope = createScope();
 
   // Handle simple actions
   scope.handleAction(addPizza, (order) => store.update(addPizzaToCart(order)));

@@ -3,9 +3,21 @@ import { Action } from './action';
 import { Controller } from './controller';
 import { createEffect, Effect, EffectHandler, HandlerOptions } from './effect';
 import { handleAction } from './handleAction';
+import { StateDeclaration } from './stateDeclaration';
+import { createStore, Store } from './store';
 
-export type EffectScope = Controller<{
+export type Scope = Controller<{
   add: (teardown: TeardownLogic) => void;
+
+  createStore<State>(
+    initialState: State,
+    stateCompare?: (s1: State, s2: State) => boolean,
+  ): Store<State>;
+
+  createDeclaredStore<State>(
+    stateDeclaration: StateDeclaration<State>,
+    initialState?: Partial<State>,
+  ): Store<State>;
 
   createController: <ControllerProps>(
     factory: () => Controller<ControllerProps>,
@@ -22,7 +34,7 @@ export type EffectScope = Controller<{
   ) => Effect<Event, Result, ErrorType>;
 }>;
 
-export function createEffectScope(): EffectScope {
+export function createScope(): Scope {
   const subscriptions = new Subscription();
 
   return {
@@ -32,6 +44,26 @@ export function createEffectScope(): EffectScope {
 
     destroy() {
       subscriptions.unsubscribe();
+    },
+
+    createStore<State>(
+      initialState: State,
+      stateCompare: (s1: State, s2: State) => boolean = Object.is,
+    ): Store<State> {
+      const store = createStore(initialState, stateCompare);
+      subscriptions.add(store.destroy);
+
+      return store;
+    },
+
+    createDeclaredStore<State>(
+      stateDeclaration: StateDeclaration<State>,
+      initialState?: Partial<State>,
+    ): Store<State> {
+      const store = stateDeclaration.createStore(initialState);
+      subscriptions.add(store.destroy);
+
+      return store;
     },
 
     createController<ControllerProps>(
