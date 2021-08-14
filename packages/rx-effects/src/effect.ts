@@ -72,6 +72,13 @@ const decreaseCount = (count: number): number => count - 1;
 
 /**
  * Creates `Effect` from the provided handler.
+ *
+ * @example
+ * ```ts
+ * const sumEffect = createEffect<{a: number, b: number}, number>((event) => {
+ *   return a + b;
+ * });
+ * ```
  */
 export function createEffect<Event = void, Result = void, ErrorType = Error>(
   handler: EffectHandler<Event, Result>,

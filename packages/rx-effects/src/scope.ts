@@ -61,6 +61,9 @@ export type Scope = Controller<{
   ) => Effect<Event, Result, ErrorType>;
 }>;
 
+/**
+ * Creates `Scope` instance.
+ */
 export function createScope(): Scope {
   const subscriptions = new Subscription();
 

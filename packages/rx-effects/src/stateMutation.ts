@@ -1,5 +1,25 @@
+/**
+ * This function mutates the state.
+ *
+ * It is recommended to return a new state or the previous one.
+ *
+ * Actually, the function can change the state in place, but it is responsible
+ * of a developer to provide `stateCompare` function to the store which handles
+ * the changes.
+ *
+ * For making changes use curring function to provide arguments:
+ * ```ts
+ * const addPizzaToCart = (name: string): StateMutation<Array<string>> =>
+ *   (state) => ([...state, name]);
+ * ```
+ */
 export type StateMutation<State> = (state: State) => State;
 
+/**
+ * Returns a mutation which applies all provided mutations for a state.
+ *
+ * You can use this helper to apply multiple changes at the same time.
+ */
 export function pipeStateMutations<State>(
   mutations: Array<StateMutation<State>>,
 ): StateMutation<State> {
