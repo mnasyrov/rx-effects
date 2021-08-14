@@ -65,7 +65,7 @@ submitForm.even$.subscribe((formData) => {
 
 #### Defined in
 
-[action.ts:22](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/action.ts#L22)
+[action.ts:22](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/action.ts#L22)
 
 ---
 
@@ -94,7 +94,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/controller.ts#L17)
+[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/controller.ts#L17)
 
 ---
 
@@ -120,7 +120,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L56)
+[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/effect.ts#L56)
 
 ---
 
@@ -153,7 +153,7 @@ Handler for an event. It can be asynchronous.
 
 #### Defined in
 
-[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L12)
+[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/effect.ts#L12)
 
 ---
 
@@ -184,7 +184,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L27)
+[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
@@ -202,7 +202,7 @@ Options for handling an action or observable.
 
 #### Defined in
 
-[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L19)
+[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/effect.ts#L19)
 
 ---
 
@@ -217,13 +217,15 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/scope.ts#L15)
+[scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
 ### StateDeclaration
 
 Ƭ **StateDeclaration**<`State`\>: `Readonly`<`Object`\>
+
+Declaration of a state.
 
 #### Type parameters
 
@@ -233,7 +235,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[stateDeclaration.ts:5](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateDeclaration.ts#L5)
+[stateDeclaration.ts:12](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateDeclaration.ts#L12)
 
 ---
 
@@ -251,6 +253,9 @@ It collects all subscriptions which are made by child entities and provides
 
 ▸ (`values?`): `State`
 
+Factory which creates a state. It can take optional values to modify the
+state.
+
 ##### Parameters
 
 | Name      | Type                |
@@ -263,7 +268,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateDeclaration.ts#L7)
 
 ---
 
@@ -281,6 +286,23 @@ It collects all subscriptions which are made by child entities and provides
 
 ▸ (`state`): `State`
 
+This function mutates the state.
+
+It is recommended to return a new state or the previous one.
+
+Actually, the function can change the state in place, but it is responsible
+of a developer to provide `stateCompare` function to the store which handles
+the changes.
+
+For making changes use curring function to provide arguments:
+
+```ts
+const addPizzaToCart =
+  (name: string): StateMutation<Array<string>> =>
+  (state) =>
+    [...state, name];
+```
+
 ##### Parameters
 
 | Name    | Type    |
@@ -293,13 +315,15 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:16](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateMutation.ts#L16)
 
 ---
 
 ### StateQuery
 
 Ƭ **StateQuery**<`T`\>: `Object`
+
+Provider for a value of a state.
 
 #### Type parameters
 
@@ -309,20 +333,22 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Type declaration
 
-| Name     | Type               |
-| :------- | :----------------- |
-| `get`    | () => `T`          |
-| `value$` | `Observable`<`T`\> |
+| Name     | Type               | Description                     |
+| :------- | :----------------- | :------------------------------ |
+| `get`    | () => `T`          | -                               |
+| `value$` | `Observable`<`T`\> | `Observable` for value changes. |
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:7](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateQuery.ts#L7)
 
 ---
 
 ### StateReader
 
 Ƭ **StateReader**<`State`\>: [`StateQuery`](README.md#statequery)<`State`\> & { `query`: <R\>(`selector`: (`state`: `State`) => `R`, `compare?`: (`v1`: `R`, `v2`: `R`) => `boolean`) => [`StateQuery`](README.md#statequery)<`R`\> ; `select`: <R\>(`selector`: (`state`: `State`) => `R`, `compare?`: (`v1`: `R`, `v2`: `R`) => `boolean`) => `Observable`<`R`\> }
+
+Read-only type of the state store.
 
 #### Type parameters
 
@@ -332,7 +358,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[store.ts:7](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/store.ts#L7)
+[store.ts:10](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/store.ts#L10)
 
 ---
 
@@ -348,7 +374,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[store.ts:19](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/store.ts#L19)
+[store.ts:40](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/store.ts#L40)
 
 ## Functions
 
@@ -368,7 +394,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[action.ts:29](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/action.ts#L29)
+[action.ts:29](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/action.ts#L29)
 
 ---
 
@@ -377,6 +403,14 @@ It collects all subscriptions which are made by child entities and provides
 ▸ **createEffect**<`Event`, `Result`, `ErrorType`\>(`handler`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
 
 Creates `Effect` from the provided handler.
+
+**`example`**
+
+```ts
+const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
+  return a + b;
+});
+```
 
 #### Type parameters
 
@@ -398,7 +432,7 @@ Creates `Effect` from the provided handler.
 
 #### Defined in
 
-[effect.ts:76](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L76)
+[effect.ts:83](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/effect.ts#L83)
 
 ---
 
@@ -406,13 +440,15 @@ Creates `Effect` from the provided handler.
 
 ▸ **createScope**(): [`Scope`](README.md#scope)
 
+Creates `Scope` instance.
+
 #### Returns
 
 [`Scope`](README.md#scope)
 
 #### Defined in
 
-[scope.ts:64](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/scope.ts#L64)
+[scope.ts:67](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/scope.ts#L67)
 
 ---
 
@@ -420,6 +456,8 @@ Creates `Effect` from the provided handler.
 
 ▸ **createStore**<`State`\>(`initialState`, `stateCompare?`): [`Store`](README.md#store)<`State`\>
 
+Creates the state store.
+
 #### Type parameters
 
 | Name    |
@@ -428,10 +466,10 @@ Creates `Effect` from the provided handler.
 
 #### Parameters
 
-| Name           | Type                                        |
-| :------------- | :------------------------------------------ |
-| `initialState` | `State`                                     |
-| `stateCompare` | (`s1`: `State`, `s2`: `State`) => `boolean` |
+| Name           | Type                                                      | Description                                                   |
+| :------------- | :-------------------------------------------------------- | :------------------------------------------------------------ |
+| `initialState` | `State`                                                   | an initial state                                              |
+| `stateCompare` | (`prevState`: `State`, `nextState`: `State`) => `boolean` | a comparator for detecting changes between old and new states |
 
 #### Returns
 
@@ -439,13 +477,15 @@ Creates `Effect` from the provided handler.
 
 #### Defined in
 
-[store.ts:25](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/store.ts#L25)
+[store.ts:56](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/store.ts#L56)
 
 ---
 
 ### declareState
 
 ▸ **declareState**<`State`\>(`stateOrFactory`, `stateCompare?`): [`StateDeclaration`](README.md#statedeclaration)<`State`\>
+
+Declares the state.
 
 #### Type parameters
 
@@ -455,10 +495,10 @@ Creates `Effect` from the provided handler.
 
 #### Parameters
 
-| Name             | Type                                                          |
-| :--------------- | :------------------------------------------------------------ |
-| `stateOrFactory` | `State` \| [`StateFactory`](README.md#statefactory)<`State`\> |
-| `stateCompare?`  | (`s1`: `State`, `s2`: `State`) => `boolean`                   |
+| Name             | Type                                                          | Description                                                   |
+| :--------------- | :------------------------------------------------------------ | :------------------------------------------------------------ |
+| `stateOrFactory` | `State` \| [`StateFactory`](README.md#statefactory)<`State`\> | an initial state or a factory for the initial state           |
+| `stateCompare?`  | (`prevState`: `State`, `nextState`: `State`) => `boolean`     | a comparator for detecting changes between old and new states |
 
 #### Returns
 
@@ -466,7 +506,7 @@ Creates `Effect` from the provided handler.
 
 #### Defined in
 
-[stateDeclaration.ts:11](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateDeclaration.ts#L11)
+[stateDeclaration.ts:29](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateDeclaration.ts#L29)
 
 ---
 
@@ -498,13 +538,16 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/handleAction.ts#L8)
+[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/handleAction.ts#L8)
 
 ---
 
 ### mapQuery
 
 ▸ **mapQuery**<`T`, `R`\>(`query`, `mapper`): [`StateQuery`](README.md#statequery)<`R`\>
+
+Returns a new `StateQuery` which maps a source value by the provided mapping
+function.
 
 #### Type parameters
 
@@ -515,10 +558,10 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Parameters
 
-| Name     | Type                                       |
-| :------- | :----------------------------------------- |
-| `query`  | [`StateQuery`](README.md#statequery)<`T`\> |
-| `mapper` | (`value`: `T`) => `R`                      |
+| Name     | Type                                       | Description  |
+| :------- | :----------------------------------------- | :----------- |
+| `query`  | [`StateQuery`](README.md#statequery)<`T`\> | source query |
+| `mapper` | (`value`: `T`) => `R`                      | value mapper |
 
 #### Returns
 
@@ -526,13 +569,16 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:22](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateQuery.ts#L22)
 
 ---
 
 ### mergeQueries
 
 ▸ **mergeQueries**<`Queries`, `Values`, `Result`\>(`queries`, `merger`): [`StateQuery`](README.md#statequery)<`Result`\>
+
+Returns a new `StateQuery` which takes the latest values from source queries
+and merges them into a single value.
 
 #### Type parameters
 
@@ -544,10 +590,10 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Parameters
 
-| Name      | Type                             |
-| :-------- | :------------------------------- |
-| `queries` | `Queries`                        |
-| `merger`  | (`values`: `Values`) => `Result` |
+| Name      | Type                             | Description    |
+| :-------- | :------------------------------- | :------------- |
+| `queries` | `Queries`                        | source queries |
+| `merger`  | (`values`: `Values`) => `Result` | value merger   |
 
 #### Returns
 
@@ -555,13 +601,17 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateQuery.ts#L19)
+[stateQuery.ts:39](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateQuery.ts#L39)
 
 ---
 
 ### pipeStateMutations
 
 ▸ **pipeStateMutations**<`State`\>(`mutations`): [`StateMutation`](README.md#statemutation)<`State`\>
+
+Returns a mutation which applies all provided mutations for a state.
+
+You can use this helper to apply multiple changes at the same time.
 
 #### Type parameters
 
@@ -581,4 +631,4 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:23](https://github.com/mnasyrov/rx-effects/blob/d1c09fc/packages/rx-effects/src/stateMutation.ts#L23)

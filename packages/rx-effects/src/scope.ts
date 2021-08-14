@@ -24,7 +24,7 @@ export type Scope = Controller<{
    */
   createStore<State>(
     initialState: State,
-    stateCompare?: (s1: State, s2: State) => boolean,
+    stateCompare?: (prevState: State, nextState: State) => boolean,
   ): Store<State>;
 
   /**
@@ -78,7 +78,7 @@ export function createScope(): Scope {
 
     createStore<State>(
       initialState: State,
-      stateCompare: (s1: State, s2: State) => boolean = Object.is,
+      stateCompare: (prevState: State, nextState: State) => boolean = Object.is,
     ): Store<State> {
       const store = createStore(initialState, stateCompare);
       subscriptions.add(store.destroy);

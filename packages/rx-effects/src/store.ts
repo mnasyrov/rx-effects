@@ -4,12 +4,33 @@ import { Controller } from './controller';
 import { StateMutation } from './stateMutation';
 import { StateQuery } from './stateQuery';
 
+/**
+ * Read-only type of the state store.
+ */
 export type StateReader<State> = StateQuery<State> & {
+  /**
+   * Returns a part of the state as `Observable`
+   *
+   * @example
+   * ```ts
+   * const state: StateReader<{form: {login: 'foo'}}> = // ...
+   * const value$ = state.select((state) => state.form.login);
+   * ```
+   */
   readonly select: <R>(
     selector: (state: State) => R,
     compare?: (v1: R, v2: R) => boolean,
   ) => Observable<R>;
 
+  /**
+   * Returns a part of the state as `StateQuery`
+   *
+   * @example
+   * ```ts
+   * const state: StateReader<{form: {login: 'foo'}}> = // ...
+   * const query = state.query((state) => state.form.login);
+   * ```
+   * */
   readonly query: <R>(
     selector: (state: State) => R,
     compare?: (v1: R, v2: R) => boolean,
@@ -18,13 +39,23 @@ export type StateReader<State> = StateQuery<State> & {
 
 export type Store<State> = StateReader<State> &
   Controller<{
+    /** Sets a new state to the store */
     set: (state: State) => void;
+
+    /** Updates the state in the store by the mutation */
     update: (mutation: StateMutation<State>) => void;
   }>;
 
+/**
+ * Creates the state store.
+ *
+ * @param initialState an initial state
+ * @param stateCompare a comparator for detecting changes between old and new
+ *   states
+ */
 export function createStore<State>(
   initialState: State,
-  stateCompare: (s1: State, s2: State) => boolean = Object.is,
+  stateCompare: (prevState: State, nextState: State) => boolean = Object.is,
 ): Store<State> {
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
   const state$ = store$.asObservable();
