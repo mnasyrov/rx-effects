@@ -44,33 +44,34 @@ Action is an event emitter
 
 **`example`**
 
-````ts
+```ts
 // Create the action
-const submitForm = createAction<{login: string, password: string}>();
+const submitForm = createAction<{ login: string; password: string }>();
 
 // Call the action
-submitForm({login: 'foo', password: 'bar'});
+submitForm({ login: 'foo', password: 'bar' });
 
 // Handle action's events
 submitForm.even$.subscribe((formData) => {
   // Process the formData
 });
+```
 
 #### Type parameters
 
-| Name |
+| Name    |
 | :------ |
 | `Event` |
 
 #### Defined in
 
-[action.ts:21](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/action.ts#L21)
+[action.ts:22](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/action.ts#L22)
 
-___
+---
 
 ### Controller
 
-Ƭ **Controller**<`ControllerProps`\>: `Readonly`<{ `destroy`: () => `void`  } & `ControllerProps`\>
+Ƭ **Controller**<`ControllerProps`\>: `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>
 
 Effects and business logic controller.
 
@@ -78,11 +79,12 @@ Implementation of the controller must provide `destroy()` method. It should
 be used for closing subscriptions and disposing resources.
 
 **`example`**
+
 ```ts
 type LoggerController = Controller<{
   log: (message: string) => void;
 }>;
-````
+```
 
 #### Type parameters
 
@@ -92,7 +94,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/controller.ts#L17)
+[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/controller.ts#L17)
 
 ---
 
@@ -118,7 +120,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L56)
+[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L56)
 
 ---
 
@@ -151,7 +153,7 @@ Handler for an event. It can be asynchronous.
 
 #### Defined in
 
-[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L12)
+[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L12)
 
 ---
 
@@ -182,7 +184,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L27)
+[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
@@ -200,7 +202,7 @@ Options for handling an action or observable.
 
 #### Defined in
 
-[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L19)
+[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L19)
 
 ---
 
@@ -215,7 +217,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/scope.ts#L15)
+[scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
@@ -231,7 +233,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[stateDeclaration.ts:5](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateDeclaration.ts#L5)
+[stateDeclaration.ts:5](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateDeclaration.ts#L5)
 
 ---
 
@@ -261,7 +263,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateDeclaration.ts#L3)
 
 ---
 
@@ -291,7 +293,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateMutation.ts#L1)
 
 ---
 
@@ -314,7 +316,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateQuery.ts#L4)
 
 ---
 
@@ -330,7 +332,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[store.ts:7](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/store.ts#L7)
+[store.ts:7](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/store.ts#L7)
 
 ---
 
@@ -346,7 +348,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[store.ts:19](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/store.ts#L19)
+[store.ts:19](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/store.ts#L19)
 
 ## Functions
 
@@ -366,7 +368,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[action.ts:28](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/action.ts#L28)
+[action.ts:29](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/action.ts#L29)
 
 ---
 
@@ -396,7 +398,7 @@ Creates `Effect` from the provided handler.
 
 #### Defined in
 
-[effect.ts:76](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L76)
+[effect.ts:76](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/effect.ts#L76)
 
 ---
 
@@ -410,7 +412,7 @@ Creates `Effect` from the provided handler.
 
 #### Defined in
 
-[scope.ts:64](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/scope.ts#L64)
+[scope.ts:64](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/scope.ts#L64)
 
 ---
 
@@ -437,7 +439,7 @@ Creates `Effect` from the provided handler.
 
 #### Defined in
 
-[store.ts:25](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/store.ts#L25)
+[store.ts:25](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/store.ts#L25)
 
 ---
 
@@ -464,7 +466,7 @@ Creates `Effect` from the provided handler.
 
 #### Defined in
 
-[stateDeclaration.ts:11](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateDeclaration.ts#L11)
+[stateDeclaration.ts:11](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateDeclaration.ts#L11)
 
 ---
 
@@ -496,7 +498,7 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/handleAction.ts#L8)
+[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/handleAction.ts#L8)
 
 ---
 
@@ -524,7 +526,7 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -553,7 +555,7 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateQuery.ts#L19)
+[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateQuery.ts#L19)
 
 ---
 
@@ -579,4 +581,4 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects/src/stateMutation.ts#L3)

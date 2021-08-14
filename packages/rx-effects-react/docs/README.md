@@ -36,7 +36,7 @@ rx-effects-react
 
 #### Defined in
 
-[useConst.ts:5](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects-react/src/useConst.ts#L5)
+[useConst.ts:5](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects-react/src/useConst.ts#L5)
 
 ---
 
@@ -64,7 +64,7 @@ rx-effects-react
 
 #### Defined in
 
-[useObservable.ts:4](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects-react/src/useObservable.ts#L4)
+[useObservable.ts:4](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects-react/src/useObservable.ts#L4)
 
 ---
 
@@ -91,7 +91,7 @@ rx-effects-react
 
 #### Defined in
 
-[useObserver.ts:5](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects-react/src/useObserver.ts#L5)
+[useObserver.ts:5](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects-react/src/useObserver.ts#L5)
 
 ---
 
@@ -121,7 +121,7 @@ rx-effects-react
 
 #### Defined in
 
-[useSelector.ts:4](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects-react/src/useSelector.ts#L4)
+[useSelector.ts:4](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects-react/src/useSelector.ts#L4)
 
 ---
 
@@ -147,4 +147,4 @@ rx-effects-react
 
 #### Defined in
 
-[useStateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects-react/src/useStateQuery.ts#L4)
+[useStateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/cec44ee/packages/rx-effects-react/src/useStateQuery.ts#L4)

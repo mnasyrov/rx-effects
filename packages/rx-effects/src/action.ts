@@ -17,6 +17,7 @@ import { Observable, Subject } from 'rxjs';
  * submitForm.even$.subscribe((formData) => {
  *   // Process the formData
  * });
+ * ```
  */
 export type Action<Event> = {
   readonly event$: Observable<Event>;
