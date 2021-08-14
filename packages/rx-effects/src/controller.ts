@@ -2,7 +2,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 /**
- * Business logic controller
+ * Effects and business logic controller.
+ *
+ * Implementation of the controller must provide `destroy()` method. It should
+ * be used for closing subscriptions and disposing resources.
  *
  * @example
  * ```ts

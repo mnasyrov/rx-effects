@@ -42,31 +42,47 @@ Action is an event emitter
 
 **`field`** event$ - Observable for emitted events.
 
+**`example`**
+
+````ts
+// Create the action
+const submitForm = createAction<{login: string, password: string}>();
+
+// Call the action
+submitForm({login: 'foo', password: 'bar'});
+
+// Handle action's events
+submitForm.even$.subscribe((formData) => {
+  // Process the formData
+});
+
 #### Type parameters
 
-| Name    |
+| Name |
 | :------ |
 | `Event` |
 
 #### Defined in
 
-[action.ts:8](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/action.ts#L8)
+[action.ts:21](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/action.ts#L21)
 
----
+___
 
 ### Controller
 
-Ƭ **Controller**<`ControllerProps`\>: `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>
+Ƭ **Controller**<`ControllerProps`\>: `Readonly`<{ `destroy`: () => `void`  } & `ControllerProps`\>
 
-Business logic controller
+Effects and business logic controller.
+
+Implementation of the controller must provide `destroy()` method. It should
+be used for closing subscriptions and disposing resources.
 
 **`example`**
-
 ```ts
 type LoggerController = Controller<{
   log: (message: string) => void;
 }>;
-```
+````
 
 #### Type parameters
 
@@ -76,13 +92,21 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[controller.ts:14](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/controller.ts#L14)
+[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/controller.ts#L17)
 
 ---
 
 ### Effect
 
 Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `destroy`: () => `void` ; `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => `Subscription` }
+
+Effect encapsulates a handler for Action or Observable.
+
+It provides the state of execution results, which can be used to construct
+a graph of business logic.
+
+Effect collects all internal subscriptions, and provides `destroy()` methods
+unsubscribe from them and deactivate the effect.
 
 #### Type parameters
 
@@ -94,7 +118,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L25)
+[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L56)
 
 ---
 
@@ -113,6 +137,8 @@ type LoggerController = Controller<{
 
 ▸ (`event`): `Result` \| `Promise`<`Result`\> \| `Observable`<`Result`\>
 
+Handler for an event. It can be asynchronous.
+
 ##### Parameters
 
 | Name    | Type    |
@@ -125,13 +151,15 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:7](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L7)
+[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L12)
 
 ---
 
 ### EffectState
 
 Ƭ **EffectState**<`Event`, `Result`, `ErrorType`\>: `Object`
+
+Details about performing the effect.
 
 #### Type parameters
 
@@ -143,24 +171,26 @@ type LoggerController = Controller<{
 
 #### Type declaration
 
-| Name           | Type                                             |
-| :------------- | :----------------------------------------------- |
-| `done$`        | `Observable`<`Object`\>                          |
-| `error$`       | `Observable`<`Object`\>                          |
-| `final$`       | `Observable`<`Event`\>                           |
-| `pending`      | [`StateQuery`](README.md#statequery)<`boolean`\> |
-| `pendingCount` | [`StateQuery`](README.md#statequery)<`number`\>  |
-| `result$`      | `Observable`<`Result`\>                          |
+| Name           | Type                                             | Description                                                                                        |
+| :------------- | :----------------------------------------------- | :------------------------------------------------------------------------------------------------- |
+| `done$`        | `Observable`<`Object`\>                          | `done$` provides a source event and a result of successful execution of the handler                |
+| `error$`       | `Observable`<`Object`\>                          | `done$` provides a source event and an error if the handler fails                                  |
+| `final$`       | `Observable`<`Event`\>                           | `final$` provides a source event after execution of the handler, for both success and error result |
+| `pending`      | [`StateQuery`](README.md#statequery)<`boolean`\> | Provides `true` if there is any execution of the handler in progress                               |
+| `pendingCount` | [`StateQuery`](README.md#statequery)<`number`\>  | Provides a count of the handler in progress                                                        |
+| `result$`      | `Observable`<`Result`\>                          | `result$` provides a result of successful execution of the handler                                 |
 
 #### Defined in
 
-[effect.ts:16](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L16)
+[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
 ### HandlerOptions
 
 Ƭ **HandlerOptions**<`ErrorType`\>: `Readonly`<`Object`\>
+
+Options for handling an action or observable.
 
 #### Type parameters
 
@@ -170,7 +200,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:11](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L11)
+[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L19)
 
 ---
 
@@ -178,9 +208,14 @@ type LoggerController = Controller<{
 
 Ƭ **Scope**: [`Controller`](README.md#controller)<`Object`\>
 
+A controller-like boundary for effects and business logic.
+
+It collects all subscriptions which are made by child entities and provides
+`destroy()` method to unsubscribe from them.
+
 #### Defined in
 
-[scope.ts:9](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/scope.ts#L9)
+[scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
@@ -196,7 +231,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateDeclaration.ts:5](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateDeclaration.ts#L5)
+[stateDeclaration.ts:5](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateDeclaration.ts#L5)
 
 ---
 
@@ -226,7 +261,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateDeclaration.ts#L3)
+[stateDeclaration.ts:3](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateDeclaration.ts#L3)
 
 ---
 
@@ -256,7 +291,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateMutation.ts#L1)
+[stateMutation.ts:1](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateMutation.ts#L1)
 
 ---
 
@@ -279,7 +314,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateQuery.ts#L4)
+[stateQuery.ts:4](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateQuery.ts#L4)
 
 ---
 
@@ -295,7 +330,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[store.ts:7](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/store.ts#L7)
+[store.ts:7](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/store.ts#L7)
 
 ---
 
@@ -311,7 +346,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[store.ts:19](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/store.ts#L19)
+[store.ts:19](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/store.ts#L19)
 
 ## Functions
 
@@ -331,13 +366,15 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[action.ts:15](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/action.ts#L15)
+[action.ts:28](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/action.ts#L28)
 
 ---
 
 ### createEffect
 
 ▸ **createEffect**<`Event`, `Result`, `ErrorType`\>(`handler`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+
+Creates `Effect` from the provided handler.
 
 #### Type parameters
 
@@ -359,7 +396,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/effect.ts#L38)
+[effect.ts:76](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/effect.ts#L76)
 
 ---
 
@@ -373,7 +410,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[scope.ts:37](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/scope.ts#L37)
+[scope.ts:64](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/scope.ts#L64)
 
 ---
 
@@ -400,7 +437,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[store.ts:25](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/store.ts#L25)
+[store.ts:25](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/store.ts#L25)
 
 ---
 
@@ -427,13 +464,15 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateDeclaration.ts:11](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateDeclaration.ts#L11)
+[stateDeclaration.ts:11](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateDeclaration.ts#L11)
 
 ---
 
 ### handleAction
 
 ▸ **handleAction**<`Event`, `Result`, `ErrorType`\>(`source`, `handler`, `options?`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+
+This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Type parameters
 
@@ -457,7 +496,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[handleAction.ts:5](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/handleAction.ts#L5)
+[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/handleAction.ts#L8)
 
 ---
 
@@ -485,7 +524,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateQuery.ts#L9)
+[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -514,7 +553,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateQuery.ts#L19)
+[stateQuery.ts:19](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateQuery.ts#L19)
 
 ---
 
@@ -540,4 +579,4 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/21d97be/packages/rx-effects/src/stateMutation.ts#L3)
+[stateMutation.ts:3](https://github.com/mnasyrov/rx-effects/blob/99ec474/packages/rx-effects/src/stateMutation.ts#L3)

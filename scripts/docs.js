@@ -21,6 +21,7 @@ function exec(command, workDir) {
 function processPackages() {
   const packagePaths = fastGlob.sync(['packages/*'], {
     onlyDirectories: true,
+    ignore: ['packages/examples'],
   });
 
   console.log('\nCopy LICENSE files...');

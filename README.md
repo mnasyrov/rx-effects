@@ -8,7 +8,21 @@ Reactive state and effect management with RxJS.
 [![downloads](https://img.shields.io/npm/dt/rx-effects.svg)](https://www.npmjs.com/package/rx-effects)
 [![types](https://img.shields.io/npm/types/rx-effects.svg)](https://www.npmjs.com/package/rx-effects)
 [![licence](https://img.shields.io/github/license/mnasyrov/rx-effects.svg)](https://github.com/mnasyrov/rx-effects/blob/master/LICENSE)
-[![Coverage Status](https://coveralls.io/repos/github/mnasyrov/rx-effects/badge.svg)](https://coveralls.io/github/mnasyrov/rx-effects)
+[![Coverage Status](https://coveralls.io/repos/github/mnasyrov/rx-effects/badge.svg?branch=main)](https://coveralls.io/github/mnasyrov/rx-effects?branch=main)
+
+## Table of Contents
+
+<!-- toc -->
+
+- [Overview](#overview)
+  - [Features](#features)
+  - [Packages](#packages)
+- [Usage](#usage)
+  - [Installation](#installation)
+  - [Concepts](#concepts)
+  - [Example](#example)
+
+<!-- tocstop -->
 
 ## Overview
 
@@ -16,13 +30,15 @@ The library provides a way to describe business and application logic using MVC-
 
 The library is inspired by [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), [RxJS](https://github.com/ReactiveX/rxjs), [Akita](https://github.com/datorama/akita), [JetState](https://github.com/mnasyrov/jetstate) and [Effector](https://github.com/effector/effector).
 
+It is recommended to use RxEffects together with [Ditox.js] – a dependency injection container.
+
 ### Features
 
-- Framework-agnostic
-- Functional API
 - Reactive state and store
 - Declarative actions and effects
 - Effect container
+- Framework-agnostic
+- Functional API
 - Typescript typings
 
 ### Packages
@@ -231,5 +247,6 @@ export const PizzaShopComponent: FC = () => {
 [rx-effects/api]: packages/rx-effects/docs/README.md
 [rx-effects-react/docs]: packages/rx-effects-react/README.md
 [rx-effects-react/api]: packages/rx-effects-react/docs/README.md
+[ditox.js]: https://github.com/mnasyrov/ditox
 
 &copy; 2021 [Mikhail Nasyrov](https://github.com/mnasyrov), [MIT license](./LICENSE)

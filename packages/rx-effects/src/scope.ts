@@ -6,27 +6,54 @@ import { handleAction } from './handleAction';
 import { StateDeclaration } from './stateDeclaration';
 import { createStore, Store } from './store';
 
+/**
+ * A controller-like boundary for effects and business logic.
+ *
+ * It collects all subscriptions which are made by child entities and provides
+ * `destroy()` method to unsubscribe from them.
+ */
 export type Scope = Controller<{
+  /**
+   * Stores any subscription-like or teardown function to be called with
+   * `destroy()` method.
+   */
   add: (teardown: TeardownLogic) => void;
 
+  /**
+   * Creates a store which will be destroyed with the scope.
+   */
   createStore<State>(
     initialState: State,
     stateCompare?: (s1: State, s2: State) => boolean,
   ): Store<State>;
 
+  /**
+   * Creates a store from its declaration which will be destroyed with the
+   * scope.
+   */
   createDeclaredStore<State>(
     stateDeclaration: StateDeclaration<State>,
     initialState?: Partial<State>,
   ): Store<State>;
 
+  /**
+   * Creates a controller which will be destroyed with the scope.
+   */
   createController: <ControllerProps>(
     factory: () => Controller<ControllerProps>,
   ) => Controller<ControllerProps>;
 
+  /**
+   * Creates an effect which will be destroyed with the scope.
+   */
   createEffect: <Event = void, Result = void, ErrorType = Error>(
     handler: EffectHandler<Event, Result>,
   ) => Effect<Event, Result, ErrorType>;
 
+  /**
+   * Creates an effect which handles `source` by `handler`, and it will be
+   * destroyed with the scope.
+   */
   handleAction: <Event, Result = void, ErrorType = Error>(
     source: Observable<Event> | Action<Event>,
     handler: EffectHandler<Event, Result>,
