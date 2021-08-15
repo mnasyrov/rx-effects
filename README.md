@@ -55,9 +55,9 @@ Core elements:
 - `StateMutation` – a pure function which changes the state.
 - `Store` – a state storage, it provides methods to update and subscribe the state.
 - `Action` – an event emitter.
-- `Effect` – a piece of business logic which handles the action and makes state changes and side effects.
-- `Scope` – a controller-like boundary for effects and business logic
+- `Effect` – a business logic which handles the action and makes state changes and side effects.
 - `Controller` – a controller type for effects and business logic
+- `Scope` – a controller-like boundary for effects and business logic
 
 ### Example
 

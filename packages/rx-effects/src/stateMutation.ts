@@ -4,10 +4,10 @@
  * It is recommended to return a new state or the previous one.
  *
  * Actually, the function can change the state in place, but it is responsible
- * of a developer to provide `stateCompare` function to the store which handles
+ * for a developer to provide `stateCompare` function to the store which handles
  * the changes.
  *
- * For making changes use curring function to provide arguments:
+ * For making changes use a currying function to provide arguments:
  * ```ts
  * const addPizzaToCart = (name: string): StateMutation<Array<string>> =>
  *   (state) => ([...state, name]);
