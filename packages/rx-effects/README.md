@@ -121,7 +121,7 @@ const addPizzaToCartWithBonus = (name: string): StateMutation<CartState> =>
 
 The store implements `StateQuery` type for providing the state:
 
-- `get()` returns the current state.`
+- `get()` returns the current state.
 - `value$` is an observable for the current state and future changes.
 
 It is allowed to get the current state at any time. However, you should be aware how it is used during async functions,
@@ -142,7 +142,57 @@ async function submitForm() {
 }
 ```
 
-`// TODO: Documentation`
+### State Queries
+
+The store has `select()` and `query()` methods:
+
+- `select()` returns `Observable` for the part of the state.
+- `value$` returns `StateQuery` for the part of the state.
+
+Both of the methods takes `selector()` and `valueComparator()` arguments:
+
+- `selector()` takes a state and produce a value based on the state.
+- `valueComparator()` is optional and allows change an equality check for the produced value.
+
+```ts
+const orders$: Observable<Array<string>> = cartStore.select(
+  (state) => state.orders,
+);
+
+const ordersQuery: StateQuery<Array<string>> = cartStore.query(
+  (state) => state.orders,
+);
+```
+
+### Destroying Store
+
+The store implements `Controller` type and has `destroy()` method.
+
+`destory()` completes internal `Observable` sources and all derived observables, which are created by `select()` and `query()` methods.
+
+After calling `destroy()` the store stops sending updates for state changes.
+
+### State Declaration
+
+`// TODO`
+
+## Actions and Effects
+
+### Action
+
+`// TODO`
+
+### Effect
+
+`// TODO`
+
+### Controller
+
+`// TODO`
+
+### Scope
+
+`// TODO`
 
 ---
 

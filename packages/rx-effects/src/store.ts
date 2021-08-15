@@ -84,18 +84,18 @@ export function createStore<State>(
 
     select<R>(
       selector: (state: State) => R,
-      valueCompare: (v1: R, v2: R) => boolean = Object.is,
+      valueComparator: (v1: R, v2: R) => boolean = Object.is,
     ): Observable<R> {
-      return state$.pipe(map(selector), distinctUntilChanged(valueCompare));
+      return state$.pipe(map(selector), distinctUntilChanged(valueComparator));
     },
 
     query<R>(
       selector: (state: State) => R,
-      valueCompare: (v1: R, v2: R) => boolean = Object.is,
+      valueComparator: (v1: R, v2: R) => boolean = Object.is,
     ): StateQuery<R> {
       return {
         get: () => selector(store$.value),
-        value$: this.select(selector, valueCompare),
+        value$: this.select(selector, valueComparator),
       };
     },
 

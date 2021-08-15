@@ -78,9 +78,12 @@ export function createScope(): Scope {
 
     createStore<State>(
       initialState: State,
-      stateCompare: (prevState: State, nextState: State) => boolean = Object.is,
+      stateComparator: (
+        prevState: State,
+        nextState: State,
+      ) => boolean = Object.is,
     ): Store<State> {
-      const store = createStore(initialState, stateCompare);
+      const store = createStore(initialState, stateComparator);
       subscriptions.add(store.destroy);
 
       return store;
