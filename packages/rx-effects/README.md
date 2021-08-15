@@ -42,13 +42,17 @@ Main elements:
 
 ## State and Store
 
-A state is described as a type, and it can be a primitive value or an object.
+### Define State
+
+A state can be a primitive value or an object, and it is described as a type.
 
 ```ts
 type CartState = { orders: Array<string> };
 ```
 
-After that, it is recommended to declare a set of `StateMutation` functions which will be used to alter the state. These
+### State Mutations
+
+After that, it is recommended to declare a set of `StateMutation` functions which can be used to update the state. These
 functions should be pure and return a new state or the previous one. For providing an argument use currying functions.
 
 Actually, `StateMutation` function can change the state in place, but it is responsible for a developer to track state
@@ -67,12 +71,16 @@ const removePizzaFromCart =
   });
 ```
 
-A store is created by `createStore()` function which takes an initial state:
+### Creation of Store
+
+A store is created by `createStore()` function, which takes an initial state:
 
 ```ts
 const INITIAL_STATE: CartState = { orders: [] };
 const cartStore: Store<CartState> = createStore(INITIAL_STATE);
 ```
+
+### Updating Store
 
 The store can be updated by `set()` and `update()` methods:
 
@@ -89,7 +97,7 @@ function addPizza(name: string) {
 }
 ```
 
-There is `pipeStateMutations()` helper which can merge state updates into the single mutation. It is useful for
+There is `pipeStateMutations()` helper, which can merge state updates into the single mutation. It is useful for
 combining several changes and applying it at the same time:
 
 ```ts
@@ -107,6 +115,31 @@ function addPizza(name: string) {
 ```ts
 const addPizzaToCartWithBonus = (name: string): StateMutation<CartState> =>
   pipeStateMutations([addPizzaToCart(name), addPizzaToCart('Bonus Pizza')]);
+```
+
+### Getting State
+
+The store implements `StateQuery` type for providing the state:
+
+- `get()` returns the current state.`
+- `value$` is an observable for the current state and future changes.
+
+It is allowed to get the current state at any time. However, you should be aware how it is used during async functions,
+because the state can be changed after awaiting a promise:
+
+```ts
+// Not recommended
+async function submitForm() {
+  await validate(formStore.get());
+  await postData(formStore.get()); // `formStore` can return another data here
+}
+
+// Recommended
+async function submitForm() {
+  const data = formStore.get();
+  await validate(data);
+  await postData(data);
+}
 ```
 
 `// TODO: Documentation`

@@ -29,10 +29,10 @@ It is recommended to use RxEffects together with [Ditox.js] – a dependency inj
 
 ### Packages
 
-List of packages and documentations:
-
-- [**rx-effects**][rx-effects/docs] – The core, state and effect management: [Documentation][rx-effects/docs], [API][rx-effects/api]
-- [**rx-effects-react**][rx-effects-react/docs] – Tooling for React.js: [Documentation][rx-effects-react/docs], [API][rx-effects-react/api]
+| Package                                       | Description                                | Links                                                      |
+| --------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------- |
+| [**rx-effects**][rx-effects/docs]             | Core elements, state and effect management | [Docs][rx-effects/docs], [API][rx-effects/api]             |
+| [**rx-effects-react**][rx-effects-react/docs] | Tooling for React.js                       | [Docs][rx-effects-react/docs], [API][rx-effects-react/api] |
 
 ## Usage
 
