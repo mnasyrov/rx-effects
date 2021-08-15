@@ -8,7 +8,7 @@ Reactive state and effect management with RxJS. Tooling for React.js.
 [![downloads](https://img.shields.io/npm/dt/rx-effects-react.svg)](https://www.npmjs.com/package/rx-effects-react)
 [![types](https://img.shields.io/npm/types/rx-effects-react.svg)](https://www.npmjs.com/package/rx-effects-react)
 [![licence](https://img.shields.io/github/license/mnasyrov/rx-effects.svg)](https://github.com/mnasyrov/rx-effects/blob/master/LICENSE)
-[![Coverage Status](https://coveralls.io/repos/github/mnasyrov/rx-effects/badge.svg)](https://coveralls.io/github/mnasyrov/rx-effects)
+[![Coverage Status](https://coveralls.io/repos/github/mnasyrov/rx-effects/badge.svg?branch=main)](https://coveralls.io/github/mnasyrov/rx-effects?branch=main)
 
 ## Documentation
 
@@ -66,6 +66,6 @@ export const PizzaShopComponent: FC = () => {
 
 ---
 
-[rx-effects/docs]: packages/rx-effects/README.md
+[rx-effects/docs]: https://github.com/mnasyrov/rx-effects/blob/main/packages/rx-effects/README.md
 
 &copy; 2021 [Mikhail Nasyrov](https://github.com/mnasyrov), [MIT license](./LICENSE)
