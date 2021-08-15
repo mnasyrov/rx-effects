@@ -7,6 +7,7 @@ rx-effects-react
 ### Functions
 
 - [useConst](README.md#useconst)
+- [useController](README.md#usecontroller)
 - [useObservable](README.md#useobservable)
 - [useObserver](README.md#useobserver)
 - [useSelector](README.md#useselector)
@@ -40,7 +41,40 @@ If the factory is provided, it is called only once.
 
 #### Defined in
 
-[useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects-react/src/useConst.ts#L12)
+[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects-react/src/useConst.ts#L12)
+
+---
+
+### useController
+
+▸ **useController**<`T`\>(`factory`, `dependencies?`): `T`
+
+Creates an ad-hoc controller by the factory and destroys it on unmounting a
+component.
+
+The factory is not part of the dependencies by default. It should be
+included explicitly when it is needed.
+
+#### Type parameters
+
+| Name | Type                                                                          |
+| :--- | :---------------------------------------------------------------------------- |
+| `T`  | extends `Readonly`<{ `destroy`: () => `void` } & `Record`<`string`, `any`\>\> |
+
+#### Parameters
+
+| Name            | Type        | Description                                            |
+| :-------------- | :---------- | :----------------------------------------------------- |
+| `factory`       | () => `T`   | a controller factory                                   |
+| `dependencies?` | `unknown`[] | array of hook dependencies to recreate the controller. |
+
+#### Returns
+
+`T`
+
+#### Defined in
+
+[rx-effects-react/src/useController.ts:17](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects-react/src/useController.ts#L17)
 
 ---
 
@@ -79,7 +113,7 @@ const value = useObservable<string>(source$, undefined);
 
 #### Defined in
 
-[useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects-react/src/useObservable.ts#L19)
+[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects-react/src/useObservable.ts#L19)
 
 ---
 
@@ -87,7 +121,7 @@ const value = useObservable<string>(source$, undefined);
 
 ▸ **useObserver**<`T`\>(`source$`, `observerOrNext`): `Subscription`
 
-Subscribes the provided observer or `next` handler on the source.
+Subscribes the provided observer or `next` handler on `source$` observable.
 
 This hook allows to do fine handling of the source observable.
 
@@ -119,7 +153,7 @@ useObserver(source$, observer);
 
 #### Defined in
 
-[useObserver.ts:21](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects-react/src/useObserver.ts#L21)
+[rx-effects-react/src/useObserver.ts:21](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects-react/src/useObserver.ts#L21)
 
 ---
 
@@ -165,7 +199,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[useSelector.ts:26](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects-react/src/useSelector.ts#L26)
+[rx-effects-react/src/useSelector.ts:26](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects-react/src/useSelector.ts#L26)
 
 ---
 
@@ -173,7 +207,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 ▸ **useStateQuery**<`T`\>(`query`): `T`
 
-Provides the current and future values which are provided by the query.
+Returns a value which is provided by the query.
 
 #### Type parameters
 
@@ -193,4 +227,4 @@ Provides the current and future values which are provided by the query.
 
 #### Defined in
 
-[useStateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects-react/src/useStateQuery.ts#L9)
+[rx-effects-react/src/useStateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects-react/src/useStateQuery.ts#L9)

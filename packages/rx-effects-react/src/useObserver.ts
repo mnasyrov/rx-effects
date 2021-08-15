@@ -3,7 +3,7 @@ import { Observable, Observer, Subscription } from 'rxjs';
 import { useConst } from './useConst';
 
 /**
- * Subscribes the provided observer or `next` handler on the source.
+ * Subscribes the provided observer or `next` handler on `source$` observable.
  *
  * This hook allows to do fine handling of the source observable.
  *

@@ -65,7 +65,7 @@ submitForm.even$.subscribe((formData) => {
 
 #### Defined in
 
-[action.ts:22](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/action.ts#L22)
+[action.ts:22](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/action.ts#L22)
 
 ---
 
@@ -94,7 +94,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/controller.ts#L17)
+[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/controller.ts#L17)
 
 ---
 
@@ -120,7 +120,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/effect.ts#L56)
+[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/effect.ts#L56)
 
 ---
 
@@ -153,7 +153,7 @@ Handler for an event. It can be asynchronous.
 
 #### Defined in
 
-[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/effect.ts#L12)
+[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/effect.ts#L12)
 
 ---
 
@@ -184,7 +184,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/effect.ts#L27)
+[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
@@ -202,7 +202,7 @@ Options for handling an action or observable.
 
 #### Defined in
 
-[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/effect.ts#L19)
+[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/effect.ts#L19)
 
 ---
 
@@ -217,7 +217,7 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/scope.ts#L15)
+[scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
@@ -235,7 +235,7 @@ Declaration of a state.
 
 #### Defined in
 
-[stateDeclaration.ts:12](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateDeclaration.ts#L12)
+[stateDeclaration.ts:12](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateDeclaration.ts#L12)
 
 ---
 
@@ -268,7 +268,7 @@ state.
 
 #### Defined in
 
-[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateDeclaration.ts#L7)
+[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateDeclaration.ts#L7)
 
 ---
 
@@ -317,7 +317,7 @@ a next state
 
 #### Defined in
 
-[stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateMutation.ts#L19)
+[stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateMutation.ts#L19)
 
 ---
 
@@ -342,7 +342,7 @@ Provider for a value of a state.
 
 #### Defined in
 
-[stateQuery.ts:7](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateQuery.ts#L7)
+[stateQuery.ts:7](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateQuery.ts#L7)
 
 ---
 
@@ -360,7 +360,7 @@ Read-only type of the state store.
 
 #### Defined in
 
-[store.ts:10](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/store.ts#L10)
+[store.ts:10](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/store.ts#L10)
 
 ---
 
@@ -376,7 +376,7 @@ Read-only type of the state store.
 
 #### Defined in
 
-[store.ts:40](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/store.ts#L40)
+[store.ts:40](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/store.ts#L40)
 
 ## Functions
 
@@ -396,7 +396,7 @@ Read-only type of the state store.
 
 #### Defined in
 
-[action.ts:29](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/action.ts#L29)
+[action.ts:29](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/action.ts#L29)
 
 ---
 
@@ -434,7 +434,7 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 #### Defined in
 
-[effect.ts:83](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/effect.ts#L83)
+[effect.ts:83](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/effect.ts#L83)
 
 ---
 
@@ -450,7 +450,7 @@ Creates `Scope` instance.
 
 #### Defined in
 
-[scope.ts:67](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/scope.ts#L67)
+[scope.ts:67](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/scope.ts#L67)
 
 ---
 
@@ -479,7 +479,7 @@ Creates the state store.
 
 #### Defined in
 
-[store.ts:56](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/store.ts#L56)
+[store.ts:56](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/store.ts#L56)
 
 ---
 
@@ -508,7 +508,7 @@ Declares the state.
 
 #### Defined in
 
-[stateDeclaration.ts:29](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateDeclaration.ts#L29)
+[stateDeclaration.ts:29](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateDeclaration.ts#L29)
 
 ---
 
@@ -540,7 +540,7 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/handleAction.ts#L8)
+[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/handleAction.ts#L8)
 
 ---
 
@@ -571,7 +571,7 @@ function.
 
 #### Defined in
 
-[stateQuery.ts:22](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateQuery.ts#L22)
+[stateQuery.ts:22](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateQuery.ts#L22)
 
 ---
 
@@ -603,7 +603,7 @@ and merges them into a single value.
 
 #### Defined in
 
-[stateQuery.ts:39](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateQuery.ts#L39)
+[stateQuery.ts:39](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateQuery.ts#L39)
 
 ---
 
@@ -633,4 +633,4 @@ You can use this helper to apply multiple changes at the same time.
 
 #### Defined in
 
-[stateMutation.ts:26](https://github.com/mnasyrov/rx-effects/blob/f3195d1/packages/rx-effects/src/stateMutation.ts#L26)
+[stateMutation.ts:26](https://github.com/mnasyrov/rx-effects/blob/a5e5c92/packages/rx-effects/src/stateMutation.ts#L26)

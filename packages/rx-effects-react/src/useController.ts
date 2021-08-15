@@ -5,8 +5,8 @@ import { useEffect, useMemo } from 'react';
 import { Controller } from 'rx-effects';
 
 /**
- * Creates a controller by the factory and destroys it on unmounting a
- * component
+ * Creates an ad-hoc controller by the factory and destroys it on unmounting a
+ * component.
  *
  * The factory is not part of the dependencies by default. It should be
  * included explicitly when it is needed.

@@ -12,7 +12,7 @@ Reactive state and effect management with RxJS. Tooling for React.js.
 
 ## Documentation
 
-- [General docs](https://github.com/mnasyrov/rx-effects#readme)
+- [Main docs](https://github.com/mnasyrov/rx-effects#readme)
 - [API docs](docs/README.md)
 
 ## Installation
@@ -23,8 +23,49 @@ npm install rx-effects rx-effects-react --save
 
 ## Usage
 
-`// TODO: Documentation`
+The package provides utility hooks to bind the core [RxEffects][rx-effects/docs]
+to React components and hooks:
 
-## License
+- [`useConst`](docs/README.md#useconst) – keeps the value as a constant between renders.
+- [`useController`](docs/README.md#usecontroller) – creates an ad-hoc controller by the factory and destroys it on unmounting.
+- [`useObservable`](docs/README.md#useobservable) – returns a value provided by `source$` observable.
+- [`useObserver`](docs/README.md#useobserver) – subscribes the provided observer or `next` handler on `source$` observable.
+- [`useSelector`](docs/README.md#useselector) – returns a value provided by `source$` observable.
+- [`useStateQuery`](docs/README.md#usestatequery) – returns a value which is provided by the query.
 
-[MIT](LICENSE)
+Example:
+
+```tsx
+// pizzaShopComponent.tsx
+
+import React, { FC, useEffect } from 'react';
+import { useConst, useObservable, useStateQuery } from 'rx-effects-react';
+import { createPizzaShopController } from './pizzaShop';
+
+export const PizzaShopComponent: FC = () => {
+  // Creates the controller and destroy it on unmounting the component
+  const controller = useConst(() => createPizzaShopController());
+  useEffect(() => controller.destroy, [controller]);
+
+  // The same creation can be achieved by using `useController()` helper:
+  // const controller = useController(createPizzaShopController);
+
+  // Using the controller
+  const { ordersQuery, addPizza, removePizza, submitCart, submitState } =
+    controller;
+
+  // Subscribing to state data and the effect stata
+  const orders = useStateQuery(ordersQuery);
+  const isPending = useStateQuery(submitState.pending);
+  const submitError = useObservable(submitState.error$, undefined);
+
+  // Actual rendering should be here.
+  return null;
+};
+```
+
+---
+
+[rx-effects/docs]: packages/rx-effects/README.md
+
+&copy; 2021 [Mikhail Nasyrov](https://github.com/mnasyrov), [MIT license](./LICENSE)

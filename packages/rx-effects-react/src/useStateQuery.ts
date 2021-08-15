@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { StateQuery } from 'rx-effects';
 
 /**
- * Provides the current and future values which are provided by the query.
+ * Returns a value which is provided by the query.
  *
  * @param query – a query for a value
  */

@@ -12,7 +12,7 @@ Reactive state and effect management with RxJS.
 
 ## Documentation
 
-- [General docs](https://github.com/mnasyrov/rx-effects#readme)
+- [Main docs](https://github.com/mnasyrov/rx-effects#readme)
 - [API docs](docs/README.md)
 
 ## Installation
@@ -25,6 +25,6 @@ npm install rx-effects --save
 
 `// TODO: Documentation`
 
-## License
+---
 
-[MIT](LICENSE)
+&copy; 2021 [Mikhail Nasyrov](https://github.com/mnasyrov), [MIT license](./LICENSE)
