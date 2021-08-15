@@ -2,6 +2,22 @@ import { useEffect } from 'react';
 import { Observable, Observer, Subscription } from 'rxjs';
 import { useConst } from './useConst';
 
+/**
+ * Subscribes the provided observer or `next` handler on the source.
+ *
+ * This hook allows to do fine handling of the source observable.
+ *
+ * @param source$ an observable
+ * @param observerOrNext `Observer` or `next` handler
+ *
+ * @example
+ * ```ts
+ * const observer = useCallback((nextValue) => {
+ *   logger.log(nextValue);
+ * }, []);
+ * useObserver(source$, observer);
+ * ```
+ */
 export function useObserver<T>(
   source$: Observable<T>,
   observerOrNext: Partial<Observer<T>> | ((value: T) => void),

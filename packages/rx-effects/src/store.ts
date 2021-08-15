@@ -50,12 +50,12 @@ export type Store<State> = StateReader<State> &
  * Creates the state store.
  *
  * @param initialState an initial state
- * @param stateCompare a comparator for detecting changes between old and new
+ * @param stateComparator a comparator for detecting changes between old and new
  *   states
  */
 export function createStore<State>(
   initialState: State,
-  stateCompare: (prevState: State, nextState: State) => boolean = Object.is,
+  stateComparator: (prevState: State, nextState: State) => boolean = Object.is,
 ): Store<State> {
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
   const state$ = store$.asObservable();
@@ -69,7 +69,7 @@ export function createStore<State>(
 
     set(nextState: State) {
       const prevState = store$.value;
-      if (!stateCompare(prevState, nextState)) {
+      if (!stateComparator(prevState, nextState)) {
         store$.next(nextState);
       }
     },
@@ -77,7 +77,7 @@ export function createStore<State>(
     update(mutation: StateMutation<State>) {
       const prevState = store$.value;
       const nextState = mutation(prevState);
-      if (!stateCompare(prevState, nextState)) {
+      if (!stateComparator(prevState, nextState)) {
         store$.next(nextState);
       }
     },

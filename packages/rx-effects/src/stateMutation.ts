@@ -12,6 +12,9 @@
  * const addPizzaToCart = (name: string): StateMutation<Array<string>> =>
  *   (state) => ([...state, name]);
  * ```
+ *
+ * @param state a previous state
+ * @returns a next state
  */
 export type StateMutation<State> = (state: State) => State;
 
