@@ -10,20 +10,6 @@ Reactive state and effect management with RxJS.
 [![licence](https://img.shields.io/github/license/mnasyrov/rx-effects.svg)](https://github.com/mnasyrov/rx-effects/blob/master/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/mnasyrov/rx-effects/badge.svg?branch=main)](https://coveralls.io/github/mnasyrov/rx-effects?branch=main)
 
-## Table of Contents
-
-<!-- toc -->
-
-- [Overview](#overview)
-  - [Features](#features)
-  - [Packages](#packages)
-- [Usage](#usage)
-  - [Installation](#installation)
-  - [Concepts](#concepts)
-  - [Example](#example)
-
-<!-- tocstop -->
-
 ## Overview
 
 The library provides a way to describe business and application logic using MVC-like architecture. Core elements include actions and effects, states and stores. All of them are optionated and can be used separately. The core package is framework-agnostic and can be used in different cases: libraries, server apps, web, SPA and micro-frontends apps.
