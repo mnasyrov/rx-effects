@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/mnasyrov/rx-effects/compare/v0.2.0...v0.2.1) (2021-08-15)
+
+### Bug Fixes
+
+- Added a missed export for `useController()` hook ([a5e5c92](https://github.com/mnasyrov/rx-effects/commit/a5e5c92da8a288f44c41dac2cb70c96d788eea38))
+
 # [0.2.0](https://github.com/mnasyrov/rx-effects/compare/v0.1.0...v0.2.0) (2021-08-09)
 
 ### Features
