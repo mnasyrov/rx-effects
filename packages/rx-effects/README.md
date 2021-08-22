@@ -164,6 +164,24 @@ const ordersQuery: StateQuery<Array<string>> = cartStore.query(
 );
 ```
 
+Utility functions:
+
+- `mapQuery()` takes a query and a value mapper and returns a new query which projects the mapped value.
+  ```ts
+  const store = createStore<{ values: Array<string> }>();
+  const valuesQuery = store.query((state) => state.values);
+  const top5values = mapQuery(valuesQuery, (values) => values.slice(0, 5));
+  ```
+- `mergeQueries()` takes queries and a value merger and returns a new query which projects the derived value of queries.
+  ```ts
+  const store1 = createStore<number>(2);
+  const store2 = createStore<number>(3);
+  const sumValueQuery = mergeQueries(
+    [store1, store2],
+    ([value1, value2]) => value1 + value2,
+  );
+  ```
+
 ### Destroying Store
 
 The store implements `Controller` type and has `destroy()` method.
