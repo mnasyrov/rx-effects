@@ -214,7 +214,7 @@ Types and factories for states and store are compatible with external libraries 
 
 #### Immer.js
 
-Integration of Immer.js is straightforward: it is enough to use `produce()` function inside `StateMutation` functions:
+Integration of [Immer.js](https://github.com/immerjs/immer) is straightforward: it is enough to use `produce()` function inside `StateMutation` functions:
 
 Example:
 
@@ -239,7 +239,7 @@ export const removePizzaFromCart = (name: string): StateMutation<CartState> =>
 
 #### Immutable.js
 
-Integration of Immutable.js:
+Integration of [Immutable.js](https://github.com/immutable-js/immutable-js):
 
 - It is recommended to use `Record` and `RecordOf` for object-list states.
 - Use `Immutable.is()` function as a comparator for Immutable's state and values.
