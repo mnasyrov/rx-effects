@@ -202,7 +202,8 @@ describe('Some unit', () => {
 
     store.update(removeItem('item2'));
 
-    expect(store.get()).toEqual(CART_STATE.createState({ orders: ['item1'] }));
+    const expectedState = CART_STATE.createState({ orders: ['item1'] });
+    expect(store.get()).toEqual(expectedState);
   });
 });
 ```
