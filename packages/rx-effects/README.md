@@ -174,7 +174,101 @@ After calling `destroy()` the store stops sending updates for state changes.
 
 ### State Declaration
 
-`// TODO`
+`StateDeclaration` describes the initial state and how to create specific state and store. The type has three fields:
+
+- `initialState` is the initial state.
+- `createState()` returns a state.
+- `createStore()` returns a store for the state.
+
+`createState()` and `createStore()` can take optional state values for overriding the initial state, it's useful for unit tests.
+
+There is `declareState()` helper which returns the declaration:
+
+```ts
+const CART_STATE = declareState<{
+  orders: Array<string>;
+}>({ orders: [] });
+
+// Later...
+const cartStore = CART_STATE.createStore();
+```
+
+Example of a unit test:
+
+```ts
+describe('Some unit', () => {
+  it('should remove an item', () => {
+    const store = CART_STATE.createStore({ orders: ['item1', 'item2'] });
+
+    store.update(removeItem('item2'));
+
+    expect(store.get()).toEqual(CART_STATE.createState({ orders: ['item1'] }));
+  });
+});
+```
+
+### Usage of libraries for immutable state
+
+Types and factories for states and store are compatible with external libraries for immutable values like Immer.js or Immutable.js. All state changes are encapsulated by `StateMutation` functions so using the API remains the same. The one thing which should be considered is providing the right state comparators to `StateDeclaration` and `Store`.
+
+#### Immer.js
+
+Integration of Immer.js is straightforward: it is enough to use `produce()` function inside `StateMutation` functions:
+
+Example:
+
+```ts
+import { produce } from 'immer';
+import { StateMutation } from 'rx-effects';
+
+export type CartState = { orders: Array<string> };
+
+export const CART_STATE = declareState<CartState>({ orders: [] });
+
+export const addPizzaToCart = (name: string): StateMutation<CartState> =>
+  produce((state) => {
+    state.orders.push(name);
+  });
+
+export const removePizzaFromCart = (name: string): StateMutation<CartState> =>
+  produce((state) => {
+    state.orders = state.orders.filter((order) => order !== name);
+  });
+```
+
+#### Immutable.js
+
+Integration of Immutable.js:
+
+- It is recommended to use `Record` and `RecordOf` for object-list states.
+- Use `Immutable.is()` function as a comparator for Immutable's state and values.
+
+Example:
+
+```ts
+import { is, List, Record, RecordOf } from 'immutable';
+import { declareState, StateMutation } from 'rx-effects';
+
+export type CartState = RecordOf<{ orders: Immutable.List<string> }>;
+
+export const CART_STATE = declareState<CartState>(
+  Record({ orders: List() }),
+  is, // State comparator of Immutable.js
+);
+
+export const addPizzaToCart =
+  (name: string): StateMutation<CartState> =>
+  (state) =>
+    state.set('orders', state.orders.push(name));
+
+export const removePizzaFromCart =
+  (name: string): StateMutation<CartState> =>
+  (state) =>
+    state.set(
+      'orders',
+      state.orders.filter((order) => order !== name),
+    );
+```
 
 ## Actions and Effects
 
