@@ -26,7 +26,7 @@ describe('mergeQueries()', () => {
   it('should return a calculated value from source queries', () => {
     const store1 = createStore(2);
     const store2 = createStore('text');
-    const query = mergeQueries([store1, store2], ([a, b]) => ({ a, b }));
+    const query = mergeQueries([store1, store2], (a, b) => ({ a, b }));
 
     expect(query.get()).toEqual({ a: 2, b: 'text' });
 
@@ -40,7 +40,7 @@ describe('mergeQueries()', () => {
   it('should return an observable with the calculated value from source queries', async () => {
     const store1 = createStore(2);
     const store2 = createStore('text');
-    const query = mergeQueries([store1, store2], ([a, b]) => ({ a, b }));
+    const query = mergeQueries([store1, store2], (a, b) => ({ a, b }));
 
     expect(await firstValueFrom(query.value$)).toEqual({ a: 2, b: 'text' });
 
@@ -49,5 +49,17 @@ describe('mergeQueries()', () => {
 
     store2.set('text2');
     expect(await firstValueFrom(query.value$)).toEqual({ a: 3, b: 'text2' });
+  });
+
+  it('should infer types for values of the queries', () => {
+    const store1 = createStore<number>(2);
+    const store2 = createStore<{ value: number }>({ value: 3 });
+
+    const query: StateQuery<number> = mergeQueries(
+      [store1, store2],
+      (value, obj) => value + obj.value,
+    );
+
+    expect(query.get()).toEqual(5);
   });
 });

@@ -178,7 +178,7 @@ Utility functions:
   const store2 = createStore<number>(3);
   const sumValueQuery = mergeQueries(
     [store1, store2],
-    ([value1, value2]) => value1 + value2,
+    (value1, value2) => value1 + value2,
   );
   ```
 
