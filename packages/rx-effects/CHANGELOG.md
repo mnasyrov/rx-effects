@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.2](https://github.com/mnasyrov/rx-effects/compare/v0.2.1...v0.2.2) (2021-09-02)
+
+### Bug Fixes
+
+- Fixed typings and arguments of `mergeQueries()` ([156abcc](https://github.com/mnasyrov/rx-effects/commit/156abccc4dbe569751c1c79d1dba19e441da91cf))
+
 ## [0.2.1](https://github.com/mnasyrov/rx-effects/compare/v0.2.0...v0.2.1) (2021-08-15)
 
 **Note:** Version bump only for package rx-effects
