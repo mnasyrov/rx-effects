@@ -90,10 +90,11 @@ describe('Store', () => {
 
     it('should use the provided valueCompare', async () => {
       const store = createStore<State>({ value: 1, data: 'a,1' });
-      const data$ = store.select(
-        (state) => state.data,
-        (v1, v2) => (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],
-      );
+      const data$ = store.select((state) => state.data, {
+        distinct: true,
+        comparator: (v1, v2) =>
+          (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],
+      });
 
       const changes = await collectChanges(data$, () => {
         store.set({ value: 1, data: 'a,2' });
@@ -122,10 +123,11 @@ describe('Store', () => {
 
     it('should use the provided valueCompare', async () => {
       const store = createStore<State>({ value: 1, data: 'a,1' });
-      const query = store.query(
-        (state) => state.data,
-        (v1, v2) => (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],
-      );
+      const query = store.query((state) => state.data, {
+        distinct: true,
+        comparator: (v1, v2) =>
+          (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],
+      });
 
       const changes = await collectChanges(query.value$, () => {
         store.set({ value: 1, data: 'a,2' });

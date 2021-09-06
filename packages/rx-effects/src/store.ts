@@ -1,8 +1,8 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
 import { Controller } from './controller';
 import { StateMutation } from './stateMutation';
-import { StateQuery } from './stateQuery';
+import { mapQuery, StateQuery, StateQueryOptions } from './stateQuery';
+import { DEFAULT_COMPARATOR } from './utils';
 
 /**
  * Read-only type of the state store.
@@ -10,6 +10,7 @@ import { StateQuery } from './stateQuery';
 export type StateReader<State> = StateQuery<State> & {
   /**
    * Returns a part of the state as `Observable`
+   * The result observable produces distinct values by default.
    *
    * @example
    * ```ts
@@ -17,13 +18,14 @@ export type StateReader<State> = StateQuery<State> & {
    * const value$ = state.select((state) => state.form.login);
    * ```
    */
-  readonly select: <R>(
+  readonly select: <R, K = R>(
     selector: (state: State) => R,
-    compare?: (v1: R, v2: R) => boolean,
+    options?: StateQueryOptions<R, K>,
   ) => Observable<R>;
 
   /**
-   * Returns a part of the state as `StateQuery`
+   * Returns a part of the state as `StateQuery`.
+   * The result query produces distinct values by default.
    *
    * @example
    * ```ts
@@ -31,9 +33,9 @@ export type StateReader<State> = StateQuery<State> & {
    * const query = state.query((state) => state.form.login);
    * ```
    * */
-  readonly query: <R>(
+  readonly query: <R, K = R>(
     selector: (state: State) => R,
-    compare?: (v1: R, v2: R) => boolean,
+    options?: StateQueryOptions<R, K>,
   ) => StateQuery<R>;
 };
 
@@ -55,7 +57,10 @@ export type Store<State> = StateReader<State> &
  */
 export function createStore<State>(
   initialState: State,
-  stateComparator: (prevState: State, nextState: State) => boolean = Object.is,
+  stateComparator: (
+    prevState: State,
+    nextState: State,
+  ) => boolean = DEFAULT_COMPARATOR,
 ): Store<State> {
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
   const state$ = store$.asObservable();
@@ -82,21 +87,18 @@ export function createStore<State>(
       }
     },
 
-    select<R>(
+    select<R, K = R>(
       selector: (state: State) => R,
-      valueComparator: (v1: R, v2: R) => boolean = Object.is,
+      options?: StateQueryOptions<R, K>,
     ): Observable<R> {
-      return state$.pipe(map(selector), distinctUntilChanged(valueComparator));
+      return this.query(selector, options).value$;
     },
 
-    query<R>(
+    query<R, K = R>(
       selector: (state: State) => R,
-      valueComparator: (v1: R, v2: R) => boolean = Object.is,
+      options: StateQueryOptions<R, K> = { distinct: true },
     ): StateQuery<R> {
-      return {
-        get: () => selector(store$.value),
-        value$: this.select(selector, valueComparator),
-      };
+      return mapQuery(this, selector, options);
     },
 
     destroy() {

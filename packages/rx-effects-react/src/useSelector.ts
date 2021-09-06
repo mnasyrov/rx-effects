@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Observable } from 'rxjs';
+import { DEFAULT_COMPARATOR } from './utils';
 
 /**
  * Returns a value provided by `source$`.
@@ -27,7 +28,7 @@ export function useSelector<S, R>(
   source$: Observable<S>,
   initialValue: S,
   selector: (state: S) => R,
-  comparator: (v1: R, v2: R) => boolean = Object.is,
+  comparator: (v1: R, v2: R) => boolean = DEFAULT_COMPARATOR,
 ): R {
   const [value, setValue] = useState<R>(() => selector(initialValue));
 

@@ -5,6 +5,7 @@ import { createEffect, Effect, EffectHandler, HandlerOptions } from './effect';
 import { handleAction } from './handleAction';
 import { StateDeclaration } from './stateDeclaration';
 import { createStore, Store } from './store';
+import { DEFAULT_COMPARATOR } from './utils';
 
 /**
  * A controller-like boundary for effects and business logic.
@@ -81,7 +82,7 @@ export function createScope(): Scope {
       stateComparator: (
         prevState: State,
         nextState: State,
-      ) => boolean = Object.is,
+      ) => boolean = DEFAULT_COMPARATOR,
     ): Store<State> {
       const store = createStore(initialState, stateComparator);
       subscriptions.add(store.destroy);
