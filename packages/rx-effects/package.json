@@ -1,7 +1,7 @@
 {
   "name": "rx-effects",
   "description": "Reactive state and effects management",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "license": "MIT",
   "author": "Mikhail Nasyrov (https://github.com/mnasyrov)",
   "homepage": "https://github.com/mnasyrov/rx-effects",
