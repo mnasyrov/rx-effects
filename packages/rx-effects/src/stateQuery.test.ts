@@ -1,4 +1,4 @@
-import { BehaviorSubject, firstValueFrom, Subject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
 import { mapQuery, mergeQueries, StateQuery } from './stateQuery';
 import { createStore } from './store';
@@ -21,14 +21,14 @@ describe('mapQuery()', () => {
     expect(await firstValueFrom(query.value$)).toBe(11);
   });
 
-  it('should produce values for each source emission by default', () => {
+  it('should not produce values for each source emission if distinct is false', () => {
     const sourceValue$ = new BehaviorSubject<number>(0);
     const sourceQuery: StateQuery<number> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
 
-    const query = mapQuery(sourceQuery, (value) => value);
+    const query = mapQuery(sourceQuery, (value) => value, { distinct: false });
     const listener = jest.fn();
     query.value$.subscribe(listener);
 
@@ -41,14 +41,14 @@ describe('mapQuery()', () => {
     expect(listener).nthCalledWith(3, 1);
   });
 
-  it('should produce distinct values', () => {
+  it('should produce distinct values by default', () => {
     const sourceValue$ = new BehaviorSubject<number>(0);
     const sourceQuery: StateQuery<number> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
 
-    const query = mapQuery(sourceQuery, (value) => value, { distinct: true });
+    const query = mapQuery(sourceQuery, (value) => value);
     const listener = jest.fn();
     query.value$.subscribe(listener);
 
@@ -69,8 +69,7 @@ describe('mapQuery()', () => {
     };
 
     const query = mapQuery(sourceQuery, (value) => value, {
-      distinct: true,
-      comparator: (a, b) => a.v === b.v,
+      distinct: { comparator: (a, b) => a.v === b.v },
     });
     const listener = jest.fn();
     query.value$.subscribe(listener);
@@ -94,8 +93,7 @@ describe('mapQuery()', () => {
     };
 
     const query = mapQuery(sourceQuery, (value) => value, {
-      distinct: true,
-      keySelector: (a) => a.v,
+      distinct: { keySelector: (a) => a.v },
     });
     const listener = jest.fn();
     query.value$.subscribe(listener);
@@ -152,11 +150,15 @@ describe('mergeQueries()', () => {
     expect(query.get()).toEqual(5);
   });
 
-  it('should produce values for each source emission by default', () => {
+  it('should produce values for each source emission if distinct is false', () => {
     const store1 = createStore(0);
     const store2 = createStore({ k: 0, value: 0 });
 
-    const query = mergeQueries([store1, store2], (a, b) => ({ a, b: b.value }));
+    const query = mergeQueries(
+      [store1, store2],
+      (a, b) => ({ a, b: b.value }),
+      { distinct: false },
+    );
     const listener = jest.fn();
     query.value$.subscribe(listener);
 
@@ -169,13 +171,11 @@ describe('mergeQueries()', () => {
     expect(listener).nthCalledWith(3, { a: 0, b: 1 });
   });
 
-  it('should produce distinct values', () => {
+  it('should produce distinct values for each source emission by default', () => {
     const store1 = createStore(0);
     const store2 = createStore({ k: 0, value: 0 });
 
-    const query = mergeQueries([store1, store2], (a, b) => a + b.value, {
-      distinct: true,
-    });
+    const query = mergeQueries([store1, store2], (a, b) => a + b.value);
     const listener = jest.fn();
     query.value$.subscribe(listener);
 
@@ -194,7 +194,7 @@ describe('mergeQueries()', () => {
     const query = mergeQueries(
       [store1, store2],
       (a, b) => ({ a, b: b.value }),
-      { distinct: true, comparator: (a, b) => a.a === b.a },
+      { distinct: { comparator: (a, b) => a.a === b.a } },
     );
     const listener = jest.fn();
     query.value$.subscribe(listener);
@@ -215,7 +215,7 @@ describe('mergeQueries()', () => {
     const query = mergeQueries(
       [store1, store2],
       (a, b) => ({ a, b: b.value }),
-      { distinct: true, keySelector: (a) => a.a },
+      { distinct: { keySelector: (a) => a.a } },
     );
     const listener = jest.fn();
     query.value$.subscribe(listener);

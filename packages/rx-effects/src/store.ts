@@ -96,7 +96,7 @@ export function createStore<State>(
 
     query<R, K = R>(
       selector: (state: State) => R,
-      options: StateQueryOptions<R, K> = { distinct: true },
+      options?: StateQueryOptions<R, K>,
     ): StateQuery<R> {
       return mapQuery(this, selector, options);
     },
