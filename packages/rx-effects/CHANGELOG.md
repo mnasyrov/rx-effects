@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.1](https://github.com/mnasyrov/rx-effects/compare/v0.3.0...v0.3.1) (2021-09-07)
+
+### Bug Fixes
+
+- `mapQuery()` and `mergeQueries()` produce distinct values by default ([17721af](https://github.com/mnasyrov/rx-effects/commit/17721af837b3a43f047ef67ba475294e58492e80))
+
 # [0.3.0](https://github.com/mnasyrov/rx-effects/compare/v0.2.2...v0.3.0) (2021-09-07)
 
 ### Features

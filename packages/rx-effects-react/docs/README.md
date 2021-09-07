@@ -41,7 +41,7 @@ If the factory is provided, it is called only once.
 
 #### Defined in
 
-[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/17721af/packages/rx-effects-react/src/useConst.ts#L12)
+[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/7bd615b/packages/rx-effects-react/src/useConst.ts#L12)
 
 ---
 
@@ -74,7 +74,7 @@ included explicitly when it is needed.
 
 #### Defined in
 
-[rx-effects-react/src/useController.ts:17](https://github.com/mnasyrov/rx-effects/blob/17721af/packages/rx-effects-react/src/useController.ts#L17)
+[rx-effects-react/src/useController.ts:17](https://github.com/mnasyrov/rx-effects/blob/7bd615b/packages/rx-effects-react/src/useController.ts#L17)
 
 ---
 
@@ -113,7 +113,7 @@ const value = useObservable<string>(source$, undefined);
 
 #### Defined in
 
-[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/17721af/packages/rx-effects-react/src/useObservable.ts#L19)
+[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/7bd615b/packages/rx-effects-react/src/useObservable.ts#L19)
 
 ---
 
@@ -153,7 +153,7 @@ useObserver(source$, observer);
 
 #### Defined in
 
-[rx-effects-react/src/useObserver.ts:21](https://github.com/mnasyrov/rx-effects/blob/17721af/packages/rx-effects-react/src/useObserver.ts#L21)
+[rx-effects-react/src/useObserver.ts:21](https://github.com/mnasyrov/rx-effects/blob/7bd615b/packages/rx-effects-react/src/useObserver.ts#L21)
 
 ---
 
@@ -199,7 +199,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/17721af/packages/rx-effects-react/src/useSelector.ts#L27)
+[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/7bd615b/packages/rx-effects-react/src/useSelector.ts#L27)
 
 ---
 
@@ -227,4 +227,4 @@ Returns a value which is provided by the query.
 
 #### Defined in
 
-[rx-effects-react/src/useStateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/17721af/packages/rx-effects-react/src/useStateQuery.ts#L9)
+[rx-effects-react/src/useStateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/7bd615b/packages/rx-effects-react/src/useStateQuery.ts#L9)
