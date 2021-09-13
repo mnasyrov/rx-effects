@@ -27,6 +27,25 @@ describe('useController()', () => {
     expect(destroy).toBeCalledTimes(1);
   });
 
+  it('should not recreate the controller with empty dependencies after rerendering', () => {
+    const destroy = jest.fn();
+
+    const createController = () => ({ destroy });
+
+    const { result, rerender, unmount } = renderHook(() =>
+      useController(createController),
+    );
+
+    const controller1 = result.current;
+    rerender();
+    const controller2 = result.current;
+
+    expect(controller1 === controller2).toBe(true);
+
+    unmount();
+    expect(destroy).toBeCalledTimes(1);
+  });
+
   it('should recreate the controller if a dependency is changed', () => {
     const destroy = jest.fn();
 

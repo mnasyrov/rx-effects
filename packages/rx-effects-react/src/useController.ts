@@ -4,6 +4,8 @@
 import { useEffect, useMemo } from 'react';
 import { Controller } from 'rx-effects';
 
+const EMPTY_DEPENDENCIES: unknown[] = [];
+
 /**
  * Creates an ad-hoc controller by the factory and destroys it on unmounting a
  * component.
@@ -16,7 +18,7 @@ import { Controller } from 'rx-effects';
  */
 export function useController<T extends Controller<Record<string, any>>>(
   factory: () => T,
-  dependencies?: unknown[],
+  dependencies: unknown[] = EMPTY_DEPENDENCIES,
 ): T {
   const controller = useMemo(factory, dependencies);
   useEffect(() => controller.destroy, [controller]);
