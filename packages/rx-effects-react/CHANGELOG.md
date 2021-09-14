@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.2](https://github.com/mnasyrov/rx-effects/compare/v0.3.1...v0.3.2) (2021-09-14)
+
+### Bug Fixes
+
+- useController() hook triggers rerenders if it is used without dependencies. ([f0b5582](https://github.com/mnasyrov/rx-effects/commit/f0b5582b7e801bd86882694d8d7dbb5456ca33bb))
+
 ## [0.3.1](https://github.com/mnasyrov/rx-effects/compare/v0.3.0...v0.3.1) (2021-09-07)
 
 **Note:** Version bump only for package rx-effects-react
