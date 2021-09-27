@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.3](https://github.com/mnasyrov/rx-effects/compare/v0.3.2...v0.3.3) (2021-09-27)
+
+### Features
+
+- Store.update() can apply an array of mutations ([d778ac9](https://github.com/mnasyrov/rx-effects/commit/d778ac99549a9ac1887ea03ab77d5f0fa6527d1f))
+
 ## [0.3.2](https://github.com/mnasyrov/rx-effects/compare/v0.3.1...v0.3.2) (2021-09-14)
 
 ### Bug Fixes
