@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Controller } from './controller';
 import { StateMutation } from './stateMutation';
 import { mapQuery, StateQuery, StateQueryOptions } from './stateQuery';
-import { DEFAULT_COMPARATOR } from './utils';
+import { DEFAULT_COMPARATOR, isReadonlyArray } from './utils';
 
 /**
  * Read-only type of the state store.
@@ -45,7 +45,11 @@ export type Store<State> = StateReader<State> &
     set: (state: State) => void;
 
     /** Updates the state in the store by the mutation */
-    update: (mutation: StateMutation<State>) => void;
+    update: (
+      mutation:
+        | StateMutation<State>
+        | ReadonlyArray<StateMutation<State> | undefined | null | false>,
+    ) => void;
   }>;
 
 /**
@@ -79,9 +83,24 @@ export function createStore<State>(
       }
     },
 
-    update(mutation: StateMutation<State>) {
+    update(
+      mutation:
+        | StateMutation<State>
+        | ReadonlyArray<StateMutation<State> | undefined | null | false>,
+    ) {
       const prevState = store$.value;
-      const nextState = mutation(prevState);
+
+      let nextState = prevState;
+
+      if (isReadonlyArray(mutation)) {
+        for (let i = 0; i < mutation.length; i++) {
+          const mutator = mutation[i];
+          if (mutator) nextState = mutator(nextState);
+        }
+      } else {
+        nextState = mutation(nextState);
+      }
+
       if (!stateComparator(prevState, nextState)) {
         store$.next(nextState);
       }

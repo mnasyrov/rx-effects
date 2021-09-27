@@ -85,7 +85,7 @@ const cartStore: Store<CartState> = createStore(INITIAL_STATE);
 The store can be updated by `set()` and `update()` methods:
 
 - `set()` applies the provided `State` value to the store.
-- `update()` calls the provided `StateMutation` with the current state and applies the new one to the store.
+- `update()` creates the new state by the provided `StateMutation` and applies it to the store.
 
 ```ts
 function resetCart() {
@@ -97,24 +97,28 @@ function addPizza(name: string) {
 }
 ```
 
-There is `pipeStateMutations()` helper, which can merge state updates into the single mutation. It is useful for
-combining several changes and applying it at the same time:
+`Store.update()` can apply an array of mutations while skipping empty mutation:
+
+```ts
+function addPizza(name: string) {
+  cartStore.update([
+    addPizzaToCart(name),
+    name === 'Pepperoni' && addPizzaToCart('Bonus Pizza'),
+  ]);
+}
+```
+
+There is `pipeStateMutations()` helper, which can merge state updates into the single mutation:
 
 ```ts
 import { pipeStateMutations } from './stateMutation';
 
-function addPizza(name: string) {
-  cartStore.update(
-    pipeStateMutations([addPizzaToCart(name), addPizzaToCart('Bonus Pizza')]),
-  );
-}
-```
-
-`pipeStateMutations()` can be used inside other mutations as well:
-
-```ts
 const addPizzaToCartWithBonus = (name: string): StateMutation<CartState> =>
   pipeStateMutations([addPizzaToCart(name), addPizzaToCart('Bonus Pizza')]);
+
+function addPizza(name: string) {
+  cartStore.update(addPizzaToCartWithBonus(name));
+}
 ```
 
 ### Getting State

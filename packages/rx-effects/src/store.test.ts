@@ -1,6 +1,6 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen, toArray } from 'rxjs/operators';
-import { createStore } from './store';
+import { createStore, Store } from './store';
 
 describe('Store', () => {
   type State = { value: number; data?: string };
@@ -72,6 +72,26 @@ describe('Store', () => {
       store.destroy();
 
       expect(await statePromise).toEqual([{ value: 1 }]);
+    });
+
+    it('should apply multiply mutations in the right order', () => {
+      const store: Store<State> = createStore<State>({ value: 0 });
+      store.update([
+        () => ({ value: 10 }),
+        (state) => ({ value: state.value + 1 }),
+        (state) => ({ value: state.value * 2 }),
+      ]);
+      expect(store.get().value).toBe(22);
+    });
+
+    it('should skip not-true items from mutations', () => {
+      const store: Store<State> = createStore<State>({ value: 0 });
+      store.update([
+        () => ({ value: 10 }),
+        !global && ((state) => ({ value: state.value + 1 })),
+        (state) => ({ value: state.value * 2 }),
+      ]);
+      expect(store.get().value).toBe(20);
     });
   });
 

@@ -24,7 +24,7 @@ export type StateMutation<State> = (state: State) => State;
  * You can use this helper to apply multiple changes at the same time.
  */
 export function pipeStateMutations<State>(
-  mutations: Array<StateMutation<State>>,
+  mutations: ReadonlyArray<StateMutation<State>>,
 ): StateMutation<State> {
   return (state) =>
     mutations.reduce((nextState, mutation) => mutation(nextState), state);
