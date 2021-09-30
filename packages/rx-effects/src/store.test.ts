@@ -1,6 +1,9 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen, toArray } from 'rxjs/operators';
+import { StateMutation } from './stateMutation';
+import { mapQuery, mergeQueries } from './stateQuery';
 import { createStore, Store } from './store';
+import { OBJECT_COMPARATOR } from './utils';
 
 describe('Store', () => {
   type State = { value: number; data?: string };
@@ -162,6 +165,115 @@ describe('Store', () => {
   });
 });
 
+describe('Concurrent Store updates', () => {
+  it('should update the store and apply derived updates until completing the current one', () => {
+    const { store, patch, history } = createTestStore<{
+      v1: string;
+      v2: string;
+      merged?: string;
+      uppercase?: string;
+    }>({
+      v1: 'a',
+      v2: 'b',
+    });
+
+    const v1 = store.query((state) => state.v1);
+    const v2 = store.query((state) => state.v2);
+
+    const merged = mergeQueries([v1, v2], (value1, value2) => value1 + value2);
+
+    const uppercase = mapQuery(merged, (value) => value.toUpperCase());
+
+    merged.value$.subscribe((merged) => store.update(patch({ merged })));
+
+    uppercase.value$.subscribe((uppercase) =>
+      store.update(patch({ uppercase })),
+    );
+
+    expect(store.get().merged).toEqual('ab');
+    expect(store.get().uppercase).toEqual('AB');
+
+    store.update((state) => ({ ...state, v1: 'c' }));
+    store.update((state) => ({ ...state, v2: 'd' }));
+
+    expect(store.get().merged).toEqual('cd');
+    expect(store.get().uppercase).toEqual('CD');
+
+    expect(history).toEqual([
+      { v1: 'a', v2: 'b' },
+      { v1: 'a', v2: 'b', merged: 'ab' },
+      { v1: 'a', v2: 'b', merged: 'ab', uppercase: 'AB' },
+      { v1: 'c', v2: 'b', merged: 'ab', uppercase: 'AB' },
+      { v1: 'c', v2: 'b', merged: 'cb', uppercase: 'CB' },
+      { v1: 'c', v2: 'd', merged: 'cb', uppercase: 'CB' },
+      { v1: 'c', v2: 'd', merged: 'cd', uppercase: 'CD' },
+    ]);
+  });
+
+  it('should trigger a listener in case a state was changed', () => {
+    const { store, patch, history } = createTestStore<{
+      bar: number;
+      foo: number;
+    }>({ bar: 0, foo: 0 }, OBJECT_COMPARATOR);
+
+    store.update(patch({ foo: 1 }));
+    store.update(patch({ foo: 2 }));
+    store.update(patch({ bar: 42 }));
+    store.update(patch({ foo: 2 }));
+    store.update(patch({ foo: 3 }));
+
+    expect(history).toEqual([
+      { bar: 0, foo: 0 },
+      { bar: 0, foo: 1 },
+      { bar: 0, foo: 2 },
+      { bar: 42, foo: 2 },
+      { bar: 42, foo: 3 },
+    ]);
+  });
+
+  it('should preserve order of pending updates during applying the current update', () => {
+    const { store, patch, history } = createTestStore<{
+      x: number;
+      y: number;
+      z: number;
+    }>({ x: 0, y: 0, z: 0 }, OBJECT_COMPARATOR);
+
+    store.value$.subscribe(({ x }) => store.update(patch({ y: x })));
+    store.value$.subscribe(({ y }) => store.update(patch({ z: y })));
+    store.update(patch({ x: 1 }));
+    store.update(patch({ x: 2 }));
+    store.update(patch({ x: 3 }));
+
+    expect(history).toEqual([
+      { x: 0, y: 0, z: 0 },
+      { x: 1, y: 0, z: 0 },
+      { x: 1, y: 1, z: 0 },
+      { x: 1, y: 1, z: 1 },
+      { x: 2, y: 1, z: 1 },
+      { x: 2, y: 2, z: 1 },
+      { x: 2, y: 2, z: 2 },
+      { x: 3, y: 2, z: 2 },
+      { x: 3, y: 3, z: 2 },
+      { x: 3, y: 3, z: 3 },
+    ]);
+  });
+
+  it('should reschedule continuous setting a state by subscribers', () => {
+    const { store, history } = createTestStore<number>(0);
+
+    store.value$.subscribe((x) => {
+      if (x < 100) {
+        store.set(x * 10);
+      }
+    });
+    store.set(1);
+    store.set(2);
+    store.set(3);
+
+    expect(history).toEqual([0, 1, 10, 100, 2, 20, 200, 3, 30, 300]);
+  });
+});
+
 function collectChanges<T>(
   source$: Observable<T>,
   action: () => void,
@@ -174,4 +286,23 @@ function collectChanges<T>(
   });
 
   return firstValueFrom(source$.pipe(bufferWhen(() => bufferClose$)));
+}
+
+function createTestStore<State>(
+  initialState: State,
+  comparator?: (prevState: State, nextState: State) => boolean,
+): {
+  store: Store<State>;
+  patch: (partial: Partial<State>) => StateMutation<State>;
+  history: State[];
+} {
+  const patch =
+    (partial: Partial<State>) =>
+    (state: State): State => ({ ...state, ...partial });
+  const store = createStore(initialState, comparator);
+
+  const history: State[] = [];
+  store.value$.subscribe((state) => history.push(state));
+
+  return { store, patch, history };
 }

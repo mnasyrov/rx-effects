@@ -52,6 +52,10 @@ export type Store<State> = StateReader<State> &
     ) => void;
   }>;
 
+type StoreMutations<State> = ReadonlyArray<
+  StateMutation<State> | undefined | null | false
+>;
+
 /**
  * Creates the state store.
  *
@@ -69,6 +73,39 @@ export function createStore<State>(
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
   const state$ = store$.asObservable();
 
+  let isUpdating = false;
+  let pendingMutations: StoreMutations<State> | undefined;
+
+  function apply(mutations: StoreMutations<State>) {
+    if (isUpdating) {
+      pendingMutations = (pendingMutations ?? []).concat(mutations);
+      return;
+    }
+
+    const prevState = store$.value;
+
+    let nextState = prevState;
+
+    for (let i = 0; i < mutations.length; i++) {
+      const mutator = mutations[i];
+      if (mutator) nextState = mutator(nextState);
+    }
+
+    if (stateComparator(prevState, nextState)) {
+      return;
+    }
+
+    isUpdating = true;
+    store$.next(nextState);
+    isUpdating = false;
+
+    if (pendingMutations?.length) {
+      const mutationsToApply = pendingMutations;
+      pendingMutations = [];
+      apply(mutationsToApply);
+    }
+  }
+
   return {
     value$: state$,
 
@@ -77,10 +114,7 @@ export function createStore<State>(
     },
 
     set(nextState: State) {
-      const prevState = store$.value;
-      if (!stateComparator(prevState, nextState)) {
-        store$.next(nextState);
-      }
+      apply([() => nextState]);
     },
 
     update(
@@ -88,21 +122,10 @@ export function createStore<State>(
         | StateMutation<State>
         | ReadonlyArray<StateMutation<State> | undefined | null | false>,
     ) {
-      const prevState = store$.value;
-
-      let nextState = prevState;
-
       if (isReadonlyArray(mutation)) {
-        for (let i = 0; i < mutation.length; i++) {
-          const mutator = mutation[i];
-          if (mutator) nextState = mutator(nextState);
-        }
+        apply(mutation);
       } else {
-        nextState = mutation(nextState);
-      }
-
-      if (!stateComparator(prevState, nextState)) {
-        store$.next(nextState);
+        apply([mutation]);
       }
     },
 
