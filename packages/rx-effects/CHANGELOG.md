@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/mnasyrov/rx-effects/compare/v0.3.3...v0.4.0) (2021-09-30)
+
+### Bug Fixes
+
+- Concurrent store updates by its subscribers ([bc29bb5](https://github.com/mnasyrov/rx-effects/commit/bc29bb545587c01386b7351e25c5ce4b5036dc9c))
+
 ## [0.3.3](https://github.com/mnasyrov/rx-effects/compare/v0.3.2...v0.3.3) (2021-09-27)
 
 ### Features
