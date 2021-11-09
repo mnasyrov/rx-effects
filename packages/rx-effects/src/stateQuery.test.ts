@@ -107,6 +107,32 @@ describe('mapQuery()', () => {
     expect(listener).nthCalledWith(2, { v: 1 });
     expect(listener).nthCalledWith(3, { v: 2 });
   });
+
+  it('should return the same calculated value if there is a subscription and the source was not changed', async () => {
+    const source = createStore(1);
+    const result = mapQuery(source, (value) => ({ value }));
+
+    expect(result.get() === result.get()).toBe(false);
+
+    let obj3;
+    let obj4;
+    const subscription1 = result.value$.subscribe((value) => (obj3 = value));
+    const subscription2 = result.value$.subscribe((value) => (obj4 = value));
+
+    expect(obj3 === obj4).toBe(true);
+
+    const obj1 = result.get();
+    const obj2 = result.get();
+    expect(obj1 === obj2).toBe(true);
+
+    expect(obj1 === obj3).toBe(true);
+
+    subscription1.unsubscribe();
+    expect(result.get() === obj1).toBe(true);
+
+    subscription2.unsubscribe();
+    expect(result.get() === obj1).toBe(false);
+  });
 });
 
 describe('mergeQueries()', () => {
@@ -227,5 +253,34 @@ describe('mergeQueries()', () => {
     expect(listener).toBeCalledTimes(2);
     expect(listener).nthCalledWith(1, { a: 0, b: 0 });
     expect(listener).nthCalledWith(2, { a: 1, b: 2 });
+  });
+
+  it('should return the same calculated value if there is a subscription and the source was not changed', async () => {
+    const source1 = createStore(1);
+    const source2 = createStore(2);
+    const result = mergeQueries([source1, source2], (value1, value2) => ({
+      value: value1 + value2,
+    }));
+
+    expect(result.get() === result.get()).toBe(false);
+
+    let obj3;
+    let obj4;
+    const subscription1 = result.value$.subscribe((value) => (obj3 = value));
+    const subscription2 = result.value$.subscribe((value) => (obj4 = value));
+
+    expect(obj3 === obj4).toBe(true);
+
+    const obj1 = result.get();
+    const obj2 = result.get();
+    expect(obj1 === obj2).toBe(true);
+
+    expect(obj1 === obj3).toBe(true);
+
+    subscription1.unsubscribe();
+    expect(result.get() === obj1).toBe(true);
+
+    subscription2.unsubscribe();
+    expect(result.get() === obj1).toBe(false);
   });
 });

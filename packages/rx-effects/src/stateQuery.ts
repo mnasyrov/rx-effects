@@ -1,5 +1,6 @@
-import { combineLatest, identity, Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { combineLatest, identity, Observable, shareReplay } from 'rxjs';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+
 import { DEFAULT_COMPARATOR } from './utils';
 
 /**
@@ -42,14 +43,16 @@ export function mapQuery<T, R, K = R>(
   mapper: (value: T) => R,
   options?: StateQueryOptions<R, K>,
 ): StateQuery<R> {
+  const { shareReplayWithRef, buffer } = createShareReplayWithRef<R>();
+
   let value$ = query.value$.pipe(map(mapper));
+  value$ = distinctValue(value$, options?.distinct).pipe(shareReplayWithRef);
 
-  value$ = distinctValue(value$, options?.distinct);
+  function get(): R {
+    return buffer.ref ? buffer.ref.value : mapper(query.get());
+  }
 
-  return {
-    get: () => mapper(query.get()),
-    value$,
-  };
+  return { get, value$ };
 }
 
 /**
@@ -73,16 +76,23 @@ export function mergeQueries<
   merger: (...values: Values) => Result,
   options?: StateQueryOptions<Result, ResultKey>,
 ): StateQuery<Result> {
+  const { shareReplayWithRef, buffer } = createShareReplayWithRef<Result>();
+
   let value$ = combineLatest(queries.map((query) => query.value$)).pipe(
     map((values) => merger(...(values as Values))),
   );
 
-  value$ = distinctValue(value$, options?.distinct);
+  value$ = distinctValue(value$, options?.distinct).pipe(shareReplayWithRef);
 
-  return {
-    get: () => merger(...(queries.map((query) => query.get()) as Values)),
-    value$,
-  };
+  function get(): Result {
+    if (buffer.ref) {
+      return buffer.ref.value;
+    }
+
+    return merger(...(queries.map((query) => query.get()) as Values));
+  }
+
+  return { get, value$ };
 }
 
 function distinctValue<T, K>(
@@ -102,4 +112,19 @@ function distinctValue<T, K>(
     (identity as (value: T) => K);
 
   return value$.pipe(distinctUntilChanged(comparator, keySelector));
+}
+
+function createShareReplayWithRef<T>() {
+  const buffer: { ref?: { value: T } | undefined } = {};
+
+  const shareReplayWithRef = (source$: Observable<T>) =>
+    source$.pipe(
+      tap({
+        next: (value) => (buffer.ref = { value }),
+        unsubscribe: () => (buffer.ref = undefined),
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
+
+  return { shareReplayWithRef, buffer };
 }
