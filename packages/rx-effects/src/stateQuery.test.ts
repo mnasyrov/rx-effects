@@ -60,6 +60,25 @@ describe('mapQuery()', () => {
     expect(listener).nthCalledWith(2, 1);
   });
 
+  it('should produce distinct values when distinct = true', () => {
+    const sourceValue$ = new BehaviorSubject<number>(0);
+    const sourceQuery: StateQuery<number> = {
+      get: () => sourceValue$.getValue(),
+      value$: sourceValue$,
+    };
+
+    const query = mapQuery(sourceQuery, (value) => value, { distinct: true });
+    const listener = jest.fn();
+    query.value$.subscribe(listener);
+
+    sourceValue$.next(1);
+    sourceValue$.next(1);
+
+    expect(listener).toBeCalledTimes(2);
+    expect(listener).nthCalledWith(1, 0);
+    expect(listener).nthCalledWith(2, 1);
+  });
+
   it('should produce distinct values with the custom comparator', () => {
     type Value = { v: number };
     const sourceValue$ = new BehaviorSubject<Value>({ v: 0 });
