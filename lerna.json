@@ -13,9 +13,6 @@
       "allowBranch": "main",
       "conventionalCommits": true,
       "exact": true
-    },
-    "publish": {
-      "from-git": true
     }
   }
 }
