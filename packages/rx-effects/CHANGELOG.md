@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/mnasyrov/rx-effects/compare/v0.4.0...v0.4.1) (2021-11-10)
+
+### Bug Fixes
+
+- Share and replay mapQuery() and mergeQueries() to subscriptions ([8308310](https://github.com/mnasyrov/rx-effects/commit/830831001630d2b2b7318d2e7126706803eff9ff))
+
 # [0.4.0](https://github.com/mnasyrov/rx-effects/compare/v0.3.3...v0.4.0) (2021-09-30)
 
 ### Bug Fixes
