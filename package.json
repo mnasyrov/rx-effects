@@ -25,9 +25,7 @@
     "docs": "node scripts/docs.js",
     "preversion": "npm run build && npm run lint && npm run test && npm run docs && git add --all",
     "prepare": "husky install",
-    "prepublishOnly": "npm run clean && npm run build",
-    "release-version": "lerna version",
-    "release-publish": "lerna publish from-git"
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "19.0.0",
