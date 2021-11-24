@@ -21,7 +21,7 @@ export function useController<T extends Controller<Record<string, any>>>(
   dependencies: unknown[] = EMPTY_DEPENDENCIES,
 ): T {
   const controller = useMemo(factory, dependencies);
-  useEffect(() => controller.destroy, [controller]);
+  useEffect(() => () => controller.destroy(), [controller]);
 
   return controller;
 }
