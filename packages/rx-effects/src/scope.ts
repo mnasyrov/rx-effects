@@ -4,8 +4,7 @@ import { Controller } from './controller';
 import { createEffect, Effect, EffectHandler, HandlerOptions } from './effect';
 import { handleAction } from './handleAction';
 import { StateDeclaration } from './stateDeclaration';
-import { createStore, Store } from './store';
-import { DEFAULT_COMPARATOR } from './utils';
+import { createStore, Store, StoreOptions } from './store';
 
 /**
  * A controller-like boundary for effects and business logic.
@@ -22,10 +21,13 @@ export type Scope = Controller<{
 
   /**
    * Creates a store which will be destroyed with the scope.
+   *
+   * @param initialState Initial state
+   * @param options Parameters for the store
    */
   createStore<State>(
     initialState: State,
-    stateCompare?: (prevState: State, nextState: State) => boolean,
+    options?: StoreOptions<State>,
   ): Store<State>;
 
   /**
@@ -79,12 +81,9 @@ export function createScope(): Scope {
 
     createStore<State>(
       initialState: State,
-      stateComparator: (
-        prevState: State,
-        nextState: State,
-      ) => boolean = DEFAULT_COMPARATOR,
+      options?: StoreOptions<State>,
     ): Store<State> {
-      const store = createStore(initialState, stateComparator);
+      const store = createStore(initialState, options);
       subscriptions.add(store.destroy);
 
       return store;

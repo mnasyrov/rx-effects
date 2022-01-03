@@ -20,16 +20,23 @@ export type StateDeclaration<State> = Readonly<{
   createStore: (initialState?: Partial<State>) => Store<State>;
 }>;
 
+export type StateDeclarationOptions<State> = Readonly<{
+  /** A comparator for detecting changes between old and new states */
+  stateComparator?: (prevState: State, nextState: State) => boolean;
+}>;
+
 /**
  * Declares the state.
  *
  * @param stateOrFactory an initial state or a factory for the initial state
- * @param stateCompare a comparator for detecting changes between old and new states
+ * @param options Parameters for declaring a state
  */
 export function declareState<State>(
   stateOrFactory: State | StateFactory<State>,
-  stateCompare?: (prevState: State, nextState: State) => boolean,
+  options?: StateDeclarationOptions<State>,
 ): StateDeclaration<State> {
+  const { stateComparator } = options ?? {};
+
   let initialState: State;
   let stateFactory: StateFactory<State>;
 
@@ -51,7 +58,7 @@ export function declareState<State>(
 
   const storeFactory = (values?: Partial<State>): Store<State> => {
     const state = stateFactory(values);
-    return createStore(state, stateCompare);
+    return createStore(state, { stateComparator });
   };
 
   return {

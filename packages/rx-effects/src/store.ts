@@ -56,20 +56,23 @@ type StoreMutations<State> = ReadonlyArray<
   StateMutation<State> | undefined | null | false
 >;
 
+export type StoreOptions<State> = Readonly<{
+  /** A comparator for detecting changes between old and new states */
+  stateComparator?: (prevState: State, nextState: State) => boolean;
+}>;
+
 /**
  * Creates the state store.
  *
- * @param initialState an initial state
- * @param stateComparator a comparator for detecting changes between old and new
- *   states
+ * @param initialState Initial state
+ * @param options Parameters for the store
  */
 export function createStore<State>(
   initialState: State,
-  stateComparator: (
-    prevState: State,
-    nextState: State,
-  ) => boolean = DEFAULT_COMPARATOR,
+  options?: StoreOptions<State>,
 ): Store<State> {
+  const stateComparator = options?.stateComparator ?? DEFAULT_COMPARATOR;
+
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
   const state$ = store$.asObservable();
 

@@ -17,7 +17,7 @@ describe('Store', () => {
     it('should use a custom "stateCompare" predicate', async () => {
       const store = createStore<State>(
         { value: 1, data: 'a' },
-        (s1, s2) => s1.value === s2.value,
+        { stateComparator: (s1, s2) => s1.value === s2.value },
       );
 
       const changes = await collectChanges(store.value$, () => {
@@ -299,7 +299,7 @@ function createTestStore<State>(
   const patch =
     (partial: Partial<State>) =>
     (state: State): State => ({ ...state, ...partial });
-  const store = createStore(initialState, comparator);
+  const store = createStore(initialState, { stateComparator: comparator });
 
   const history: State[] = [];
   store.value$.subscribe((state) => history.push(state));
