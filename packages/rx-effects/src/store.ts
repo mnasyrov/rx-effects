@@ -52,7 +52,7 @@ export type Store<State> = StateReader<State> &
     ) => void;
   }>;
 
-type StoreMutations<State> = ReadonlyArray<
+type StoreMutationEntries<State> = ReadonlyArray<
   StateMutation<State> | undefined | null | false
 >;
 
@@ -77,9 +77,9 @@ export function createStore<State>(
   const state$ = store$.asObservable();
 
   let isUpdating = false;
-  let pendingMutations: StoreMutations<State> | undefined;
+  let pendingMutations: StoreMutationEntries<State> | undefined;
 
-  function apply(mutations: StoreMutations<State>) {
+  function apply(mutations: StoreMutationEntries<State>) {
     if (isUpdating) {
       pendingMutations = (pendingMutations ?? []).concat(mutations);
       return;

@@ -7,4 +7,5 @@ export * from './stateDeclaration';
 export * from './stateMutation';
 export * from './stateQuery';
 export * from './store';
+export * from './storeActions';
 export { OBJECT_COMPARATOR } from './utils';

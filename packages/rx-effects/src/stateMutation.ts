@@ -19,6 +19,13 @@
 export type StateMutation<State> = (state: State) => State;
 
 /**
+ * A record of state mutations.
+ */
+export type StateMutations<State> = Readonly<
+  Record<string, (...args: any[]) => StateMutation<State>>
+>;
+
+/**
  * Returns a mutation which applies all provided mutations for a state.
  *
  * You can use this helper to apply multiple changes at the same time.

@@ -1,4 +1,10 @@
+import { StateMutations } from './stateMutation';
 import { createStore, Store } from './store';
+import {
+  createStoreActions,
+  StoreActions,
+  StoreActionsFactory,
+} from './storeActions';
 
 /**
  * Factory which creates a state. It can take optional values to modify the
@@ -18,6 +24,17 @@ export type StateDeclaration<State> = Readonly<{
 
   /** Creates a store. It can take optional values to modify the initial state. */
   createStore: (initialState?: Partial<State>) => Store<State>;
+
+  /** Creates store actions for the store by state mutations. */
+  createStoreActions<Mutations extends StateMutations<State>>(
+    store: Store<State>,
+    mutations: Mutations,
+  ): StoreActions<State, Mutations>;
+
+  /** Creates a factory of store actions by state mutations. */
+  createStoreActions<Mutations extends StateMutations<State>>(
+    mutations: Mutations,
+  ): StoreActionsFactory<State, Mutations>;
 }>;
 
 export type StateDeclarationOptions<State> = Readonly<{
@@ -65,5 +82,7 @@ export function declareState<State>(
     initialState,
     createState: stateFactory,
     createStore: storeFactory,
+
+    createStoreActions: createStoreActions,
   };
 }
