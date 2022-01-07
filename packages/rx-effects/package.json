@@ -25,25 +25,23 @@
   "engines": {
     "node": ">=12"
   },
-  "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.module.js",
-  "jsnext:main": "dist/index.module.js",
-  "types": "dist/index.d.ts",
-  "source": "src/index.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "sideEffects": false,
   "files": [
     "dist",
     "docs",
     "src",
+    "index.ts",
     "LICENSE",
-    "mod.ts",
     "README.md"
   ],
   "scripts": {
-    "clean": "shx rm -rf dist",
-    "build": "rollup -c",
-    "watch": "rollup -c --watch"
+    "clean": "rm -rf dist",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.build.json --outDir dist/cjs --module commonjs",
+    "build:esm": "tsc -p tsconfig.build.json --outDir dist/esm --module es2015"
   },
   "peerDependencies": {
     "rxjs": ">=7.0.0"
