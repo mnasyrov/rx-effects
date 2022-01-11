@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs';
 import { STORE_EVENT_BUS, StoreEvent } from './storeEvents';
-import { getStateMutationMetadata } from './storeMetadata';
+import { getStateMutationMetadata, isInternalStore } from './storeMetadata';
 
 export type StoreExtensionApi = Readonly<{
   getStateMutationMetadata: typeof getStateMutationMetadata;
@@ -20,6 +20,8 @@ export function registerStoreExtension(
   const middleware = extension(api);
 
   return STORE_EVENT_BUS.subscribe((event) => {
-    middleware.onStoreEvent?.(event);
+    if (middleware.onStoreEvent && !isInternalStore(event.store)) {
+      middleware.onStoreEvent(event);
+    }
   });
 }

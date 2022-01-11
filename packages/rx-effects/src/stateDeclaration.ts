@@ -44,6 +44,9 @@ export type StateDeclarationOptions<State> = Readonly<{
 
   /** A comparator for detecting changes between old and new states */
   stateComparator?: (prevState: State, nextState: State) => boolean;
+
+  /** @internal */
+  internal?: boolean;
 }>;
 
 /**
@@ -56,7 +59,7 @@ export function declareState<State>(
   stateOrFactory: State | StateFactory<State>,
   options?: StateDeclarationOptions<State>,
 ): StateDeclaration<State> {
-  const { name, stateComparator } = options ?? {};
+  const { name, stateComparator, internal } = options ?? {};
 
   let initialState: State;
   let stateFactory: StateFactory<State>;
@@ -79,7 +82,7 @@ export function declareState<State>(
 
   const storeFactory = (values?: Partial<State>): Store<State> => {
     const state = stateFactory(values);
-    return createStore(state, { name, stateComparator });
+    return createStore(state, { name, stateComparator, internal });
   };
 
   return {

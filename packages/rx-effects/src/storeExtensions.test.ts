@@ -1,5 +1,8 @@
+import { createAction } from './action';
+import { createScope } from './scope';
 import { createStore } from './store';
 import { registerStoreExtension } from './storeExtensions';
+import { createStoreLoggerExtension } from './storeLoggerExtension';
 
 describe('registerStoreExtension()', () => {
   it('should register an extension', () => {
@@ -21,5 +24,17 @@ describe('registerStoreExtension()', () => {
     registerStoreExtension(() => ({}));
     createStore<number>(0, { name: 'test' });
     expect.assertions(0);
+  });
+
+  it('should not emit events from internal stores', () => {
+    const eventHandler = jest.fn();
+
+    registerStoreExtension(() => ({
+      onStoreEvent: eventHandler,
+    }));
+
+    createStore<number>(0, { name: 'test', internal: true });
+
+    expect(eventHandler).toBeCalledTimes(0);
   });
 });

@@ -66,7 +66,7 @@ export type Effect<Event, Result = void, ErrorType = Error> = EffectState<
   readonly destroy: () => void;
 };
 
-const PENDING_COUNT_STATE = declareState(0);
+const PENDING_COUNT_STATE = declareState(0, { internal: true });
 const increaseCount = (count: number): number => count + 1;
 const decreaseCount = (count: number): number => count - 1;
 

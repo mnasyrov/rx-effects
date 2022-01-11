@@ -1,3 +1,5 @@
+import { createAction } from './action';
+import { createScope } from './scope';
 import { StateMutation } from './stateMutation';
 import { createStore } from './store';
 import { createStoreActions } from './storeActions';
@@ -61,5 +63,20 @@ describe('createStoreLoggerExtension()', () => {
 
     createStore<number>(0);
     expect(logger).nthCalledWith(1, expect.stringMatching(/^#\d/), 'created');
+  });
+
+  it('should not log events from internal stores', () => {
+    const logger = jest.fn();
+
+    registerStoreExtension(createStoreLoggerExtension(logger));
+
+    const scope = createScope();
+    const action = createAction<number>();
+    scope.handleAction(action, () => {
+      // Do nothing
+    });
+    action(1);
+
+    expect(logger).toBeCalledTimes(0);
   });
 });

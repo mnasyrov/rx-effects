@@ -3,6 +3,7 @@ import { Controller } from './controller';
 import { StateMutation } from './stateMutation';
 import { mapQuery, StateQuery, StateQueryOptions } from './stateQuery';
 import { STORE_EVENT_BUS } from './storeEvents';
+import { setInternalStoreFlag } from './storeMetadata';
 import { DEFAULT_COMPARATOR, isReadonlyArray } from './utils';
 
 let STORE_SEQ_NUMBER = 0;
@@ -67,6 +68,9 @@ export type StoreOptions<State> = Readonly<{
 
   /** A comparator for detecting changes between old and new states */
   stateComparator?: (prevState: State, nextState: State) => boolean;
+
+  /** @internal */
+  internal?: boolean;
 }>;
 
 /**
@@ -178,6 +182,10 @@ export function createStore<State>(
       pendingMutations = [];
       apply(mutationsToApply);
     }
+  }
+
+  if (options?.internal) {
+    setInternalStoreFlag(store);
   }
 
   STORE_EVENT_BUS.next({ type: 'created', store });
