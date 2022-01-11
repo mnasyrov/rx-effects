@@ -14,12 +14,21 @@ rx-effects
 - [HandlerOptions](README.md#handleroptions)
 - [Scope](README.md#scope)
 - [StateDeclaration](README.md#statedeclaration)
+- [StateDeclarationOptions](README.md#statedeclarationoptions)
 - [StateFactory](README.md#statefactory)
 - [StateMutation](README.md#statemutation)
+- [StateMutationMetadata](README.md#statemutationmetadata)
+- [StateMutations](README.md#statemutations)
 - [StateQuery](README.md#statequery)
 - [StateQueryOptions](README.md#statequeryoptions)
 - [StateReader](README.md#statereader)
 - [Store](README.md#store)
+- [StoreAction](README.md#storeaction)
+- [StoreActions](README.md#storeactions)
+- [StoreActionsFactory](README.md#storeactionsfactory)
+- [StoreEvent](README.md#storeevent)
+- [StoreExtension](README.md#storeextension)
+- [StoreOptions](README.md#storeoptions)
 
 ### Functions
 
@@ -28,11 +37,14 @@ rx-effects
 - [createEffect](README.md#createeffect)
 - [createScope](README.md#createscope)
 - [createStore](README.md#createstore)
+- [createStoreActions](README.md#createstoreactions)
+- [createStoreLoggerExtension](README.md#createstoreloggerextension)
 - [declareState](README.md#declarestate)
 - [handleAction](README.md#handleaction)
 - [mapQuery](README.md#mapquery)
 - [mergeQueries](README.md#mergequeries)
 - [pipeStateMutations](README.md#pipestatemutations)
+- [registerStoreExtension](README.md#registerstoreextension)
 
 ## Type aliases
 
@@ -67,7 +79,7 @@ submitForm.even$.subscribe((formData) => {
 
 #### Defined in
 
-[action.ts:22](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/action.ts#L22)
+[packages/rx-effects/src/action.ts:22](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/action.ts#L22)
 
 ---
 
@@ -90,19 +102,19 @@ type LoggerController = Controller<{
 
 #### Type parameters
 
-| Name              | Type               |
-| :---------------- | :----------------- |
-| `ControllerProps` | extends `Object`{} |
+| Name              | Type                  |
+| :---------------- | :-------------------- |
+| `ControllerProps` | extends `Object` = {} |
 
 #### Defined in
 
-[controller.ts:17](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/controller.ts#L17)
+[packages/rx-effects/src/controller.ts:16](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/controller.ts#L16)
 
 ---
 
 ### Effect
 
-Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `destroy`: () => `void` ; `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => `Subscription` }
+Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `destroy`: () => `void` ; `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => `Subscription` }
 
 Effect encapsulates a handler for Action or Observable.
 
@@ -122,7 +134,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/effect.ts#L56)
+[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/effect.ts#L56)
 
 ---
 
@@ -143,6 +155,8 @@ unsubscribe from them and deactivate the effect.
 
 Handler for an event. It can be asynchronous.
 
+**`result`** a result, Promise or Observable
+
 ##### Parameters
 
 | Name    | Type    |
@@ -155,7 +169,7 @@ Handler for an event. It can be asynchronous.
 
 #### Defined in
 
-[effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/effect.ts#L12)
+[packages/rx-effects/src/effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/effect.ts#L12)
 
 ---
 
@@ -175,24 +189,24 @@ Details about performing the effect.
 
 #### Type declaration
 
-| Name           | Type                                             | Description                                                                                        |
-| :------------- | :----------------------------------------------- | :------------------------------------------------------------------------------------------------- |
-| `done$`        | `Observable`<`Object`\>                          | `done$` provides a source event and a result of successful execution of the handler                |
-| `error$`       | `Observable`<`Object`\>                          | `done$` provides a source event and an error if the handler fails                                  |
-| `final$`       | `Observable`<`Event`\>                           | `final$` provides a source event after execution of the handler, for both success and error result |
-| `pending`      | [`StateQuery`](README.md#statequery)<`boolean`\> | Provides `true` if there is any execution of the handler in progress                               |
-| `pendingCount` | [`StateQuery`](README.md#statequery)<`number`\>  | Provides a count of the handler in progress                                                        |
-| `result$`      | `Observable`<`Result`\>                          | `result$` provides a result of successful execution of the handler                                 |
+| Name           | Type                                                       | Description                                                                                        |
+| :------------- | :--------------------------------------------------------- | :------------------------------------------------------------------------------------------------- |
+| `done$`        | `Observable`<{ `event`: `Event` ; `result`: `Result` }\>   | `done$` provides a source event and a result of successful execution of the handler                |
+| `error$`       | `Observable`<{ `error`: `ErrorType` ; `event`: `Event` }\> | `done$` provides a source event and an error if the handler fails                                  |
+| `final$`       | `Observable`<`Event`\>                                     | `final$` provides a source event after execution of the handler, for both success and error result |
+| `pending`      | [`StateQuery`](README.md#statequery)<`boolean`\>           | Provides `true` if there is any execution of the handler in progress                               |
+| `pendingCount` | [`StateQuery`](README.md#statequery)<`number`\>            | Provides a count of the handler in progress                                                        |
+| `result$`      | `Observable`<`Result`\>                                    | `result$` provides a result of successful execution of the handler                                 |
 
 #### Defined in
 
-[effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/effect.ts#L27)
+[packages/rx-effects/src/effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
 ### HandlerOptions
 
-Ƭ **HandlerOptions**<`ErrorType`\>: `Readonly`<`Object`\>
+Ƭ **HandlerOptions**<`ErrorType`\>: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>
 
 Options for handling an action or observable.
 
@@ -204,13 +218,13 @@ Options for handling an action or observable.
 
 #### Defined in
 
-[effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/effect.ts#L19)
+[packages/rx-effects/src/effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/effect.ts#L19)
 
 ---
 
 ### Scope
 
-Ƭ **Scope**: [`Controller`](README.md#controller)<`Object`\>
+Ƭ **Scope**: [`Controller`](README.md#controller)<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>) => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\> ; `createDeclaredStore`: <State\>(`stateDeclaration`: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `createStoreActions`: <Mutations\>(`store`: [`Store`](README.md#store)<`State`\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>, `initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>) => [`Store`](README.md#store)<`State`\> ; `handleAction`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> }\>
 
 A controller-like boundary for effects and business logic.
 
@@ -219,13 +233,13 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[scope.ts:16](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/scope.ts#L16)
+[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
 ### StateDeclaration
 
-Ƭ **StateDeclaration**<`State`\>: `Readonly`<`Object`\>
+Ƭ **StateDeclaration**<`State`\>: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `createStoreActions`: <Mutations\>(`store`: [`Store`](README.md#store)<`State`\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>
 
 Declaration of a state.
 
@@ -237,7 +251,23 @@ Declaration of a state.
 
 #### Defined in
 
-[stateDeclaration.ts:12](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateDeclaration.ts#L12)
+[packages/rx-effects/src/stateDeclaration.ts:18](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateDeclaration.ts#L18)
+
+---
+
+### StateDeclarationOptions
+
+Ƭ **StateDeclarationOptions**<`State`\>: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Defined in
+
+[packages/rx-effects/src/stateDeclaration.ts:42](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateDeclaration.ts#L42)
 
 ---
 
@@ -270,7 +300,7 @@ state.
 
 #### Defined in
 
-[stateDeclaration.ts:7](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateDeclaration.ts#L7)
+[packages/rx-effects/src/stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateDeclaration.ts#L13)
 
 ---
 
@@ -319,7 +349,35 @@ a next state
 
 #### Defined in
 
-[stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateMutation.ts#L19)
+[packages/rx-effects/src/stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateMutation.ts#L19)
+
+---
+
+### StateMutationMetadata
+
+Ƭ **StateMutationMetadata**: `Readonly`<{ `name?`: `string` }\>
+
+#### Defined in
+
+[packages/rx-effects/src/storeMetadata.ts:7](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeMetadata.ts#L7)
+
+---
+
+### StateMutations
+
+Ƭ **StateMutations**<`State`\>: `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\>
+
+A record of state mutations.
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Defined in
+
+[packages/rx-effects/src/stateMutation.ts:24](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateMutation.ts#L24)
 
 ---
 
@@ -339,12 +397,12 @@ Provider for a value of a state.
 
 | Name     | Type               | Description                     |
 | :------- | :----------------- | :------------------------------ |
-| `get`    | () => `T`          | -                               |
 | `value$` | `Observable`<`T`\> | `Observable` for value changes. |
+| `get`    | () => `T`          | -                               |
 
 #### Defined in
 
-[stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateQuery.ts#L9)
+[packages/rx-effects/src/stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -375,13 +433,13 @@ Options for processing the query result
 
 #### Defined in
 
-[stateQuery.ts:24](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateQuery.ts#L24)
+[packages/rx-effects/src/stateQuery.ts:24](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateQuery.ts#L24)
 
 ---
 
 ### StateReader
 
-Ƭ **StateReader**<`State`\>: [`StateQuery`](README.md#statequery)<`State`\> & { `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`StateQueryOptions`](README.md#statequeryoptions)<`R`, `K`\>) => [`StateQuery`](README.md#statequery)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`StateQueryOptions`](README.md#statequeryoptions)<`R`, `K`\>) => `Observable`<`R`\> }
+Ƭ **StateReader**<`State`\>: [`StateQuery`](README.md#statequery)<`State`\> & { `id`: `number` ; `name?`: `string` ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`StateQueryOptions`](README.md#statequeryoptions)<`R`, `K`\>) => [`StateQuery`](README.md#statequery)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`StateQueryOptions`](README.md#statequeryoptions)<`R`, `K`\>) => `Observable`<`R`\> }
 
 Read-only type of the state store.
 
@@ -393,13 +451,13 @@ Read-only type of the state store.
 
 #### Defined in
 
-[store.ts:10](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/store.ts#L10)
+[packages/rx-effects/src/store.ts:14](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/store.ts#L14)
 
 ---
 
 ### Store
 
-Ƭ **Store**<`State`\>: [`StateReader`](README.md#statereader)<`State`\> & [`Controller`](README.md#controller)<`Object`\>
+Ƭ **Store**<`State`\>: [`StateReader`](README.md#statereader)<`State`\> & [`Controller`](README.md#controller)<{ `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>
 
 #### Type parameters
 
@@ -409,7 +467,155 @@ Read-only type of the state store.
 
 #### Defined in
 
-[store.ts:42](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/store.ts#L42)
+[packages/rx-effects/src/store.ts:49](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/store.ts#L49)
+
+---
+
+### StoreAction
+
+Ƭ **StoreAction**<`Args`\>: (...`args`: `Args`) => `void`
+
+#### Type parameters
+
+| Name   | Type                |
+| :----- | :------------------ |
+| `Args` | extends `unknown`[] |
+
+#### Type declaration
+
+▸ (...`args`): `void`
+
+Store's action for changing its state
+
+##### Parameters
+
+| Name      | Type   |
+| :-------- | :----- |
+| `...args` | `Args` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[packages/rx-effects/src/storeActions.ts:6](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeActions.ts#L6)
+
+---
+
+### StoreActions
+
+Ƭ **StoreActions**<`State`, `Mutations`\>: { [K in keyof Mutations]: StoreAction<Parameters<Mutations[K]\>\> }
+
+Record of store actions
+
+#### Type parameters
+
+| Name        | Type                                                           |
+| :---------- | :------------------------------------------------------------- |
+| `State`     | `State`                                                        |
+| `Mutations` | extends [`StateMutations`](README.md#statemutations)<`State`\> |
+
+#### Defined in
+
+[packages/rx-effects/src/storeActions.ts:9](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeActions.ts#L9)
+
+---
+
+### StoreActionsFactory
+
+Ƭ **StoreActionsFactory**<`State`, `Mutations`\>: (`store`: [`Store`](README.md#store)<`State`\>) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
+
+#### Type parameters
+
+| Name        | Type                                                           |
+| :---------- | :------------------------------------------------------------- |
+| `State`     | `State`                                                        |
+| `Mutations` | extends [`StateMutations`](README.md#statemutations)<`State`\> |
+
+#### Type declaration
+
+▸ (`store`): [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
+
+##### Parameters
+
+| Name    | Type                                 |
+| :------ | :----------------------------------- |
+| `store` | [`Store`](README.md#store)<`State`\> |
+
+##### Returns
+
+[`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
+
+#### Defined in
+
+[packages/rx-effects/src/storeActions.ts:13](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeActions.ts#L13)
+
+---
+
+### StoreEvent
+
+Ƭ **StoreEvent**<`State`\>: { `store`: [`Store`](README.md#store)<`State`\> ; `type`: `"created"` } \| { `store`: [`Store`](README.md#store)<`State`\> ; `type`: `"destroyed"` } \| { `mutation`: [`StateMutation`](README.md#statemutation)<`State`\> ; `nextState`: `State` ; `prevState`: `State` ; `store`: [`Store`](README.md#store)<`State`\> ; `type`: `"mutation"` } \| { `nextState`: `State` ; `prevState`: `State` ; `store`: [`Store`](README.md#store)<`State`\> ; `type`: `"updated"` }
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Defined in
+
+[packages/rx-effects/src/storeEvents.ts:5](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeEvents.ts#L5)
+
+---
+
+### StoreExtension
+
+Ƭ **StoreExtension**<`State`\>: (`api`: `StoreExtensionApi`) => { `onStoreEvent?`: (`event`: [`StoreEvent`](README.md#storeevent)<`State`\>) => `void` }
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Type declaration
+
+▸ (`api`): `Object`
+
+##### Parameters
+
+| Name  | Type                |
+| :---- | :------------------ |
+| `api` | `StoreExtensionApi` |
+
+##### Returns
+
+`Object`
+
+| Name            | Type                                                                |
+| :-------------- | :------------------------------------------------------------------ |
+| `onStoreEvent?` | (`event`: [`StoreEvent`](README.md#storeevent)<`State`\>) => `void` |
+
+#### Defined in
+
+[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeExtensions.ts#L9)
+
+---
+
+### StoreOptions
+
+Ƭ **StoreOptions**<`State`\>: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:66](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/store.ts#L66)
 
 ## Functions
 
@@ -432,7 +638,7 @@ Makes shallow comparison of two objects.
 
 #### Defined in
 
-[utils.ts:8](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/utils.ts#L8)
+[packages/rx-effects/src/utils.ts:8](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/utils.ts#L8)
 
 ---
 
@@ -452,7 +658,7 @@ Makes shallow comparison of two objects.
 
 #### Defined in
 
-[action.ts:29](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/action.ts#L29)
+[packages/rx-effects/src/action.ts:29](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/action.ts#L29)
 
 ---
 
@@ -490,7 +696,7 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 #### Defined in
 
-[effect.ts:83](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/effect.ts#L83)
+[packages/rx-effects/src/effect.ts:83](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/effect.ts#L83)
 
 ---
 
@@ -506,13 +712,13 @@ Creates `Scope` instance.
 
 #### Defined in
 
-[scope.ts:68](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/scope.ts#L68)
+[packages/rx-effects/src/scope.ts:70](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/scope.ts#L70)
 
 ---
 
 ### createStore
 
-▸ **createStore**<`State`\>(`initialState`, `stateComparator?`): [`Store`](README.md#store)<`State`\>
+▸ **createStore**<`State`\>(`initialState`, `options?`): [`Store`](README.md#store)<`State`\>
 
 Creates the state store.
 
@@ -524,10 +730,10 @@ Creates the state store.
 
 #### Parameters
 
-| Name              | Type                                                      | Description                                                   |
-| :---------------- | :-------------------------------------------------------- | :------------------------------------------------------------ |
-| `initialState`    | `State`                                                   | an initial state                                              |
-| `stateComparator` | (`prevState`: `State`, `nextState`: `State`) => `boolean` | a comparator for detecting changes between old and new states |
+| Name           | Type                                                                                                                                        | Description              |
+| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------- |
+| `initialState` | `State`                                                                                                                                     | Initial state            |
+| `options?`     | `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\> | Parameters for the store |
 
 #### Returns
 
@@ -535,13 +741,88 @@ Creates the state store.
 
 #### Defined in
 
-[store.ts:66](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/store.ts#L66)
+[packages/rx-effects/src/store.ts:82](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/store.ts#L82)
+
+---
+
+### createStoreActions
+
+▸ **createStoreActions**<`State`, `Mutations`\>(`store`, `mutations`): [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
+
+Creates store actions for the store by state mutations
+
+#### Type parameters
+
+| Name        | Type                                                                                                                   |
+| :---------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `State`     | `State`                                                                                                                |
+| `Mutations` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
+
+#### Parameters
+
+| Name        | Type                                 |
+| :---------- | :----------------------------------- |
+| `store`     | [`Store`](README.md#store)<`State`\> |
+| `mutations` | `Mutations`                          |
+
+#### Returns
+
+[`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
+
+#### Defined in
+
+[packages/rx-effects/src/storeActions.ts:19](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeActions.ts#L19)
+
+▸ **createStoreActions**<`State`, `Mutations`\>(`mutations`): [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\>
+
+Creates a factory of store actions by state mutations
+
+#### Type parameters
+
+| Name        | Type                                                                                                                   |
+| :---------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `State`     | `State`                                                                                                                |
+| `Mutations` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
+
+#### Parameters
+
+| Name        | Type        |
+| :---------- | :---------- |
+| `mutations` | `Mutations` |
+
+#### Returns
+
+[`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\>
+
+#### Defined in
+
+[packages/rx-effects/src/storeActions.ts:25](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeActions.ts#L25)
+
+---
+
+### createStoreLoggerExtension
+
+▸ **createStoreLoggerExtension**(`logger`): [`StoreExtension`](README.md#storeextension)<`unknown`\>
+
+#### Parameters
+
+| Name     | Type                                                        |
+| :------- | :---------------------------------------------------------- |
+| `logger` | (`message?`: `any`, ...`optionalParams`: `any`[]) => `void` |
+
+#### Returns
+
+[`StoreExtension`](README.md#storeextension)<`unknown`\>
+
+#### Defined in
+
+[packages/rx-effects/src/storeLoggerExtension.ts:3](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeLoggerExtension.ts#L3)
 
 ---
 
 ### declareState
 
-▸ **declareState**<`State`\>(`stateOrFactory`, `stateCompare?`): [`StateDeclaration`](README.md#statedeclaration)<`State`\>
+▸ **declareState**<`State`\>(`stateOrFactory`, `options?`): [`StateDeclaration`](README.md#statedeclaration)<`State`\>
 
 Declares the state.
 
@@ -553,10 +834,10 @@ Declares the state.
 
 #### Parameters
 
-| Name             | Type                                                          | Description                                                   |
-| :--------------- | :------------------------------------------------------------ | :------------------------------------------------------------ |
-| `stateOrFactory` | `State` \| [`StateFactory`](README.md#statefactory)<`State`\> | an initial state or a factory for the initial state           |
-| `stateCompare?`  | (`prevState`: `State`, `nextState`: `State`) => `boolean`     | a comparator for detecting changes between old and new states |
+| Name             | Type                                                                                                                                        | Description                                         |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------- |
+| `stateOrFactory` | `State` \| [`StateFactory`](README.md#statefactory)<`State`\>                                                                               | an initial state or a factory for the initial state |
+| `options?`       | `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\> | Parameters for declaring a state                    |
 
 #### Returns
 
@@ -564,7 +845,7 @@ Declares the state.
 
 #### Defined in
 
-[stateDeclaration.ts:29](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateDeclaration.ts#L29)
+[packages/rx-effects/src/stateDeclaration.ts:58](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateDeclaration.ts#L58)
 
 ---
 
@@ -584,11 +865,11 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Parameters
 
-| Name       | Type                                                             |
-| :--------- | :--------------------------------------------------------------- |
-| `source`   | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> |
-| `handler`  | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>   |
-| `options?` | [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>       |
+| Name       | Type                                                                                                      |
+| :--------- | :-------------------------------------------------------------------------------------------------------- |
+| `source`   | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>                                          |
+| `handler`  | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>                                            |
+| `options?` | `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\> |
 
 #### Returns
 
@@ -596,7 +877,7 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/handleAction.ts#L8)
+[packages/rx-effects/src/handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/handleAction.ts#L8)
 
 ---
 
@@ -629,7 +910,7 @@ function.
 
 #### Defined in
 
-[stateQuery.ts:41](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateQuery.ts#L41)
+[packages/rx-effects/src/stateQuery.ts:41](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateQuery.ts#L41)
 
 ---
 
@@ -652,7 +933,7 @@ and merges them into a single value.
 
 | Name       | Type                                                                       | Description                             |
 | :--------- | :------------------------------------------------------------------------- | :-------------------------------------- |
-| `queries`  | [...{ [K in keyof Values]: StateQuery<Values[K]\>}]                        | source queries                          |
+| `queries`  | [...{ [K in string \| number \| symbol]: StateQuery<Values[K]\> }[]]       | source queries                          |
 | `merger`   | (...`values`: `Values`) => `Result`                                        | value merger                            |
 | `options?` | [`StateQueryOptions`](README.md#statequeryoptions)<`Result`, `ResultKey`\> | options for processing the result value |
 
@@ -662,7 +943,7 @@ and merges them into a single value.
 
 #### Defined in
 
-[stateQuery.ts:66](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateQuery.ts#L66)
+[packages/rx-effects/src/stateQuery.ts:66](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateQuery.ts#L66)
 
 ---
 
@@ -682,9 +963,9 @@ You can use this helper to apply multiple changes at the same time.
 
 #### Parameters
 
-| Name        | Type                                                                   |
-| :---------- | :--------------------------------------------------------------------- |
-| `mutations` | `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\>\> |
+| Name        | Type                                                            |
+| :---------- | :-------------------------------------------------------------- |
+| `mutations` | readonly [`StateMutation`](README.md#statemutation)<`State`\>[] |
 
 #### Returns
 
@@ -692,4 +973,24 @@ You can use this helper to apply multiple changes at the same time.
 
 #### Defined in
 
-[stateMutation.ts:26](https://github.com/mnasyrov/rx-effects/blob/ed7b2fc/packages/rx-effects/src/stateMutation.ts#L26)
+[packages/rx-effects/src/stateMutation.ts:33](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/stateMutation.ts#L33)
+
+---
+
+### registerStoreExtension
+
+▸ **registerStoreExtension**(`extension`): `Subscription`
+
+#### Parameters
+
+| Name        | Type                                                     |
+| :---------- | :------------------------------------------------------- |
+| `extension` | [`StoreExtension`](README.md#storeextension)<`unknown`\> |
+
+#### Returns
+
+`Subscription`
+
+#### Defined in
+
+[packages/rx-effects/src/storeExtensions.ts:13](https://github.com/mnasyrov/rx-effects/blob/27420cb/packages/rx-effects/src/storeExtensions.ts#L13)

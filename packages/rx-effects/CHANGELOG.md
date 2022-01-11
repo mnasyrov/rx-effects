@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/mnasyrov/rx-effects/compare/v0.5.0...v0.5.1) (2022-01-11)
+
+### Bug Fixes
+
+- Do not expose internal stores to extensions ([27420cb](https://github.com/mnasyrov/rx-effects/commit/27420cb152ddfafa48f9d7f75b59e558ba982d64))
+
 # [0.5.0](https://github.com/mnasyrov/rx-effects/compare/v0.4.1...v0.5.0) (2022-01-11)
 
 ### Bug Fixes

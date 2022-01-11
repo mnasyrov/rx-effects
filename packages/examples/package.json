@@ -1,12 +1,12 @@
 {
   "private": true,
   "name": "rx-effects-examples",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "rx-effects": "0.5.0",
-    "rx-effects-react": "0.5.0"
+    "rx-effects": "0.5.1",
+    "rx-effects-react": "0.5.1"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
