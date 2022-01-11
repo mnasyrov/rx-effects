@@ -2,12 +2,18 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Controller } from './controller';
 import { StateMutation } from './stateMutation';
 import { mapQuery, StateQuery, StateQueryOptions } from './stateQuery';
+import { STORE_EVENT_BUS } from './storeEvents';
 import { DEFAULT_COMPARATOR, isReadonlyArray } from './utils';
+
+let STORE_SEQ_NUMBER = 0;
 
 /**
  * Read-only type of the state store.
  */
 export type StateReader<State> = StateQuery<State> & {
+  id: number;
+  name?: string;
+
   /**
    * Returns a part of the state as `Observable`
    * The result observable produces distinct values by default.
@@ -57,6 +63,8 @@ type StoreMutationEntries<State> = ReadonlyArray<
 >;
 
 export type StoreOptions<State> = Readonly<{
+  name?: string;
+
   /** A comparator for detecting changes between old and new states */
   stateComparator?: (prevState: State, nextState: State) => boolean;
 }>;
@@ -79,37 +87,10 @@ export function createStore<State>(
   let isUpdating = false;
   let pendingMutations: StoreMutationEntries<State> | undefined;
 
-  function apply(mutations: StoreMutationEntries<State>) {
-    if (isUpdating) {
-      pendingMutations = (pendingMutations ?? []).concat(mutations);
-      return;
-    }
+  const store = {
+    id: ++STORE_SEQ_NUMBER,
+    name: options?.name,
 
-    const prevState = store$.value;
-
-    let nextState = prevState;
-
-    for (let i = 0; i < mutations.length; i++) {
-      const mutator = mutations[i];
-      if (mutator) nextState = mutator(nextState);
-    }
-
-    if (stateComparator(prevState, nextState)) {
-      return;
-    }
-
-    isUpdating = true;
-    store$.next(nextState);
-    isUpdating = false;
-
-    if (pendingMutations?.length) {
-      const mutationsToApply = pendingMutations;
-      pendingMutations = [];
-      apply(mutationsToApply);
-    }
-  }
-
-  return {
     value$: state$,
 
     get(): State {
@@ -148,6 +129,58 @@ export function createStore<State>(
 
     destroy() {
       store$.complete();
+      STORE_EVENT_BUS.next({ type: 'destroyed', store });
     },
   };
+
+  function apply(mutations: StoreMutationEntries<State>) {
+    if (isUpdating) {
+      pendingMutations = (pendingMutations ?? []).concat(mutations);
+      return;
+    }
+
+    const prevState = store$.value;
+
+    let nextState = prevState;
+
+    for (let i = 0; i < mutations.length; i++) {
+      const mutation = mutations[i];
+      if (mutation) {
+        const stateBeforeMutation = nextState;
+        nextState = mutation(nextState);
+
+        STORE_EVENT_BUS.next({
+          type: 'mutation',
+          store,
+          mutation,
+          nextState,
+          prevState: stateBeforeMutation,
+        });
+      }
+    }
+
+    if (stateComparator(prevState, nextState)) {
+      return;
+    }
+
+    isUpdating = true;
+    store$.next(nextState);
+    STORE_EVENT_BUS.next({
+      type: 'updated',
+      store,
+      nextState,
+      prevState,
+    });
+    isUpdating = false;
+
+    if (pendingMutations?.length) {
+      const mutationsToApply = pendingMutations;
+      pendingMutations = [];
+      apply(mutationsToApply);
+    }
+  }
+
+  STORE_EVENT_BUS.next({ type: 'created', store });
+
+  return store;
 }

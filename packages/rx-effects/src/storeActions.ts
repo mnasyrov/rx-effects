@@ -1,5 +1,6 @@
 import { StateMutations } from './stateMutation';
 import { Store } from './store';
+import { setStateMutationName } from './storeMetadata';
 
 /** Store's action for changing its state */
 export type StoreAction<Args extends unknown[]> = (...args: Args) => void;
@@ -53,9 +54,12 @@ function createStoreActionsObject<
 >(store: Store<State>, mutations: Mutations): StoreActions<State, Mutations> {
   const actions: any = {};
 
-  Object.entries(mutations).forEach(([key, mutation]) => {
+  Object.entries(mutations).forEach(([key, mutationFactory]) => {
     (actions as any)[key] = (...args: any[]) => {
-      store.update(mutation(...args));
+      const mutation = mutationFactory(...args);
+      setStateMutationName(mutation, key);
+
+      store.update(mutation);
     };
   });
 

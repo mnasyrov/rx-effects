@@ -108,7 +108,7 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
       done$.next({ event, result: handlerResult });
     } catch (error) {
       pendingCount.update(decreaseCount);
-      error$.next({ event, error });
+      error$.next({ event, error: error as ErrorType });
     }
   }
 

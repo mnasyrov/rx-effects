@@ -16,6 +16,8 @@ export type StateFactory<State> = (values?: Partial<State>) => State;
  * Declaration of a state.
  */
 export type StateDeclaration<State> = Readonly<{
+  name?: string;
+
   /** Initial state, it is created during declaring the state. */
   initialState: State;
 
@@ -38,6 +40,8 @@ export type StateDeclaration<State> = Readonly<{
 }>;
 
 export type StateDeclarationOptions<State> = Readonly<{
+  name?: string;
+
   /** A comparator for detecting changes between old and new states */
   stateComparator?: (prevState: State, nextState: State) => boolean;
 }>;
@@ -52,7 +56,7 @@ export function declareState<State>(
   stateOrFactory: State | StateFactory<State>,
   options?: StateDeclarationOptions<State>,
 ): StateDeclaration<State> {
-  const { stateComparator } = options ?? {};
+  const { name, stateComparator } = options ?? {};
 
   let initialState: State;
   let stateFactory: StateFactory<State>;
@@ -75,7 +79,7 @@ export function declareState<State>(
 
   const storeFactory = (values?: Partial<State>): Store<State> => {
     const state = stateFactory(values);
-    return createStore(state, { stateComparator });
+    return createStore(state, { name, stateComparator });
   };
 
   return {
