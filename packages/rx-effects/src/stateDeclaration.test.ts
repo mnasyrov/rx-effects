@@ -91,5 +91,31 @@ describe('StateDeclaration', () => {
         value: 2,
       });
     });
+
+    it('should set a name to the store', () => {
+      const declaration: StateDeclaration<State> = declareState(stateFactory, {
+        name: 'foo',
+      });
+
+      const store = declaration.createStore();
+      expect(store.name).toBe('foo');
+    });
+
+    it('should use a provided comparator for the store', () => {
+      const stateComparator = (a: State, b: State) => a.value === b.value;
+
+      const declaration: StateDeclaration<State> = declareState(stateFactory, {
+        stateComparator,
+      });
+
+      const store = declaration.createStore();
+      expect(store.get().data).toBe(undefined);
+
+      store.set({ value: 1, data: 'a' });
+      expect(store.get().data).toBe(undefined);
+
+      store.set({ value: 2, data: 'b' });
+      expect(store.get().data).toBe('b');
+    });
   });
 });

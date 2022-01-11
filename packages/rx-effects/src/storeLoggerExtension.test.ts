@@ -53,4 +53,13 @@ describe('createStoreLoggerExtension()', () => {
 
     expect(logger).nthCalledWith(8, 'test#1', 'destroyed');
   });
+
+  it('should log only store ID in case its name is empty', () => {
+    const logger = jest.fn();
+
+    registerStoreExtension(createStoreLoggerExtension(logger));
+
+    createStore<number>(0);
+    expect(logger).nthCalledWith(1, expect.stringMatching(/^#\d/), 'created');
+  });
 });

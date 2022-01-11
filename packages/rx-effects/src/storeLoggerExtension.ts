@@ -1,7 +1,7 @@
 import { StoreExtension } from './storeExtensions';
 
 export function createStoreLoggerExtension(
-  logger: typeof console.log = console.log,
+  logger: typeof console.log,
 ): StoreExtension<unknown> {
   return (api) => ({
     onStoreEvent(event) {
