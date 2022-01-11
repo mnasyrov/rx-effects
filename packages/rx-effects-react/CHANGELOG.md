@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/mnasyrov/rx-effects/compare/v0.4.1...v0.5.0) (2022-01-11)
+
+### Bug Fixes
+
+- Fixed eslint rules ([6975806](https://github.com/mnasyrov/rx-effects/commit/69758063de4d9f6b7821b439aad054087df249b9))
+- **rx-effects-react:** Fixed calling `destroy()` of a class-based controller by `useController()` ([1bdf6b5](https://github.com/mnasyrov/rx-effects/commit/1bdf6b55df6f41988bf7b481ec2019c97731f127))
+
 ## [0.4.1](https://github.com/mnasyrov/rx-effects/compare/v0.4.0...v0.4.1) (2021-11-10)
 
 **Note:** Version bump only for package rx-effects-react
