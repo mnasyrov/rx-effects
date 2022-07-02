@@ -39,10 +39,6 @@ If the factory is provided, it is called only once.
 
 `T`
 
-#### Defined in
-
-[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects-react/src/useConst.ts#L12)
-
 ---
 
 ### useController
@@ -72,10 +68,6 @@ included explicitly when it is needed.
 
 `T`
 
-#### Defined in
-
-[rx-effects-react/src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects-react/src/useController.ts#L18)
-
 ---
 
 ### useObservable
@@ -87,7 +79,7 @@ Returns a value provided by `source$`.
 The hook returns the initial value and subscribes on the `source$`. After
 that, the hook returns values which are provided by the source.
 
-**`example`**
+**`Example`**
 
 ```ts
 const value = useObservable<string>(source$, undefined);
@@ -111,10 +103,6 @@ const value = useObservable<string>(source$, undefined);
 
 `T`
 
-#### Defined in
-
-[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects-react/src/useObservable.ts#L19)
-
 ---
 
 ### useObserver
@@ -125,7 +113,7 @@ Subscribes the provided observer or `next` handler on `source$` observable.
 
 This hook allows to do fine handling of the source observable.
 
-**`example`**
+**`Example`**
 
 ```ts
 const observer = useCallback((nextValue) => {
@@ -151,10 +139,6 @@ useObserver(source$, observer);
 
 `Subscription`
 
-#### Defined in
-
-[rx-effects-react/src/useObserver.ts:21](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects-react/src/useObserver.ts#L21)
-
 ---
 
 ### useSelector
@@ -166,7 +150,7 @@ Returns a value provided by `source$`.
 The hook returns the initial value and subscribes on the `source$`. After
 that, the hook returns values which are provided by the source.
 
-**`example`**
+**`Example`**
 
 ```ts
 const value = useSelector<{ data: Record<string, string> }>(
@@ -197,10 +181,6 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 `R`
 
-#### Defined in
-
-[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects-react/src/useSelector.ts#L27)
-
 ---
 
 ### useStateQuery
@@ -224,7 +204,3 @@ Returns a value which is provided by the query.
 #### Returns
 
 `T`
-
-#### Defined in
-
-[rx-effects-react/src/useStateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects-react/src/useStateQuery.ts#L9)
