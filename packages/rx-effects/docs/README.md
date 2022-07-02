@@ -4,7 +4,7 @@ rx-effects
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [Action](README.md#action)
 - [Controller](README.md#controller)
@@ -46,7 +46,7 @@ rx-effects
 - [pipeStateMutations](README.md#pipestatemutations)
 - [registerStoreExtension](README.md#registerstoreextension)
 
-## Type aliases
+## Type Aliases
 
 ### Action
 
@@ -54,9 +54,11 @@ rx-effects
 
 Action is an event emitter
 
-**`field`** event$ - Observable for emitted events.
+**`Field`**
 
-**`example`**
+event$ - Observable for emitted events.
+
+**`Example`**
 
 ```ts
 // Create the action
@@ -79,7 +81,7 @@ submitForm.even$.subscribe((formData) => {
 
 #### Defined in
 
-[packages/rx-effects/src/action.ts:22](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/action.ts#L22)
+[packages/rx-effects/src/action.ts:22](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/action.ts#L22)
 
 ---
 
@@ -92,7 +94,7 @@ Effects and business logic controller.
 Implementation of the controller must provide `destroy()` method. It should
 be used for closing subscriptions and disposing resources.
 
-**`example`**
+**`Example`**
 
 ```ts
 type LoggerController = Controller<{
@@ -108,13 +110,13 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[packages/rx-effects/src/controller.ts:16](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/controller.ts#L16)
+[packages/rx-effects/src/controller.ts:16](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/controller.ts#L16)
 
 ---
 
 ### Effect
 
-Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `destroy`: () => `void` ; `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => `Subscription` }
+Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `destroy`: () => `void` ; `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => `Subscription` }
 
 Effect encapsulates a handler for Action or Observable.
 
@@ -134,7 +136,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/effect.ts#L56)
+[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/effect.ts#L56)
 
 ---
 
@@ -155,7 +157,9 @@ unsubscribe from them and deactivate the effect.
 
 Handler for an event. It can be asynchronous.
 
-**`result`** a result, Promise or Observable
+**`Result`**
+
+a result, Promise or Observable
 
 ##### Parameters
 
@@ -169,7 +173,7 @@ Handler for an event. It can be asynchronous.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/effect.ts#L12)
+[packages/rx-effects/src/effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/effect.ts#L12)
 
 ---
 
@@ -200,7 +204,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/effect.ts#L27)
+[packages/rx-effects/src/effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
@@ -218,13 +222,13 @@ Options for handling an action or observable.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/effect.ts#L19)
+[packages/rx-effects/src/effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/effect.ts#L19)
 
 ---
 
 ### Scope
 
-Ƭ **Scope**: [`Controller`](README.md#controller)<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>) => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\> ; `createDeclaredStore`: <State\>(`stateDeclaration`: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `createStoreActions`: <Mutations\>(`store`: [`Store`](README.md#store)<`State`\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>, `initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>) => [`Store`](README.md#store)<`State`\> ; `handleAction`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> }\>
+Ƭ **Scope**: [`Controller`](README.md#controller)<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => [`Controller`](README.md#controller)<`ControllerProps`\>) => [`Controller`](README.md#controller)<`ControllerProps`\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `handleAction`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `createDeclaredStore`: <State\>(`stateDeclaration`: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStoreActions`: <Mutations\>(`store`: [`Store`](README.md#store)<`State`\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>, `initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>) => [`Store`](README.md#store)<`State`\> }\>
 
 A controller-like boundary for effects and business logic.
 
@@ -233,13 +237,13 @@ It collects all subscriptions which are made by child entities and provides
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/scope.ts#L15)
+[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
 ### StateDeclaration
 
-Ƭ **StateDeclaration**<`State`\>: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `createStoreActions`: <Mutations\>(`store`: [`Store`](README.md#store)<`State`\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>
+Ƭ **StateDeclaration**<`State`\>: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStoreActions`: <Mutations\>(`store`: [`Store`](README.md#store)<`State`\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>
 
 Declaration of a state.
 
@@ -251,7 +255,7 @@ Declaration of a state.
 
 #### Defined in
 
-[packages/rx-effects/src/stateDeclaration.ts:18](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateDeclaration.ts#L18)
+[packages/rx-effects/src/stateDeclaration.ts:18](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/stateDeclaration.ts#L18)
 
 ---
 
@@ -267,7 +271,7 @@ Declaration of a state.
 
 #### Defined in
 
-[packages/rx-effects/src/stateDeclaration.ts:42](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateDeclaration.ts#L42)
+[packages/rx-effects/src/stateDeclaration.ts:42](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/stateDeclaration.ts#L42)
 
 ---
 
@@ -300,7 +304,7 @@ state.
 
 #### Defined in
 
-[packages/rx-effects/src/stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateDeclaration.ts#L13)
+[packages/rx-effects/src/stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/stateDeclaration.ts#L13)
 
 ---
 
@@ -349,7 +353,7 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateMutation.ts#L19)
+[packages/rx-effects/src/stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/stateMutation.ts#L19)
 
 ---
 
@@ -359,7 +363,7 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/storeMetadata.ts:7](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeMetadata.ts#L7)
+[packages/rx-effects/src/storeMetadata.ts:7](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/storeMetadata.ts#L7)
 
 ---
 
@@ -377,7 +381,7 @@ A record of state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/stateMutation.ts:24](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateMutation.ts#L24)
+[packages/rx-effects/src/stateMutation.ts:24](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/stateMutation.ts#L24)
 
 ---
 
@@ -397,12 +401,12 @@ Provider for a value of a state.
 
 | Name     | Type               | Description                     |
 | :------- | :----------------- | :------------------------------ |
-| `value$` | `Observable`<`T`\> | `Observable` for value changes. |
 | `get`    | () => `T`          | Returns the value of a state    |
+| `value$` | `Observable`<`T`\> | `Observable` for value changes. |
 
 #### Defined in
 
-[packages/rx-effects/src/stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateQuery.ts#L9)
+[packages/rx-effects/src/stateQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/stateQuery.ts#L9)
 
 ---
 
@@ -412,11 +416,17 @@ Provider for a value of a state.
 
 Options for processing the query result
 
-**`property`** distinct Enables distinct results
+**`Property`**
 
-**`property`** distinct.comparator Custom comparator for values. Strict equality `===` is used by default.
+Enables distinct results
 
-**`property`** distinct.keySelector Getter for keys of values to compare. Values itself are used for comparing by default.
+**`Property`**
+
+Custom comparator for values. Strict equality `===` is used by default.
+
+**`Property`**
+
+Getter for keys of values to compare. Values itself are used for comparing by default.
 
 #### Type parameters
 
@@ -433,7 +443,7 @@ Options for processing the query result
 
 #### Defined in
 
-[packages/rx-effects/src/stateQuery.ts:24](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateQuery.ts#L24)
+[packages/rx-effects/src/stateQuery.ts:24](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/stateQuery.ts#L24)
 
 ---
 
@@ -451,13 +461,13 @@ Read-only type of the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:14](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/store.ts#L14)
+[packages/rx-effects/src/store.ts:14](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/store.ts#L14)
 
 ---
 
 ### Store
 
-Ƭ **Store**<`State`\>: [`StateReader`](README.md#statereader)<`State`\> & [`Controller`](README.md#controller)<{ `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>
+Ƭ **Store**<`State`\>: [`StateReader`](README.md#statereader)<`State`\> & [`Controller`](README.md#controller)<{ `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\>) => `void` }\>
 
 #### Type parameters
 
@@ -467,7 +477,7 @@ Read-only type of the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:49](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/store.ts#L49)
+[packages/rx-effects/src/store.ts:49](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/store.ts#L49)
 
 ---
 
@@ -499,7 +509,7 @@ Store's action for changing its state
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:6](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeActions.ts#L6)
+[packages/rx-effects/src/storeActions.ts:6](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/storeActions.ts#L6)
 
 ---
 
@@ -518,7 +528,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:9](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeActions.ts#L9)
+[packages/rx-effects/src/storeActions.ts:9](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/storeActions.ts#L9)
 
 ---
 
@@ -549,7 +559,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:13](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeActions.ts#L13)
+[packages/rx-effects/src/storeActions.ts:13](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/storeActions.ts#L13)
 
 ---
 
@@ -565,7 +575,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeEvents.ts:5](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeEvents.ts#L5)
+[packages/rx-effects/src/storeEvents.ts:5](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/storeEvents.ts#L5)
 
 ---
 
@@ -599,7 +609,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeExtensions.ts#L9)
+[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/storeExtensions.ts#L9)
 
 ---
 
@@ -615,13 +625,13 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:66](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/store.ts#L66)
+[packages/rx-effects/src/store.ts:66](https://github.com/mnasyrov/rx-effects/blob/0390d8d/packages/rx-effects/src/store.ts#L66)
 
 ## Functions
 
 ### OBJECT_COMPARATOR
 
-▸ `Const` **OBJECT_COMPARATOR**(`objA`, `objB`): `boolean`
+▸ **OBJECT_COMPARATOR**(`objA`, `objB`): `boolean`
 
 Makes shallow comparison of two objects.
 
@@ -635,10 +645,6 @@ Makes shallow comparison of two objects.
 #### Returns
 
 `boolean`
-
-#### Defined in
-
-[packages/rx-effects/src/utils.ts:8](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/utils.ts#L8)
 
 ---
 
@@ -656,10 +662,6 @@ Makes shallow comparison of two objects.
 
 [`Action`](README.md#action)<`Event`\>
 
-#### Defined in
-
-[packages/rx-effects/src/action.ts:29](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/action.ts#L29)
-
 ---
 
 ### createEffect
@@ -668,7 +670,7 @@ Makes shallow comparison of two objects.
 
 Creates `Effect` from the provided handler.
 
-**`example`**
+**`Example`**
 
 ```ts
 const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
@@ -694,10 +696,6 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
 
-#### Defined in
-
-[packages/rx-effects/src/effect.ts:83](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/effect.ts#L83)
-
 ---
 
 ### createScope
@@ -709,10 +707,6 @@ Creates `Scope` instance.
 #### Returns
 
 [`Scope`](README.md#scope)
-
-#### Defined in
-
-[packages/rx-effects/src/scope.ts:70](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/scope.ts#L70)
 
 ---
 
@@ -738,10 +732,6 @@ Creates the state store.
 #### Returns
 
 [`Store`](README.md#store)<`State`\>
-
-#### Defined in
-
-[packages/rx-effects/src/store.ts:82](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/store.ts#L82)
 
 ---
 
@@ -769,10 +759,6 @@ Creates store actions for the store by state mutations
 
 [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
 
-#### Defined in
-
-[packages/rx-effects/src/storeActions.ts:19](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeActions.ts#L19)
-
 ▸ **createStoreActions**<`State`, `Mutations`\>(`mutations`): [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\>
 
 Creates a factory of store actions by state mutations
@@ -794,10 +780,6 @@ Creates a factory of store actions by state mutations
 
 [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\>
 
-#### Defined in
-
-[packages/rx-effects/src/storeActions.ts:25](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeActions.ts#L25)
-
 ---
 
 ### createStoreLoggerExtension
@@ -813,10 +795,6 @@ Creates a factory of store actions by state mutations
 #### Returns
 
 [`StoreExtension`](README.md#storeextension)<`unknown`\>
-
-#### Defined in
-
-[packages/rx-effects/src/storeLoggerExtension.ts:3](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeLoggerExtension.ts#L3)
 
 ---
 
@@ -842,10 +820,6 @@ Declares the state.
 #### Returns
 
 [`StateDeclaration`](README.md#statedeclaration)<`State`\>
-
-#### Defined in
-
-[packages/rx-effects/src/stateDeclaration.ts:58](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateDeclaration.ts#L58)
 
 ---
 
@@ -874,10 +848,6 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 #### Returns
 
 [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
-
-#### Defined in
-
-[packages/rx-effects/src/handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/handleAction.ts#L8)
 
 ---
 
@@ -908,10 +878,6 @@ function.
 
 [`StateQuery`](README.md#statequery)<`R`\>
 
-#### Defined in
-
-[packages/rx-effects/src/stateQuery.ts:41](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateQuery.ts#L41)
-
 ---
 
 ### mergeQueries
@@ -941,10 +907,6 @@ and merges them into a single value.
 
 [`StateQuery`](README.md#statequery)<`Result`\>
 
-#### Defined in
-
-[packages/rx-effects/src/stateQuery.ts:66](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateQuery.ts#L66)
-
 ---
 
 ### pipeStateMutations
@@ -971,10 +933,6 @@ You can use this helper to apply multiple changes at the same time.
 
 [`StateMutation`](README.md#statemutation)<`State`\>
 
-#### Defined in
-
-[packages/rx-effects/src/stateMutation.ts:33](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/stateMutation.ts#L33)
-
 ---
 
 ### registerStoreExtension
@@ -990,7 +948,3 @@ You can use this helper to apply multiple changes at the same time.
 #### Returns
 
 `Subscription`
-
-#### Defined in
-
-[packages/rx-effects/src/storeExtensions.ts:13](https://github.com/mnasyrov/rx-effects/blob/0dac31e/packages/rx-effects/src/storeExtensions.ts#L13)
