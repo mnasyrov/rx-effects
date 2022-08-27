@@ -1,6 +1,9 @@
 export * from './action';
 export * from './effect';
-export * from './scope';
+
+export type { Scope, ExternalScope } from './scope';
+export { createScope } from './scope';
+
 export * from './controller';
 export * from './handleAction';
 export * from './stateDeclaration';

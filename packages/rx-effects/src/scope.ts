@@ -9,7 +9,7 @@ import { createStore, Store, StoreOptions } from './store';
 /**
  * A controller-like boundary for effects and business logic.
  *
- * It collects all subscriptions which are made by child entities and provides
+ * `Scope` collects all subscriptions which are made by child entities and provides
  * `destroy()` method to unsubscribe from them.
  */
 export type Scope = Controller<{
@@ -63,6 +63,11 @@ export type Scope = Controller<{
     options?: HandlerOptions<ErrorType>,
   ) => Effect<Event, Result, ErrorType>;
 }>;
+
+/**
+ * `ExternalScope` and `Scope` types allow to distinct which third-party code can invoke `destroy()` method.
+ */
+export type ExternalScope = Omit<Scope, 'destroy'>;
 
 /**
  * Creates `Scope` instance.
