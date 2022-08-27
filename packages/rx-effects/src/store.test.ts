@@ -163,6 +163,15 @@ describe('Store', () => {
       expect(changes).toEqual(['a,1', 'b,3']);
     });
   });
+
+  describe('asQuery()', () => {
+    it('should return the same store', () => {
+      const store = createStore(1);
+      const query = store.asQuery();
+
+      expect(query).toBe(store);
+    });
+  });
 });
 
 describe('Concurrent Store updates', () => {
