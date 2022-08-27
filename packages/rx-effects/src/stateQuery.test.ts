@@ -1,12 +1,11 @@
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-
-import { mapQuery, mergeQueries, StateQuery } from './stateQuery';
+import { mapQuery, mergeQueries, Query } from './queries';
 import { createStore } from './store';
 
 describe('mapQuery()', () => {
   it('should return a new state query with applied mapper which transforms the selected value', async () => {
     const sourceValue$ = new BehaviorSubject<number>(0);
-    const sourceQuery: StateQuery<number> = {
+    const sourceQuery: Query<number> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
@@ -23,7 +22,7 @@ describe('mapQuery()', () => {
 
   it('should not produce values for each source emission if distinct is false', () => {
     const sourceValue$ = new BehaviorSubject<number>(0);
-    const sourceQuery: StateQuery<number> = {
+    const sourceQuery: Query<number> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
@@ -43,7 +42,7 @@ describe('mapQuery()', () => {
 
   it('should produce distinct values by default', () => {
     const sourceValue$ = new BehaviorSubject<number>(0);
-    const sourceQuery: StateQuery<number> = {
+    const sourceQuery: Query<number> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
@@ -62,7 +61,7 @@ describe('mapQuery()', () => {
 
   it('should produce distinct values when distinct = true', () => {
     const sourceValue$ = new BehaviorSubject<number>(0);
-    const sourceQuery: StateQuery<number> = {
+    const sourceQuery: Query<number> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
@@ -82,7 +81,7 @@ describe('mapQuery()', () => {
   it('should produce distinct values with the custom comparator', () => {
     type Value = { v: number };
     const sourceValue$ = new BehaviorSubject<Value>({ v: 0 });
-    const sourceQuery: StateQuery<Value> = {
+    const sourceQuery: Query<Value> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
@@ -106,7 +105,7 @@ describe('mapQuery()', () => {
   it('should produce distinct values with the custom keySelector', () => {
     type Value = { v: number };
     const sourceValue$ = new BehaviorSubject<Value>({ v: 0 });
-    const sourceQuery: StateQuery<Value> = {
+    const sourceQuery: Query<Value> = {
       get: () => sourceValue$.getValue(),
       value$: sourceValue$,
     };
@@ -187,7 +186,7 @@ describe('mergeQueries()', () => {
     const store1 = createStore<number>(2);
     const store2 = createStore<{ value: number }>({ value: 3 });
 
-    const query: StateQuery<number> = mergeQueries(
+    const query: Query<number> = mergeQueries(
       [store1, store2],
       (value, obj) => value + obj.value,
     );

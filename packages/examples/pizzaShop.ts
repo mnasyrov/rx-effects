@@ -5,7 +5,7 @@ import {
   declareState,
   EffectState,
   StateMutation,
-  StateQuery,
+  Query,
 } from 'rx-effects';
 import { delay, filter, map, mapTo, of } from 'rxjs';
 
@@ -31,7 +31,7 @@ const CART_STATE = declareState<CartState>(() => ({ orders: [] }));
 // It should provide methods for triggering the actions,
 // and queries or observables for subscribing to data.
 export type PizzaShopController = Controller<{
-  ordersQuery: StateQuery<Array<string>>;
+  ordersQuery: Query<Array<string>>;
 
   addPizza: (name: string) => void;
   removePizza: (name: string) => void;

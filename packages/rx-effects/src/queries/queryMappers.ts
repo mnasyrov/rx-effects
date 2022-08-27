@@ -1,37 +1,10 @@
 import { combineLatest, identity, Observable, shareReplay } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-
-import { DEFAULT_COMPARATOR } from './utils';
-
-/**
- * Provider for a value of a state.
- */
-export type StateQuery<T> = {
-  /** Returns the value of a state */
-  readonly get: () => T;
-
-  /** `Observable` for value changes.  */
-  readonly value$: Observable<T>;
-};
+import { DEFAULT_COMPARATOR } from '../utils';
+import { Query, QueryOptions } from './query';
 
 /**
- * Options for processing the query result
- *
- * @property distinct Enables distinct results
- * @property distinct.comparator Custom comparator for values. Strict equality `===` is used by default.
- * @property distinct.keySelector Getter for keys of values to compare. Values itself are used for comparing by default.
- */
-export type StateQueryOptions<T, K> = {
-  distinct?:
-    | boolean
-    | {
-        comparator?: (previous: K, current: K) => boolean;
-        keySelector?: (value: T) => K;
-      };
-};
-
-/**
- * Returns a new `StateQuery` which maps a source value by the provided mapping
+ * Creates a new `Query` which maps a source value by the provided mapping
  * function.
  *
  * @param query source query
@@ -39,10 +12,10 @@ export type StateQueryOptions<T, K> = {
  * @param options options for processing the result value
  */
 export function mapQuery<T, R, K = R>(
-  query: StateQuery<T>,
+  query: Query<T>,
   mapper: (value: T) => R,
-  options?: StateQueryOptions<R, K>,
-): StateQuery<R> {
+  options?: QueryOptions<R, K>,
+): Query<R> {
   const { shareReplayWithRef, buffer } = createShareReplayWithRef<R>();
 
   let value$ = query.value$.pipe(map(mapper));
@@ -56,7 +29,7 @@ export function mapQuery<T, R, K = R>(
 }
 
 /**
- * Returns a new `StateQuery` which takes the latest values from source queries
+ * Creates a new `Query` which takes the latest values from source queries
  * and merges them into a single value.
  *
  * @param queries source queries
@@ -70,12 +43,12 @@ export function mergeQueries<
 >(
   queries: [
     ...{
-      [K in keyof Values]: StateQuery<Values[K]>;
+      [K in keyof Values]: Query<Values[K]>;
     }
   ],
   merger: (...values: Values) => Result,
-  options?: StateQueryOptions<Result, ResultKey>,
-): StateQuery<Result> {
+  options?: QueryOptions<Result, ResultKey>,
+): Query<Result> {
   const { shareReplayWithRef, buffer } = createShareReplayWithRef<Result>();
 
   let value$ = combineLatest(queries.map((query) => query.value$)).pipe(
@@ -97,7 +70,7 @@ export function mergeQueries<
 
 function distinctValue<T, K>(
   value$: Observable<T>,
-  distinct: StateQueryOptions<T, K>['distinct'],
+  distinct: QueryOptions<T, K>['distinct'],
 ): Observable<T> {
   if (distinct === false) {
     return value$;

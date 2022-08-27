@@ -31,7 +31,7 @@ to React components and hooks:
 - [`useObservable`](docs/README.md#useobservable) – returns a value provided by `source$` observable.
 - [`useObserver`](docs/README.md#useobserver) – subscribes the provided observer or `next` handler on `source$` observable.
 - [`useSelector`](docs/README.md#useselector) – returns a value provided by `source$` observable.
-- [`useStateQuery`](docs/README.md#usestatequery) – returns a value which is provided by the query.
+- [`useQuery`](docs/README.md#usequery) – returns a value which is provided by the query.
 
 Example:
 
@@ -39,7 +39,7 @@ Example:
 // pizzaShopComponent.tsx
 
 import React, { FC, useEffect } from 'react';
-import { useConst, useObservable, useStateQuery } from 'rx-effects-react';
+import { useConst, useObservable, useQuery } from 'rx-effects-react';
 import { createPizzaShopController } from './pizzaShop';
 
 export const PizzaShopComponent: FC = () => {
@@ -55,8 +55,8 @@ export const PizzaShopComponent: FC = () => {
     controller;
 
   // Subscribing to state data and the effect stata
-  const orders = useStateQuery(ordersQuery);
-  const isPending = useStateQuery(submitState.pending);
+  const orders = useQuery(ordersQuery);
+  const isPending = useQuery(submitState.pending);
   const submitError = useObservable(submitState.error$, undefined);
 
   // Actual rendering should be here.

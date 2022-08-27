@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Controller } from './controller';
+import { mapQuery, Query, QueryOptions } from './queries';
 import { StateMutation } from './stateMutation';
-import { mapQuery, StateQuery, StateQueryOptions } from './stateQuery';
 import { STORE_EVENT_BUS } from './storeEvents';
 import { setInternalStoreFlag } from './storeMetadata';
 import { DEFAULT_COMPARATOR, isReadonlyArray } from './utils';
@@ -11,53 +11,62 @@ let STORE_SEQ_NUMBER = 0;
 /**
  * Read-only type of the state store.
  */
-export type StateReader<State> = StateQuery<State> & {
-  id: number;
-  name?: string;
+export type StateReader<State> = Readonly<
+  Query<State> & {
+    id: number;
+    name?: string;
 
-  /**
-   * Returns a part of the state as `Observable`
-   * The result observable produces distinct values by default.
-   *
-   * @example
-   * ```ts
-   * const state: StateReader<{form: {login: 'foo'}}> = // ...
-   * const value$ = state.select((state) => state.form.login);
-   * ```
-   */
-  readonly select: <R, K = R>(
-    selector: (state: State) => R,
-    options?: StateQueryOptions<R, K>,
-  ) => Observable<R>;
+    /**
+     * Returns a part of the state as `Observable`
+     * The result observable produces distinct values by default.
+     *
+     * @example
+     * ```ts
+     * const state: StateReader<{form: {login: 'foo'}}> = // ...
+     * const value$ = state.select((state) => state.form.login);
+     * ```
+     */
+    select: <R, K = R>(
+      selector: (state: State) => R,
+      options?: QueryOptions<R, K>,
+    ) => Observable<R>;
 
-  /**
-   * Returns a part of the state as `StateQuery`.
-   * The result query produces distinct values by default.
-   *
-   * @example
-   * ```ts
-   * const state: StateReader<{form: {login: 'foo'}}> = // ...
-   * const query = state.query((state) => state.form.login);
-   * ```
-   * */
-  readonly query: <R, K = R>(
-    selector: (state: State) => R,
-    options?: StateQueryOptions<R, K>,
-  ) => StateQuery<R>;
-};
+    /**
+     * Returns a part of the state as `Query`.
+     * The result query produces distinct values by default.
+     *
+     * @example
+     * ```ts
+     * const state: StateReader<{form: {login: 'foo'}}> = // ...
+     * const query = state.query((state) => state.form.login);
+     * ```
+     * */
+    query: <R, K = R>(
+      selector: (state: State) => R,
+      options?: QueryOptions<R, K>,
+    ) => Query<R>;
 
-export type Store<State> = StateReader<State> &
-  Controller<{
-    /** Sets a new state to the store */
-    set: (state: State) => void;
+    /**
+     * Cast the store to a narrowed `Query` type.
+     */
+    asQuery: () => Query<State>;
+  }
+>;
 
-    /** Updates the state in the store by the mutation */
-    update: (
-      mutation:
-        | StateMutation<State>
-        | ReadonlyArray<StateMutation<State> | undefined | null | false>,
-    ) => void;
-  }>;
+export type Store<State> = Readonly<
+  StateReader<State> &
+    Controller<{
+      /** Sets a new state to the store */
+      set: (state: State) => void;
+
+      /** Updates the state in the store by the mutation */
+      update: (
+        mutation:
+          | StateMutation<State>
+          | ReadonlyArray<StateMutation<State> | undefined | null | false>,
+      ) => void;
+    }>
+>;
 
 type StoreMutationEntries<State> = ReadonlyArray<
   StateMutation<State> | undefined | null | false
@@ -91,7 +100,7 @@ export function createStore<State>(
   let isUpdating = false;
   let pendingMutations: StoreMutationEntries<State> | undefined;
 
-  const store = {
+  const store: Store<State> = {
     id: ++STORE_SEQ_NUMBER,
     name: options?.name,
 
@@ -119,17 +128,19 @@ export function createStore<State>(
 
     select<R, K = R>(
       selector: (state: State) => R,
-      options?: StateQueryOptions<R, K>,
+      options?: QueryOptions<R, K>,
     ): Observable<R> {
       return this.query(selector, options).value$;
     },
 
     query<R, K = R>(
       selector: (state: State) => R,
-      options?: StateQueryOptions<R, K>,
-    ): StateQuery<R> {
+      options?: QueryOptions<R, K>,
+    ): Query<R> {
       return mapQuery(this, selector, options);
     },
+
+    asQuery: () => store,
 
     destroy() {
       store$.complete();

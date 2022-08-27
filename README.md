@@ -51,7 +51,7 @@ The main idea is to use the classic MVC pattern with event-based models (state s
 Core elements:
 
 - `State` – a data model.
-- `StateQuery` – a getter and subscriber for data of the state.
+- `Query` – a getter and subscriber for data of the state.
 - `StateMutation` – a pure function which changes the state.
 - `Store` – a state storage, it provides methods to update and subscribe the state.
 - `Action` – an event emitter.
@@ -73,7 +73,7 @@ import {
   declareState,
   EffectState,
   StateMutation,
-  StateQuery,
+  Query,
 } from 'rx-effects';
 import { delay, filter, map, mapTo, of } from 'rxjs';
 
@@ -99,7 +99,7 @@ const CART_STATE = declareState<CartState>(() => ({ orders: [] }));
 // It should provide methods for triggering the actions,
 // and queries or observables for subscribing to data.
 export type PizzaShopController = Controller<{
-  ordersQuery: StateQuery<Array<string>>;
+  ordersQuery: Query<Array<string>>;
 
   addPizza: (name: string) => void;
   removePizza: (name: string) => void;
@@ -164,7 +164,7 @@ export function createPizzaShopController(): PizzaShopController {
 // pizzaShopComponent.tsx
 
 import React, { FC, useEffect } from 'react';
-import { useConst, useObservable, useStateQuery } from 'rx-effects-react';
+import { useConst, useObservable, useQuery } from 'rx-effects-react';
 import { createPizzaShopController } from './pizzaShop';
 
 export const PizzaShopComponent: FC = () => {
@@ -180,8 +180,8 @@ export const PizzaShopComponent: FC = () => {
     controller;
 
   // Subscribing to state data and the effect stata
-  const orders = useStateQuery(ordersQuery);
-  const isPending = useStateQuery(submitState.pending);
+  const orders = useQuery(ordersQuery);
+  const isPending = useQuery(submitState.pending);
   const submitError = useObservable(submitState.error$, undefined);
 
   return (

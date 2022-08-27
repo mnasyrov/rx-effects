@@ -32,7 +32,7 @@ some actions.
 Main elements:
 
 - `State` – a data model.
-- `StateQuery` – a getter and subscriber for data of the state.
+- `Query` – a getter and subscriber for data of the state.
 - `StateMutation` – a pure function which changes the state.
 - `Store` – a state storage, it provides methods to update and subscribe the state.
 - `Action` – an event emitter.
@@ -123,7 +123,7 @@ function addPizza(name: string) {
 
 ### Getting State
 
-The store implements `StateQuery` type for providing the state:
+The store implements `Query` type for providing the state:
 
 - `get()` returns the current state.
 - `value$` is an observable for the current state and future changes.
@@ -151,7 +151,7 @@ async function submitForm() {
 The store has `select()` and `query()` methods:
 
 - `select()` returns `Observable` for the part of the state.
-- `value$` returns `StateQuery` for the part of the state.
+- `value$` returns `Query` for the part of the state.
 
 Both of the methods takes `selector()` and `valueComparator()` arguments:
 
@@ -163,7 +163,7 @@ const orders$: Observable<Array<string>> = cartStore.select(
   (state) => state.orders,
 );
 
-const ordersQuery: StateQuery<Array<string>> = cartStore.query(
+const ordersQuery: Query<Array<string>> = cartStore.query(
   (state) => state.orders,
 );
 ```
