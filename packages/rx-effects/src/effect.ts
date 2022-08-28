@@ -13,6 +13,7 @@ import {
   tap,
 } from 'rxjs';
 import { Action } from './action';
+import { Controller } from './controller';
 import { declareState } from './stateDeclaration';
 import { Query } from './queries';
 
@@ -52,25 +53,25 @@ export type HandlerOptions<ErrorType = Error> = Readonly<{
 /**
  * Details about performing the effect.
  */
-export type EffectState<Event, Result = void, ErrorType = Error> = {
+export type EffectState<Event, Result = void, ErrorType = Error> = Readonly<{
   /** `result$` provides a result of successful execution of the handler */
-  readonly result$: Observable<Result>;
+  result$: Observable<Result>;
 
   /** `done$` provides a source event and a result of successful execution of the handler */
-  readonly done$: Observable<{ event: Event; result: Result }>;
+  done$: Observable<{ event: Event; result: Result }>;
 
   /** `done$` provides a source event and an error if the handler fails */
-  readonly error$: Observable<{ event: Event; error: ErrorType }>;
+  error$: Observable<{ event: Event; error: ErrorType }>;
 
   /** `final$` provides a source event after execution of the handler, for both success and error result */
-  readonly final$: Observable<Event>;
+  final$: Observable<Event>;
 
   /** Provides `true` if there is any execution of the handler in progress */
-  readonly pending: Query<boolean>;
+  pending: Query<boolean>;
 
   /** Provides a count of the handler in progress */
-  readonly pendingCount: Query<number>;
-};
+  pendingCount: Query<number>;
+}>;
 
 export type EffectEventProject<Event, Result> = (
   event: Event,
@@ -101,18 +102,14 @@ export type EffectOptions<Event, Result> = Readonly<{
  * Effect collects all internal subscriptions, and provides `destroy()` methods
  * unsubscribe from them and deactivate the effect.
  */
-export type Effect<Event, Result = void, ErrorType = Error> = EffectState<
-  Event,
-  Result,
-  ErrorType
-> & {
-  readonly handle: (
-    source: Action<Event> | Observable<Event>,
-    options?: HandlerOptions<ErrorType>,
-  ) => Subscription;
-
-  readonly destroy: () => void;
-};
+export type Effect<Event, Result = void, ErrorType = Error> = Controller<
+  EffectState<Event, Result, ErrorType> & {
+    handle: (
+      source: Action<Event> | Observable<Event>,
+      options?: HandlerOptions<ErrorType>,
+    ) => Subscription;
+  }
+>;
 
 const PENDING_COUNT_STATE = declareState(0, { internal: true });
 const increaseCount = (count: number): number => count + 1;
