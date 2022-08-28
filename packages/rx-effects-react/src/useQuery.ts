@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { StateQuery } from 'rx-effects';
+import { Query, StateQuery } from 'rx-effects';
 
 /**
  * Returns a value which is provided by the query.
  *
  * @param query – a query for a value
  */
-export function useStateQuery<T>(query: StateQuery<T>): T {
+export function useQuery<T>(query: Query<T>): T {
   const [value, setValue] = useState<T>(query.get);
 
   useEffect(() => {
@@ -18,4 +18,15 @@ export function useStateQuery<T>(query: StateQuery<T>): T {
   }, [query.value$]);
 
   return value;
+}
+
+/**
+ * Returns a value which is provided by the query.
+ *
+ * @deprecated Use `useQuery()`.
+ *
+ * @param query – a query for a value
+ */
+export function useStateQuery<T>(query: StateQuery<T>): T {
+  return useQuery(query);
 }

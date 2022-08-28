@@ -5,7 +5,7 @@ export * from './controller';
 export * from './handleAction';
 export * from './stateDeclaration';
 export * from './stateMutation';
-export * from './stateQuery';
+export * from './queries';
 export * from './store';
 export type { StoreEvent } from './storeEvents';
 export * from './storeActions';

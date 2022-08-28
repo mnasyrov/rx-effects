@@ -1,5 +1,5 @@
 import React, { FC, useEffect } from 'react';
-import { useConst, useObservable, useStateQuery } from 'rx-effects-react';
+import { useConst, useObservable, useQuery } from 'rx-effects-react';
 import { createPizzaShopController } from './pizzaShop';
 
 export const PizzaShopComponent: FC = () => {
@@ -15,8 +15,8 @@ export const PizzaShopComponent: FC = () => {
     controller;
 
   // Subscribing to state data and the effect stata
-  const orders = useStateQuery(ordersQuery);
-  const isPending = useStateQuery(submitState.pending);
+  const orders = useQuery(ordersQuery);
+  const isPending = useQuery(submitState.pending);
   const submitError = useObservable(submitState.error$, undefined);
 
   return (

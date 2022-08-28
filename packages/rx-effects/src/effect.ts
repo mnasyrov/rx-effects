@@ -2,7 +2,7 @@ import { from, identity, merge, Observable, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Action } from './action';
 import { declareState } from './stateDeclaration';
-import { StateQuery } from './stateQuery';
+import { Query } from './queries';
 
 /**
  * Handler for an event. It can be asynchronous.
@@ -38,10 +38,10 @@ export type EffectState<Event, Result = void, ErrorType = Error> = {
   readonly final$: Observable<Event>;
 
   /** Provides `true` if there is any execution of the handler in progress */
-  readonly pending: StateQuery<boolean>;
+  readonly pending: Query<boolean>;
 
   /** Provides a count of the handler in progress */
-  readonly pendingCount: StateQuery<number>;
+  readonly pendingCount: Query<number>;
 };
 
 /**

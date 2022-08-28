@@ -1,7 +1,7 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen, toArray } from 'rxjs/operators';
+import { mapQuery, mergeQueries } from './queries';
 import { StateMutation } from './stateMutation';
-import { mapQuery, mergeQueries } from './stateQuery';
 import { createStore, Store } from './store';
 import { OBJECT_COMPARATOR } from './utils';
 
@@ -161,6 +161,15 @@ describe('Store', () => {
 
       expect(query.get()).toEqual('b,3');
       expect(changes).toEqual(['a,1', 'b,3']);
+    });
+  });
+
+  describe('asQuery()', () => {
+    it('should return the same store', () => {
+      const store = createStore(1);
+      const query = store.asQuery();
+
+      expect(query).toBe(store);
     });
   });
 });
