@@ -1,4 +1,5 @@
 import {
+  exhaustMap,
   firstValueFrom,
   from,
   mapTo,
@@ -301,6 +302,44 @@ describe('Effect', () => {
         },
         completedEvent,
       ]);
+    });
+  });
+
+  describe('EffectOptions.pipeline', () => {
+    const timeIntervalHandler = (interval: number) =>
+      timer(interval).pipe(mapTo(interval));
+
+    it('should use the default mergeMap pipeline in case the option is not set', async () => {
+      const effect = createEffect<number, number>(timeIntervalHandler);
+
+      const resultPromise = getFirstValues(effect.result$, 3);
+      effect.handle(from([100, 50, 10]));
+
+      expect(effect.pending.get()).toBe(true);
+      expect(await resultPromise).toEqual([10, 50, 100]);
+      expect(effect.pending.get()).toBe(false);
+    });
+
+    it('should specify a custom pipeline (switchMap) for effect execution', async () => {
+      const effect = createEffect<number, number>(timeIntervalHandler, {
+        pipeline: (eventProject) => switchMap(eventProject),
+      });
+
+      const resultPromise = getFirstValues(effect.result$, 1);
+      effect.handle(from([100, 50, 10]));
+
+      expect(await resultPromise).toEqual([10]);
+    });
+
+    it('should specify a custom pipeline (exhaustMap) for effect execution', async () => {
+      const effect = createEffect<number, number>(timeIntervalHandler, {
+        pipeline: (eventProject) => exhaustMap(eventProject),
+      });
+
+      const resultPromise = getFirstValues(effect.result$, 1);
+      effect.handle(from([100, 50, 10]));
+
+      expect(await resultPromise).toEqual([100]);
     });
   });
 });
