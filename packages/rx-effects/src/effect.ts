@@ -1,5 +1,17 @@
-import { from, identity, merge, Observable, Subject, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {
+  defer,
+  identity,
+  map,
+  merge,
+  mergeMap,
+  Observable,
+  of,
+  OperatorFunction,
+  retry,
+  Subject,
+  Subscription,
+  tap,
+} from 'rxjs';
 import { Action } from './action';
 import { declareState } from './stateDeclaration';
 import { Query } from './queries';
@@ -44,6 +56,26 @@ export type EffectState<Event, Result = void, ErrorType = Error> = {
   readonly pendingCount: Query<number>;
 };
 
+export type EffectEventProject<Event, Result> = (
+  event: Event,
+) => Observable<Result>;
+
+export type EffectPipeline<Event, Result> = (
+  eventProject: EffectEventProject<Event, Result>,
+) => OperatorFunction<Event, Result>;
+
+const DEFAULT_MERGE_MAP_PIPELINE: EffectPipeline<any, any> = (eventProject) =>
+  mergeMap(eventProject);
+
+export type EffectOptions<Event, Result> = Readonly<{
+  /**
+   * Custom pipeline for processing effect's events.
+   *
+   * `mergeMap` pipeline is used by default.
+   */
+  pipeline?: EffectPipeline<Event, Result>;
+}>;
+
 /**
  * Effect encapsulates a handler for Action or Observable.
  *
@@ -82,53 +114,51 @@ const decreaseCount = (count: number): number => count - 1;
  */
 export function createEffect<Event = void, Result = void, ErrorType = Error>(
   handler: EffectHandler<Event, Result>,
+  options?: EffectOptions<Event, Result>,
 ): Effect<Event, Result, ErrorType> {
+  const pipeline: EffectPipeline<Event, Result> =
+    options?.pipeline ?? DEFAULT_MERGE_MAP_PIPELINE;
+
   const subscriptions = new Subscription();
 
+  const event$ = new Subject<Event>();
   const done$ = new Subject<{ event: Event; result: Result }>();
   const error$ = new Subject<{ event: Event; error: ErrorType }>();
-
   const pendingCount = PENDING_COUNT_STATE.createStore();
 
-  function applyHandler(event: Event): void {
-    pendingCount.update(increaseCount);
+  subscriptions.add(() => {
+    event$.complete();
+    done$.complete();
+    error$.complete();
+    pendingCount.destroy();
+  });
 
-    try {
-      const handlerResult = handler(event);
+  const eventProject: EffectEventProject<Event, Result> = (event: Event) => {
+    return defer(() => {
+      pendingCount.update(increaseCount);
 
-      if (
-        handlerResult instanceof Promise ||
-        handlerResult instanceof Observable
-      ) {
-        subscriptions.add(executeObservable(event, from(handlerResult)));
-        return;
-      }
+      const result = handler(event);
 
-      pendingCount.update(decreaseCount);
-      done$.next({ event, result: handlerResult });
-    } catch (error) {
-      pendingCount.update(decreaseCount);
-      error$.next({ event, error: error as ErrorType });
-    }
-  }
+      return result instanceof Observable || result instanceof Promise
+        ? result
+        : of(result);
+    }).pipe(
+      tap({
+        next: (result) => {
+          done$.next({ event, result });
+        },
+        complete: () => {
+          pendingCount.update(decreaseCount);
+        },
+        error: (error) => {
+          pendingCount.update(decreaseCount);
+          error$.next({ event, error });
+        },
+      }),
+    );
+  };
 
-  function executeObservable(
-    event: Event,
-    observable: Observable<Result>,
-  ): Subscription {
-    return observable.subscribe({
-      next: (result) => {
-        done$.next({ event, result });
-      },
-      complete: () => {
-        pendingCount.update(decreaseCount);
-      },
-      error: (error) => {
-        pendingCount.update(decreaseCount);
-        error$.next({ event, error });
-      },
-    });
-  }
+  subscriptions.add(event$.pipe(pipeline(eventProject), retry()).subscribe());
 
   function handle<SourceErrorType = Error>(
     source: Observable<Event> | Action<Event>,
@@ -139,7 +169,7 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
     ) as Observable<Event>;
 
     const subscription = observable.subscribe({
-      next: (event) => applyHandler(event),
+      next: (event) => event$.next(event),
       error: (error) => options?.onSourceFailed?.(error),
       complete: () => options?.onSourceCompleted?.(),
     });
@@ -157,11 +187,9 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
     pendingCount: pendingCount.query(identity),
 
     handle,
+
     destroy: () => {
       subscriptions.unsubscribe();
-      done$.complete();
-      error$.complete();
-      pendingCount.destroy();
     },
   };
 }
