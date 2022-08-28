@@ -9,8 +9,12 @@ rx-effects
 - [Action](README.md#action)
 - [Controller](README.md#controller)
 - [Effect](README.md#effect)
+- [EffectEventProject](README.md#effecteventproject)
 - [EffectHandler](README.md#effecthandler)
+- [EffectOptions](README.md#effectoptions)
+- [EffectPipeline](README.md#effectpipeline)
 - [EffectState](README.md#effectstate)
+- [ExternalScope](README.md#externalscope)
 - [HandlerOptions](README.md#handleroptions)
 - [Query](README.md#query)
 - [QueryOptions](README.md#queryoptions)
@@ -31,6 +35,10 @@ rx-effects
 - [StoreEvent](README.md#storeevent)
 - [StoreExtension](README.md#storeextension)
 - [StoreOptions](README.md#storeoptions)
+
+### Variables
+
+- [GLOBAL_EFFECT_UNHANDLED_ERROR$](README.md#global_effect_unhandled_error$)
 
 ### Functions
 
@@ -81,7 +89,7 @@ submitForm.even$.subscribe((formData) => {
 
 #### Defined in
 
-[packages/rx-effects/src/action.ts:22](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/action.ts#L22)
+[packages/rx-effects/src/action.ts:22](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/action.ts#L22)
 
 ---
 
@@ -110,13 +118,13 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[packages/rx-effects/src/controller.ts:16](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/controller.ts#L16)
+[packages/rx-effects/src/controller.ts:16](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/controller.ts#L16)
 
 ---
 
 ### Effect
 
-Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `destroy`: () => `void` ; `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => `Subscription` }
+Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`Controller`](README.md#controller)<[`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => `Subscription` }\>
 
 Effect encapsulates a handler for Action or Observable.
 
@@ -136,7 +144,38 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/effect.ts#L56)
+[packages/rx-effects/src/effect.ts:105](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L105)
+
+---
+
+### EffectEventProject
+
+Ƭ **EffectEventProject**<`Event`, `Result`\>: (`event`: `Event`) => `Observable`<`Result`\>
+
+#### Type parameters
+
+| Name     |
+| :------- |
+| `Event`  |
+| `Result` |
+
+#### Type declaration
+
+▸ (`event`): `Observable`<`Result`\>
+
+##### Parameters
+
+| Name    | Type    |
+| :------ | :------ |
+| `event` | `Event` |
+
+##### Returns
+
+`Observable`<`Result`\>
+
+#### Defined in
+
+[packages/rx-effects/src/effect.ts:76](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L76)
 
 ---
 
@@ -171,13 +210,61 @@ Handler for an event. It can be asynchronous.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:12](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/effect.ts#L12)
+[packages/rx-effects/src/effect.ts:41](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L41)
+
+---
+
+### EffectOptions
+
+Ƭ **EffectOptions**<`Event`, `Result`\>: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>
+
+#### Type parameters
+
+| Name     |
+| :------- |
+| `Event`  |
+| `Result` |
+
+#### Defined in
+
+[packages/rx-effects/src/effect.ts:87](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L87)
+
+---
+
+### EffectPipeline
+
+Ƭ **EffectPipeline**<`Event`, `Result`\>: (`eventProject`: [`EffectEventProject`](README.md#effecteventproject)<`Event`, `Result`\>) => `OperatorFunction`<`Event`, `Result`\>
+
+#### Type parameters
+
+| Name     |
+| :------- |
+| `Event`  |
+| `Result` |
+
+#### Type declaration
+
+▸ (`eventProject`): `OperatorFunction`<`Event`, `Result`\>
+
+##### Parameters
+
+| Name           | Type                                                                     |
+| :------------- | :----------------------------------------------------------------------- |
+| `eventProject` | [`EffectEventProject`](README.md#effecteventproject)<`Event`, `Result`\> |
+
+##### Returns
+
+`OperatorFunction`<`Event`, `Result`\>
+
+#### Defined in
+
+[packages/rx-effects/src/effect.ts:80](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L80)
 
 ---
 
 ### EffectState
 
-Ƭ **EffectState**<`Event`, `Result`, `ErrorType`\>: `Object`
+Ƭ **EffectState**<`Event`, `Result`, `ErrorType`\>: `Readonly`<{ `done$`: `Observable`<{ `event`: `Event` ; `result`: `Result` }\> ; `error$`: `Observable`<{ `error`: `ErrorType` ; `event`: `Event` }\> ; `final$`: `Observable`<`Event`\> ; `pending`: [`Query`](README.md#query)<`boolean`\> ; `pendingCount`: [`Query`](README.md#query)<`number`\> ; `result$`: `Observable`<`Result`\> }\>
 
 Details about performing the effect.
 
@@ -189,20 +276,21 @@ Details about performing the effect.
 | `Result`    | `void`  |
 | `ErrorType` | `Error` |
 
-#### Type declaration
+#### Defined in
 
-| Name           | Type                                                       | Description                                                                                        |
-| :------------- | :--------------------------------------------------------- | :------------------------------------------------------------------------------------------------- |
-| `done$`        | `Observable`<{ `event`: `Event` ; `result`: `Result` }\>   | `done$` provides a source event and a result of successful execution of the handler                |
-| `error$`       | `Observable`<{ `error`: `ErrorType` ; `event`: `Event` }\> | `done$` provides a source event and an error if the handler fails                                  |
-| `final$`       | `Observable`<`Event`\>                                     | `final$` provides a source event after execution of the handler, for both success and error result |
-| `pending`      | [`Query`](README.md#query)<`boolean`\>                     | Provides `true` if there is any execution of the handler in progress                               |
-| `pendingCount` | [`Query`](README.md#query)<`number`\>                      | Provides a count of the handler in progress                                                        |
-| `result$`      | `Observable`<`Result`\>                                    | `result$` provides a result of successful execution of the handler                                 |
+[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L56)
+
+---
+
+### ExternalScope
+
+Ƭ **ExternalScope**: `Omit`<[`Scope`](README.md#scope), `"destroy"`\>
+
+`ExternalScope` and `Scope` types allow to distinct which third-party code can invoke `destroy()` method.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/effect.ts#L27)
+[packages/rx-effects/src/scope.ts:70](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/scope.ts#L70)
 
 ---
 
@@ -220,7 +308,7 @@ Options for handling an action or observable.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:19](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/effect.ts#L19)
+[packages/rx-effects/src/effect.ts:48](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L48)
 
 ---
 
@@ -238,7 +326,7 @@ Provider for a value of a state.
 
 #### Defined in
 
-[packages/rx-effects/src/queries/query.ts:6](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/queries/query.ts#L6)
+[packages/rx-effects/src/queries/query.ts:6](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/queries/query.ts#L6)
 
 ---
 
@@ -263,22 +351,22 @@ Options for processing the query result
 
 #### Defined in
 
-[packages/rx-effects/src/queries/query.ts:21](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/queries/query.ts#L21)
+[packages/rx-effects/src/queries/query.ts:21](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/queries/query.ts#L21)
 
 ---
 
 ### Scope
 
-Ƭ **Scope**: [`Controller`](README.md#controller)<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>) => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\> ; `createDeclaredStore`: <State\>(`stateDeclaration`: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStore`: (`initialState?`: `Partial`<`State`\>) => `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\> ; `createStoreActions`: <Mutations\>(`store`: `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>, `initialState?`: `Partial`<`State`\>) => `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\> ; `handleAction`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> }\>
+Ƭ **Scope**: [`Controller`](README.md#controller)<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>) => `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\> ; `createDeclaredStore`: <State\>(`stateDeclaration`: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStore`: (`initialState?`: `Partial`<`State`\>) => `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\> ; `createStoreActions`: <Mutations\>(`store`: `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>, `initialState?`: `Partial`<`State`\>) => `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => `Readonly`<{ `destroy`: () => `void` } & `Readonly`<{ `done$`: `Observable`<{ `event`: `Event` ; `result`: `Result` }\> ; `error$`: `Observable`<{ `error`: `ErrorType` ; `event`: `Event` }\> ; `final$`: `Observable`<`Event`\> ; `pending`: [`Query`](README.md#query)<`boolean`\> ; `pendingCount`: [`Query`](README.md#query)<`number`\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => `Subscription` }\> ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> & { `id`: `number` ; `name?`: `string` ; `asQuery`: () => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Readonly`<{ `value$`: `Observable`<`T`\> ; `get`: () => `T` }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `T`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\> ; `handleAction`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => `Readonly`<{ `destroy`: () => `void` } & `Readonly`<{ `done$`: `Observable`<{ `event`: `Event` ; `result`: `Result` }\> ; `error$`: `Observable`<{ `error`: `ErrorType` ; `event`: `Event` }\> ; `final$`: `Observable`<`Event`\> ; `pending`: [`Query`](README.md#query)<`boolean`\> ; `pendingCount`: [`Query`](README.md#query)<`number`\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>) => `Subscription` }\> }\>
 
 A controller-like boundary for effects and business logic.
 
-It collects all subscriptions which are made by child entities and provides
+`Scope` collects all subscriptions which are made by child entities and provides
 `destroy()` method to unsubscribe from them.
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/scope.ts#L15)
+[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
@@ -296,7 +384,7 @@ Declaration of a state.
 
 #### Defined in
 
-[packages/rx-effects/src/stateDeclaration.ts:18](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/stateDeclaration.ts#L18)
+[packages/rx-effects/src/stateDeclaration.ts:18](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/stateDeclaration.ts#L18)
 
 ---
 
@@ -312,7 +400,7 @@ Declaration of a state.
 
 #### Defined in
 
-[packages/rx-effects/src/stateDeclaration.ts:42](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/stateDeclaration.ts#L42)
+[packages/rx-effects/src/stateDeclaration.ts:42](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/stateDeclaration.ts#L42)
 
 ---
 
@@ -345,7 +433,7 @@ state.
 
 #### Defined in
 
-[packages/rx-effects/src/stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/stateDeclaration.ts#L13)
+[packages/rx-effects/src/stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/stateDeclaration.ts#L13)
 
 ---
 
@@ -394,7 +482,7 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/stateMutation.ts#L19)
+[packages/rx-effects/src/stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/stateMutation.ts#L19)
 
 ---
 
@@ -404,7 +492,7 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/storeMetadata.ts:7](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeMetadata.ts#L7)
+[packages/rx-effects/src/storeMetadata.ts:7](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeMetadata.ts#L7)
 
 ---
 
@@ -422,7 +510,7 @@ A record of state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/stateMutation.ts:24](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/stateMutation.ts#L24)
+[packages/rx-effects/src/stateMutation.ts:24](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/stateMutation.ts#L24)
 
 ---
 
@@ -440,7 +528,7 @@ A record of state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/queries/query.ts:33](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/queries/query.ts#L33)
+[packages/rx-effects/src/queries/query.ts:33](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/queries/query.ts#L33)
 
 ---
 
@@ -459,7 +547,7 @@ A record of state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/queries/query.ts:38](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/queries/query.ts#L38)
+[packages/rx-effects/src/queries/query.ts:38](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/queries/query.ts#L38)
 
 ---
 
@@ -477,7 +565,7 @@ Read-only type of the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:14](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/store.ts#L14)
+[packages/rx-effects/src/store.ts:14](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/store.ts#L14)
 
 ---
 
@@ -493,7 +581,7 @@ Read-only type of the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:56](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/store.ts#L56)
+[packages/rx-effects/src/store.ts:56](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/store.ts#L56)
 
 ---
 
@@ -525,7 +613,7 @@ Store's action for changing its state
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:6](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeActions.ts#L6)
+[packages/rx-effects/src/storeActions.ts:6](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeActions.ts#L6)
 
 ---
 
@@ -544,7 +632,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:9](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeActions.ts#L9)
+[packages/rx-effects/src/storeActions.ts:9](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeActions.ts#L9)
 
 ---
 
@@ -575,7 +663,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:13](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeActions.ts#L13)
+[packages/rx-effects/src/storeActions.ts:13](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeActions.ts#L13)
 
 ---
 
@@ -591,7 +679,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeEvents.ts:5](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeEvents.ts#L5)
+[packages/rx-effects/src/storeEvents.ts:5](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeEvents.ts#L5)
 
 ---
 
@@ -625,7 +713,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeExtensions.ts#L9)
+[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeExtensions.ts#L9)
 
 ---
 
@@ -641,7 +729,17 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:75](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/store.ts#L75)
+[packages/rx-effects/src/store.ts:75](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/store.ts#L75)
+
+## Variables
+
+### GLOBAL_EFFECT_UNHANDLED_ERROR$
+
+• **GLOBAL_EFFECT_UNHANDLED_ERROR$**: `Observable`<{ `error`: `unknown` ; `event`: `unknown` }\>
+
+#### Defined in
+
+[packages/rx-effects/src/effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L25)
 
 ## Functions
 
@@ -664,7 +762,7 @@ Makes shallow comparison of two objects.
 
 #### Defined in
 
-[packages/rx-effects/src/utils.ts:8](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/utils.ts#L8)
+[packages/rx-effects/src/utils.ts:8](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/utils.ts#L8)
 
 ---
 
@@ -684,13 +782,13 @@ Makes shallow comparison of two objects.
 
 #### Defined in
 
-[packages/rx-effects/src/action.ts:29](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/action.ts#L29)
+[packages/rx-effects/src/action.ts:29](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/action.ts#L29)
 
 ---
 
 ### createEffect
 
-▸ **createEffect**<`Event`, `Result`, `ErrorType`\>(`handler`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+▸ **createEffect**<`Event`, `Result`, `ErrorType`\>(`handler`, `options?`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
 
 Creates `Effect` from the provided handler.
 
@@ -712,9 +810,10 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 #### Parameters
 
-| Name      | Type                                                           |
-| :-------- | :------------------------------------------------------------- |
-| `handler` | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\> |
+| Name       | Type                                                                                           |
+| :--------- | :--------------------------------------------------------------------------------------------- |
+| `handler`  | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>                                 |
+| `options?` | `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\> |
 
 #### Returns
 
@@ -722,7 +821,7 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:83](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/effect.ts#L83)
+[packages/rx-effects/src/effect.ts:128](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/effect.ts#L128)
 
 ---
 
@@ -738,7 +837,7 @@ Creates `Scope` instance.
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:70](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/scope.ts#L70)
+[packages/rx-effects/src/scope.ts:75](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/scope.ts#L75)
 
 ---
 
@@ -767,7 +866,7 @@ Creates the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:91](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/store.ts#L91)
+[packages/rx-effects/src/store.ts:91](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/store.ts#L91)
 
 ---
 
@@ -797,7 +896,7 @@ Creates store actions for the store by state mutations
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:19](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeActions.ts#L19)
+[packages/rx-effects/src/storeActions.ts:19](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeActions.ts#L19)
 
 ▸ **createStoreActions**<`State`, `Mutations`\>(`mutations`): [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\>
 
@@ -822,7 +921,7 @@ Creates a factory of store actions by state mutations
 
 #### Defined in
 
-[packages/rx-effects/src/storeActions.ts:25](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeActions.ts#L25)
+[packages/rx-effects/src/storeActions.ts:25](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeActions.ts#L25)
 
 ---
 
@@ -842,7 +941,7 @@ Creates a factory of store actions by state mutations
 
 #### Defined in
 
-[packages/rx-effects/src/storeLoggerExtension.ts:3](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeLoggerExtension.ts#L3)
+[packages/rx-effects/src/storeLoggerExtension.ts:3](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeLoggerExtension.ts#L3)
 
 ---
 
@@ -871,7 +970,7 @@ Declares the state.
 
 #### Defined in
 
-[packages/rx-effects/src/stateDeclaration.ts:58](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/stateDeclaration.ts#L58)
+[packages/rx-effects/src/stateDeclaration.ts:58](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/stateDeclaration.ts#L58)
 
 ---
 
@@ -903,7 +1002,7 @@ This helper creates `Effect` from `handler` and subscribes it to `source`.
 
 #### Defined in
 
-[packages/rx-effects/src/handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/handleAction.ts#L8)
+[packages/rx-effects/src/handleAction.ts:8](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/handleAction.ts#L8)
 
 ---
 
@@ -936,7 +1035,7 @@ function.
 
 #### Defined in
 
-[packages/rx-effects/src/queries/queryMappers.ts:14](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/queries/queryMappers.ts#L14)
+[packages/rx-effects/src/queries/queryMappers.ts:14](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/queries/queryMappers.ts#L14)
 
 ---
 
@@ -969,7 +1068,7 @@ and merges them into a single value.
 
 #### Defined in
 
-[packages/rx-effects/src/queries/queryMappers.ts:39](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/queries/queryMappers.ts#L39)
+[packages/rx-effects/src/queries/queryMappers.ts:39](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/queries/queryMappers.ts#L39)
 
 ---
 
@@ -999,7 +1098,7 @@ You can use this helper to apply multiple changes at the same time.
 
 #### Defined in
 
-[packages/rx-effects/src/stateMutation.ts:33](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/stateMutation.ts#L33)
+[packages/rx-effects/src/stateMutation.ts:33](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/stateMutation.ts#L33)
 
 ---
 
@@ -1019,4 +1118,4 @@ You can use this helper to apply multiple changes at the same time.
 
 #### Defined in
 
-[packages/rx-effects/src/storeExtensions.ts:13](https://github.com/mnasyrov/rx-effects/blob/bfe3371/packages/rx-effects/src/storeExtensions.ts#L13)
+[packages/rx-effects/src/storeExtensions.ts:13](https://github.com/mnasyrov/rx-effects/blob/718c5a2/packages/rx-effects/src/storeExtensions.ts#L13)
