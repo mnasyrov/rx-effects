@@ -13,7 +13,7 @@ import {
 } from 'rxjs';
 import { switchMap, take, toArray } from 'rxjs/operators';
 import { createAction } from './action';
-import { createEffect } from './effect';
+import { createEffect, GLOBAL_EFFECT_UNHANDLED_ERROR$ } from './effect';
 
 describe('Effect', () => {
   describe('result$', () => {
@@ -52,6 +52,20 @@ describe('Effect', () => {
       expect(await results).toEqual([
         { event: 2, error: new Error('test error') },
       ]);
+    });
+
+    it('should emit GLOBAL_EFFECT_UNHANDLED_ERROR$ in case error$ is not observed', async () => {
+      const effect = createEffect<number>(() => {
+        throw new Error('test error');
+      });
+
+      const promise = firstValueFrom(GLOBAL_EFFECT_UNHANDLED_ERROR$);
+      effect.handle(of(1));
+
+      expect(await promise).toEqual({
+        event: 1,
+        error: new Error('test error'),
+      });
     });
   });
 
@@ -341,6 +355,38 @@ describe('Effect', () => {
 
       expect(await resultPromise).toEqual([100]);
     });
+  });
+});
+
+describe('GLOBAL_EFFECT_UNHANDLED_ERROR$', () => {
+  it('should emit event and error in case it is  observed', async () => {
+    const effect = createEffect<number>(() => {
+      throw 'test error';
+    });
+
+    const promise = firstValueFrom(GLOBAL_EFFECT_UNHANDLED_ERROR$);
+    effect.handle(of(1));
+
+    expect(await promise).toEqual({ event: 1, error: 'test error' });
+  });
+
+  it('should print an error to the console in case it is not observed', async () => {
+    const effect = createEffect<number>(() => {
+      throw 'test error';
+    });
+
+    const consoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    effect.handle(of(1));
+
+    expect(consoleError).toBeCalledWith('Uncaught error in Effect', {
+      event: 1,
+      error: 'test error',
+    });
+
+    consoleError.mockReset();
   });
 });
 

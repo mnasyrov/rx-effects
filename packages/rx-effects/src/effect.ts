@@ -16,6 +16,22 @@ import { Action } from './action';
 import { declareState } from './stateDeclaration';
 import { Query } from './queries';
 
+const GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT = new Subject<{
+  event: unknown;
+  error: unknown;
+}>();
+
+export const GLOBAL_EFFECT_UNHANDLED_ERROR$ =
+  GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.asObservable();
+
+function emitGlobalUnhandledError(event: unknown, error: unknown): void {
+  if (GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.observed) {
+    GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.next({ event, error });
+  } else {
+    console.error('Uncaught error in Effect', { event, error });
+  }
+}
+
 /**
  * Handler for an event. It can be asynchronous.
  *
@@ -152,7 +168,12 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
         },
         error: (error) => {
           pendingCount.update(decreaseCount);
-          error$.next({ event, error });
+
+          if (error$.observed) {
+            error$.next({ event, error });
+          } else {
+            emitGlobalUnhandledError(event, error);
+          }
         },
       }),
     );
