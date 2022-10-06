@@ -12,7 +12,7 @@ let STORE_SEQ_NUMBER = 0;
 /**
  * Read-only type of the state store.
  */
-export type StateReader<State> = Readonly<
+export type StateQuery<State> = Readonly<
   Query<State> & {
     id: number;
     name?: string;
@@ -55,7 +55,7 @@ export type StateReader<State> = Readonly<
 >;
 
 export type Store<State> = Readonly<
-  StateReader<State> &
+  StateQuery<State> &
     Controller<{
       /** Sets a new state to the store */
       set: (state: State) => void;
