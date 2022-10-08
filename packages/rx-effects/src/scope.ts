@@ -1,7 +1,13 @@
 import { Observable, Subscription, TeardownLogic } from 'rxjs';
 import { Action } from './action';
 import { Controller } from './controller';
-import { createEffect, Effect, EffectHandler, HandlerOptions } from './effect';
+import {
+  createEffect,
+  Effect,
+  EffectHandler,
+  EffectOptions,
+  HandlerOptions,
+} from './effect';
 import { handleAction } from './handleAction';
 import { StateDeclaration } from './stateDeclaration';
 import { createStore, Store, StoreOptions } from './store';
@@ -60,7 +66,7 @@ export type Scope = Controller<{
   handleAction: <Event, Result = void, ErrorType = Error>(
     source: Observable<Event> | Action<Event>,
     handler: EffectHandler<Event, Result>,
-    options?: HandlerOptions<ErrorType>,
+    options?: HandlerOptions<ErrorType> & EffectOptions<Event, Result>,
   ) => Effect<Event, Result, ErrorType>;
 }>;
 
@@ -115,8 +121,9 @@ export function createScope(): Scope {
 
     createEffect<Event, Result, ErrorType>(
       handler: EffectHandler<Event, Result>,
+      options?: EffectOptions<Event, Result>,
     ) {
-      const effect = createEffect<Event, Result, ErrorType>(handler);
+      const effect = createEffect<Event, Result, ErrorType>(handler, options);
       subscriptions.add(effect.destroy);
 
       return effect;
