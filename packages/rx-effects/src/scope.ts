@@ -8,7 +8,7 @@ import {
   EffectOptions,
   HandlerOptions,
 } from './effect';
-import { handleAction } from './handleAction';
+import { Query } from './queries';
 import { StateDeclaration } from './stateDeclaration';
 import { createStore, Store, StoreOptions } from './store';
 
@@ -68,6 +68,26 @@ export type Scope = Controller<{
     handler: EffectHandler<Event, Result>,
     options?: HandlerOptions<ErrorType> & EffectOptions<Event, Result>,
   ) => Effect<Event, Result, ErrorType>;
+
+  /**
+   * Creates an effect which handles `query` by `handler`, and it will be
+   * destroyed with the scope.
+   */
+  handleQuery: <Value, Result = void, ErrorType = Error>(
+    query: Query<Value>,
+    handler: EffectHandler<Value, Result>,
+    options?: EffectOptions<Value, Result>,
+  ) => Effect<Value, Result, ErrorType>;
+
+  /**
+   * Subscribes an observable within the scope.
+   */
+  subscribe: <Value>(
+    ...args: [
+      source: Observable<Value>,
+      ...args: Parameters<Observable<Value>['subscribe']>,
+    ]
+  ) => Subscription;
 }>;
 
 /**
@@ -129,11 +149,41 @@ export function createScope(): Scope {
       return effect;
     },
 
-    handleAction(source, handler, options) {
-      const effect = handleAction(source, handler, options);
+    handleAction<Event, Result = void, ErrorType = Error>(
+      source: Observable<Event> | Action<Event>,
+      handler: EffectHandler<Event, Result>,
+      options?: HandlerOptions<ErrorType> & EffectOptions<Event, Result>,
+    ) {
+      const effect = createEffect<Event, Result, ErrorType>(handler, options);
+      effect.handle(source, options);
+
       subscriptions.add(effect.destroy);
 
       return effect;
+    },
+
+    handleQuery<Value, Result = void, ErrorType = Error>(
+      query: Query<Value>,
+      handler: EffectHandler<Value, Result>,
+      options?: HandlerOptions<ErrorType> & EffectOptions<Value, Result>,
+    ): Effect<Value, Result, ErrorType> {
+      const effect = createEffect<Value, Result, ErrorType>(handler, options);
+      effect.handle(query.value$, options);
+
+      subscriptions.add(effect.destroy);
+
+      return effect;
+    },
+
+    subscribe<Value>(
+      source: Observable<Value>,
+      ...args: Parameters<Observable<Value>['subscribe']>
+    ): Subscription {
+      const subscription = source.subscribe(...args);
+
+      subscriptions.add(subscription);
+
+      return subscription;
     },
   };
 }
