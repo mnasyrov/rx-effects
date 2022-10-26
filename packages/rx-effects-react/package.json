@@ -1,6 +1,6 @@
 {
   "name": "rx-effects-react",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Reactive state and effects management. Tooling for React.js",
   "license": "MIT",
   "author": "Mikhail Nasyrov (https://github.com/mnasyrov)",
@@ -45,7 +45,7 @@
     "build:esm": "tsc -p tsconfig.build.json --outDir dist/esm --module es2015"
   },
   "dependencies": {
-    "rx-effects": "0.6.0"
+    "rx-effects": "0.7.0"
   },
   "peerDependencies": {
     "react": ">=17.0.0",

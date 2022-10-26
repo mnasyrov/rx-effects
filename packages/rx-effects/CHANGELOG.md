@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/mnasyrov/rx-effects/compare/v0.6.0...v0.7.0) (2022-10-26)
+
+### Bug Fixes
+
+- Fixed usage of Effect's options by `handleAction()` and `scope.createEffect()` ([#7](https://github.com/mnasyrov/rx-effects/issues/7)) ([e44bd23](https://github.com/mnasyrov/rx-effects/commit/e44bd23b563f7a61ea1ecfa291b311f52d55e577))
+
+### Features
+
+- New scope's methods: `handleQuery()` and `subscribe()` ([#8](https://github.com/mnasyrov/rx-effects/issues/8)) ([5242c3e](https://github.com/mnasyrov/rx-effects/commit/5242c3e91b042b5eb060a0d1899a018c4b29294a))
+
 # [0.6.0](https://github.com/mnasyrov/rx-effects/compare/v0.5.2...v0.6.0) (2022-08-28)
 
 ### Features
