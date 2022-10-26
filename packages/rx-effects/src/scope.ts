@@ -1,4 +1,4 @@
-import { Observable, Subscription, TeardownLogic } from 'rxjs';
+import { Observable, Observer, Subscription, TeardownLogic } from 'rxjs';
 import { Action } from './action';
 import { Controller } from './controller';
 import {
@@ -79,15 +79,11 @@ export type Scope = Controller<{
     options?: EffectOptions<Value, Result>,
   ) => Effect<Value, Result, ErrorType>;
 
-  /**
-   * Subscribes an observable within the scope.
-   */
-  subscribe: <Value>(
-    ...args: [
-      source: Observable<Value>,
-      ...args: Parameters<Observable<Value>['subscribe']>,
-    ]
-  ) => Subscription;
+  observe: {
+    <T>(source: Observable<T>): Subscription;
+    <T>(source: Observable<T>, next: (value: T) => void): Subscription;
+    <T>(source: Observable<T>, observer: Partial<Observer<T>>): Subscription;
+  };
 }>;
 
 /**
@@ -175,11 +171,14 @@ export function createScope(): Scope {
       return effect;
     },
 
-    subscribe<Value>(
-      source: Observable<Value>,
-      ...args: Parameters<Observable<Value>['subscribe']>
+    observe<T>(
+      source: Observable<T>,
+      nextOrObserver?: Partial<Observer<T>> | ((value: T) => unknown),
     ): Subscription {
-      const subscription = source.subscribe(...args);
+      const subscription =
+        typeof nextOrObserver === 'function'
+          ? source.subscribe(nextOrObserver)
+          : source.subscribe(nextOrObserver);
 
       subscriptions.add(subscription);
 

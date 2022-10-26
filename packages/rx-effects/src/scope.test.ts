@@ -120,12 +120,32 @@ describe('Scope', () => {
 
   describe('subscribe()', () => {
     it('should be able to unsubscribe the created subscription from the observable', async () => {
-      const subject = new Subject();
+      const subject = new Subject<number>();
 
       const scope = createScope();
 
       const handler = jest.fn((value) => value * 3);
-      scope.subscribe(subject, handler);
+      scope.observe(subject, handler);
+
+      subject.next(2);
+
+      scope.destroy();
+      subject.next(3);
+
+      expect(handler).toBeCalledTimes(1);
+      expect(handler).lastCalledWith(2);
+      expect(handler).lastReturnedWith(6);
+    });
+
+    it('should be subscribe an observer', async () => {
+      const subject = new Subject<number>();
+
+      const scope = createScope();
+
+      const handler = jest.fn((value) => value * 3);
+      scope.observe(subject, {
+        next: handler,
+      });
 
       subject.next(2);
 
