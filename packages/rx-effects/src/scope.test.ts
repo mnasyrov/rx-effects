@@ -1,7 +1,8 @@
-import { firstValueFrom, materialize, toArray } from 'rxjs';
+import { firstValueFrom, materialize, Subject, toArray } from 'rxjs';
 import { createAction } from './action';
 import { createScope } from './scope';
 import { declareState } from './stateDeclaration';
+import { createStore } from './store';
 
 describe('Scope', () => {
   describe('destroy()', () => {
@@ -89,6 +90,51 @@ describe('Scope', () => {
       scope.destroy();
       store.set(3);
       expect(await valuePromise).toEqual([1, 2]);
+    });
+  });
+
+  describe('handleQuery()', () => {
+    it('should be able to unsubscribe the created effect from the query', async () => {
+      const store = createStore(1);
+
+      const scope = createScope();
+
+      const handler = jest.fn((value) => value * 3);
+
+      const effect = scope.handleQuery(store, handler);
+
+      const resultPromise = firstValueFrom(
+        effect.result$.pipe(materialize(), toArray()),
+      );
+      store.set(2);
+
+      scope.destroy();
+      store.set(3);
+
+      expect(await resultPromise).toEqual([
+        { hasValue: true, kind: 'N', value: 6 },
+        { hasValue: false, kind: 'C' },
+      ]);
+    });
+  });
+
+  describe('subscribe()', () => {
+    it('should be able to unsubscribe the created subscription from the observable', async () => {
+      const subject = new Subject();
+
+      const scope = createScope();
+
+      const handler = jest.fn((value) => value * 3);
+      scope.subscribe(subject, handler);
+
+      subject.next(2);
+
+      scope.destroy();
+      subject.next(3);
+
+      expect(handler).toBeCalledTimes(1);
+      expect(handler).lastCalledWith(2);
+      expect(handler).lastReturnedWith(6);
     });
   });
 });
