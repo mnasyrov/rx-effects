@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2](https://github.com/mnasyrov/rx-effects/compare/v0.7.1...v0.7.2) (2022-10-29)
+
+### Features
+
+- Introduced `scope.onDestroy()` and `scope.subscribe()`. Added info about API deprecation. ([#9](https://github.com/mnasyrov/rx-effects/issues/9)) ([4467782](https://github.com/mnasyrov/rx-effects/commit/44677829f889aa4fbca12fb467f149cd0fab6869))
+
 ## [0.7.1](https://github.com/mnasyrov/rx-effects/compare/v0.7.0...v0.7.1) (2022-10-26)
 
 **Note:** Version bump only for package rx-effects-react

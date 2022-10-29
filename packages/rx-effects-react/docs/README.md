@@ -216,7 +216,7 @@ Returns a value which is provided by the query.
 
 **`Deprecated`**
 
-Use `useQuery()`.
+Use `useQuery()`. This function will be removed at 0.8 version.
 
 #### Type parameters
 
