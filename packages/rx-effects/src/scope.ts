@@ -22,8 +22,16 @@ export type Scope = Controller<{
   /**
    * Stores any subscription-like or teardown function to be called with
    * `destroy()` method.
+   *
+   * @deprecated Use `Scope.onDestroy()`. This function will be removed at 0.8 version.
    */
   add: (teardown: TeardownLogic) => void;
+
+  /**
+   * Register subscription-like or teardown function to be called with
+   * `destroy()` method.
+   */
+  onDestroy: (teardown: TeardownLogic) => void;
 
   /**
    * Creates a store which will be destroyed with the scope.
@@ -79,6 +87,15 @@ export type Scope = Controller<{
     options?: EffectOptions<Value, Result>,
   ) => Effect<Value, Result, ErrorType>;
 
+  subscribe: {
+    <T>(source: Observable<T>): Subscription;
+    <T>(source: Observable<T>, next: (value: T) => void): Subscription;
+    <T>(source: Observable<T>, observer: Partial<Observer<T>>): Subscription;
+  };
+
+  /**
+   * @deprecated It will be removed in 0.8 version
+   */
   observe: {
     <T>(source: Observable<T>): Subscription;
     <T>(source: Observable<T>, next: (value: T) => void): Subscription;
@@ -97,10 +114,27 @@ export type ExternalScope = Omit<Scope, 'destroy'>;
 export function createScope(): Scope {
   const subscriptions = new Subscription();
 
+  function onDestroy(teardown: TeardownLogic): void {
+    subscriptions.add(teardown);
+  }
+
+  function subscribe<T>(
+    source: Observable<T>,
+    nextOrObserver?: Partial<Observer<T>> | ((value: T) => unknown),
+  ): Subscription {
+    const subscription =
+      typeof nextOrObserver === 'function'
+        ? source.subscribe(nextOrObserver)
+        : source.subscribe(nextOrObserver);
+
+    subscriptions.add(subscription);
+
+    return subscription;
+  }
+
   return {
-    add(teardown) {
-      subscriptions.add(teardown);
-    },
+    add: onDestroy,
+    onDestroy,
 
     destroy() {
       subscriptions.unsubscribe();
@@ -171,18 +205,11 @@ export function createScope(): Scope {
       return effect;
     },
 
-    observe<T>(
-      source: Observable<T>,
-      nextOrObserver?: Partial<Observer<T>> | ((value: T) => unknown),
-    ): Subscription {
-      const subscription =
-        typeof nextOrObserver === 'function'
-          ? source.subscribe(nextOrObserver)
-          : source.subscribe(nextOrObserver);
+    subscribe,
 
-      subscriptions.add(subscription);
-
-      return subscription;
-    },
+    /**
+     * @deprecated It will be removed in 0.8 version
+     */
+    observe: subscribe,
   };
 }

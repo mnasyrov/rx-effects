@@ -23,7 +23,7 @@ export function useQuery<T>(query: Query<T>): T {
 /**
  * Returns a value which is provided by the query.
  *
- * @deprecated Use `useQuery()`.
+ * @deprecated Use `useQuery()`. This function will be removed at 0.8 version.
  *
  * @param query – a query for a value
  */

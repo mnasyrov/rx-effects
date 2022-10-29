@@ -28,11 +28,11 @@ export type QueryOptions<T, K> = Readonly<{
 }>;
 
 /**
- * @deprecated Deprecated, use `Query` type.
+ * @deprecated Deprecated, use `Query` type. Will be removed at 0.8 version.
  */
 export type StateQuery<T> = Query<T>;
 
 /**
- * @deprecated Deprecated, use `QueryOptions` type.
+ * @deprecated Deprecated, use `QueryOptions` type. Will be removed at 0.8 version.
  */
 export type StateQueryOptions<T, K> = QueryOptions<T, K>;

@@ -11,7 +11,7 @@ import {
 /**
  * This helper creates `Effect` from `handler` and subscribes it to `source`.
  *
- * @deprecated Will be removed in the next version.
+ * @deprecated This function will be removed at 0.8 version.
  */
 export function handleAction<Event, Result = void, ErrorType = Error>(
   source: Observable<Event> | Action<Event>,
