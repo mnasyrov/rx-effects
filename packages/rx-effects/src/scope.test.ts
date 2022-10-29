@@ -125,7 +125,7 @@ describe('Scope', () => {
       const scope = createScope();
 
       const handler = jest.fn((value) => value * 3);
-      scope.observe(subject, handler);
+      scope.subscribe(subject, handler);
 
       subject.next(2);
 
@@ -143,7 +143,7 @@ describe('Scope', () => {
       const scope = createScope();
 
       const handler = jest.fn((value) => value * 3);
-      scope.observe(subject, {
+      scope.subscribe(subject, {
         next: handler,
       });
 

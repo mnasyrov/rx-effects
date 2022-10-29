@@ -45,13 +45,13 @@ export type EffectHandler<Event, Result> = (
 /**
  * Options for handling an action or observable.
  *
- * @deprecated Will be removed in the next version.
+ * @deprecated Will be removed at 0.8 version.
  */
 export type HandlerOptions<ErrorType = Error> = Readonly<{
-  /** @deprecated Will be removed in the next version. */
+  /** @deprecated Will be removed at 0.8 version. */
   onSourceCompleted?: () => void;
 
-  /** @deprecated Will be removed in the next version. */
+  /** @deprecated Will be removed at 0.8 version. */
   onSourceFailed?: (error: ErrorType) => void;
 }>;
 
