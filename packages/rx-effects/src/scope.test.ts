@@ -10,7 +10,7 @@ describe('Scope', () => {
       const scope = createScope();
       const teardown = jest.fn();
 
-      scope.add(teardown);
+      scope.onDestroy(teardown);
       scope.destroy();
 
       expect(teardown).toBeCalledTimes(1);
@@ -24,7 +24,7 @@ describe('Scope', () => {
       const action = createAction<number>();
       const handler = jest.fn((value) => value * 3);
 
-      const effect = scope.handleAction(action, handler);
+      const effect = scope.handle(action, handler);
       scope.destroy();
 
       const resultPromise = firstValueFrom(effect.result$.pipe(materialize()));
@@ -101,7 +101,7 @@ describe('Scope', () => {
 
       const handler = jest.fn((value) => value * 3);
 
-      const effect = scope.handleQuery(store, handler);
+      const effect = scope.handle(store, handler);
 
       const resultPromise = firstValueFrom(
         effect.result$.pipe(materialize(), toArray()),

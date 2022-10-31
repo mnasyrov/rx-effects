@@ -5,7 +5,6 @@ export type { Scope, ExternalScope } from './scope';
 export { createScope } from './scope';
 
 export * from './controller';
-export * from './handleAction';
 export * from './stateDeclaration';
 export * from './stateMutation';
 export * from './queries';

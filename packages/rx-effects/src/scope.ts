@@ -1,13 +1,7 @@
 import { Observable, Observer, Subscription, TeardownLogic } from 'rxjs';
 import { Action } from './action';
 import { Controller } from './controller';
-import {
-  createEffect,
-  Effect,
-  EffectHandler,
-  EffectOptions,
-  HandlerOptions,
-} from './effect';
+import { createEffect, Effect, EffectHandler, EffectOptions } from './effect';
 import { Query } from './queries';
 import { StateDeclaration } from './stateDeclaration';
 import { createStore, Store, StoreOptions } from './store';
@@ -19,14 +13,6 @@ import { createStore, Store, StoreOptions } from './store';
  * `destroy()` method to unsubscribe from them.
  */
 export type Scope = Controller<{
-  /**
-   * Stores any subscription-like or teardown function to be called with
-   * `destroy()` method.
-   *
-   * @deprecated Use `Scope.onDestroy()`. This function will be removed at 0.8 version.
-   */
-  add: (teardown: TeardownLogic) => void;
-
   /**
    * Register subscription-like or teardown function to be called with
    * `destroy()` method.
@@ -65,38 +51,20 @@ export type Scope = Controller<{
    */
   createEffect: <Event = void, Result = void, ErrorType = Error>(
     handler: EffectHandler<Event, Result>,
+    options?: EffectOptions<Event, Result>,
   ) => Effect<Event, Result, ErrorType>;
 
   /**
    * Creates an effect which handles `source` by `handler`, and it will be
    * destroyed with the scope.
    */
-  handleAction: <Event, Result = void, ErrorType = Error>(
-    source: Observable<Event> | Action<Event>,
+  handle: <Event, Result = void, ErrorType = Error>(
+    source: Observable<Event> | Action<Event> | Query<Event>,
     handler: EffectHandler<Event, Result>,
-    options?: HandlerOptions<ErrorType> & EffectOptions<Event, Result>,
+    options?: EffectOptions<Event, Result>,
   ) => Effect<Event, Result, ErrorType>;
 
-  /**
-   * Creates an effect which handles `query` by `handler`, and it will be
-   * destroyed with the scope.
-   */
-  handleQuery: <Value, Result = void, ErrorType = Error>(
-    query: Query<Value>,
-    handler: EffectHandler<Value, Result>,
-    options?: EffectOptions<Value, Result>,
-  ) => Effect<Value, Result, ErrorType>;
-
   subscribe: {
-    <T>(source: Observable<T>): Subscription;
-    <T>(source: Observable<T>, next: (value: T) => void): Subscription;
-    <T>(source: Observable<T>, observer: Partial<Observer<T>>): Subscription;
-  };
-
-  /**
-   * @deprecated It will be removed in 0.8 version
-   */
-  observe: {
     <T>(source: Observable<T>): Subscription;
     <T>(source: Observable<T>, next: (value: T) => void): Subscription;
     <T>(source: Observable<T>, observer: Partial<Observer<T>>): Subscription;
@@ -118,98 +86,73 @@ export function createScope(): Scope {
     subscriptions.add(teardown);
   }
 
-  function subscribe<T>(
-    source: Observable<T>,
-    nextOrObserver?: Partial<Observer<T>> | ((value: T) => unknown),
-  ): Subscription {
-    const subscription =
-      typeof nextOrObserver === 'function'
-        ? source.subscribe(nextOrObserver)
-        : source.subscribe(nextOrObserver);
+  function destroy(): void {
+    subscriptions.unsubscribe();
+  }
 
-    subscriptions.add(subscription);
+  function createController<ControllerProps>(
+    factory: () => Controller<ControllerProps>,
+  ) {
+    const controller = factory();
+    onDestroy(controller.destroy);
 
-    return subscription;
+    return controller;
   }
 
   return {
-    add: onDestroy,
+    createController,
     onDestroy,
-
-    destroy() {
-      subscriptions.unsubscribe();
-    },
+    destroy,
 
     createStore<State>(
       initialState: State,
       options?: StoreOptions<State>,
     ): Store<State> {
-      const store = createStore(initialState, options);
-      subscriptions.add(store.destroy);
-
-      return store;
+      return createController(() => createStore(initialState, options));
     },
 
     createDeclaredStore<State>(
       stateDeclaration: StateDeclaration<State>,
       initialState?: Partial<State>,
     ): Store<State> {
-      const store = stateDeclaration.createStore(initialState);
-      subscriptions.add(store.destroy);
-
-      return store;
-    },
-
-    createController<ControllerProps>(
-      factory: () => Controller<ControllerProps>,
-    ) {
-      const controller = factory();
-      subscriptions.add(controller.destroy);
-
-      return controller;
+      return createController(() => stateDeclaration.createStore(initialState));
     },
 
     createEffect<Event, Result, ErrorType>(
       handler: EffectHandler<Event, Result>,
       options?: EffectOptions<Event, Result>,
     ) {
-      const effect = createEffect<Event, Result, ErrorType>(handler, options);
-      subscriptions.add(effect.destroy);
-
-      return effect;
+      return createController(() =>
+        createEffect<Event, Result, ErrorType>(handler, options),
+      );
     },
 
-    handleAction<Event, Result = void, ErrorType = Error>(
-      source: Observable<Event> | Action<Event>,
+    handle<Event, Result = void, ErrorType = Error>(
+      source: Observable<Event> | Action<Event> | Query<Event>,
       handler: EffectHandler<Event, Result>,
-      options?: HandlerOptions<ErrorType> & EffectOptions<Event, Result>,
+      options?: EffectOptions<Event, Result>,
     ) {
-      const effect = createEffect<Event, Result, ErrorType>(handler, options);
-      effect.handle(source, options);
+      const effect = createController(() =>
+        createEffect<Event, Result, ErrorType>(handler, options),
+      );
 
-      subscriptions.add(effect.destroy);
-
-      return effect;
-    },
-
-    handleQuery<Value, Result = void, ErrorType = Error>(
-      query: Query<Value>,
-      handler: EffectHandler<Value, Result>,
-      options?: HandlerOptions<ErrorType> & EffectOptions<Value, Result>,
-    ): Effect<Value, Result, ErrorType> {
-      const effect = createEffect<Value, Result, ErrorType>(handler, options);
-      effect.handle(query.value$, options);
-
-      subscriptions.add(effect.destroy);
+      effect.handle(source);
 
       return effect;
     },
 
-    subscribe,
+    subscribe<T>(
+      source: Observable<T>,
+      nextOrObserver?: Partial<Observer<T>> | ((value: T) => unknown),
+    ): Subscription {
+      const subscription =
+        typeof nextOrObserver === 'function'
+          ? source.subscribe(nextOrObserver)
+          : source.subscribe(nextOrObserver);
 
-    /**
-     * @deprecated It will be removed in 0.8 version
-     */
-    observe: subscribe,
+      onDestroy(subscription);
+
+      return subscription;
+    },
   };
 }

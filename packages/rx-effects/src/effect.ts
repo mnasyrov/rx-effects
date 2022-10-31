@@ -14,22 +14,48 @@ import {
 } from 'rxjs';
 import { Action } from './action';
 import { Controller } from './controller';
-import { declareState } from './stateDeclaration';
 import { Query } from './queries';
+import { declareState } from './stateDeclaration';
 
-const GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT = new Subject<{
-  event: unknown;
-  error: unknown;
-}>();
+export type EffectResult<Event, Value> = Readonly<{
+  event: Event;
+  result: Value;
+}>;
+
+export type EffectErrorOrigin = 'source' | 'handler';
+
+export type EffectError<Event, ErrorType> = Readonly<
+  | {
+      origin: 'source';
+      event?: undefined;
+      error: any;
+    }
+  | {
+      origin: 'handler';
+      event: Event;
+      error: ErrorType;
+    }
+>;
+
+export type EffectNotification<Event, Result, ErrorType> = Readonly<
+  | ({ type: 'result' } & EffectResult<Event, Result>)
+  | ({ type: 'error' } & EffectError<Event, ErrorType>)
+>;
+
+const GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT = new Subject<
+  EffectError<unknown, unknown>
+>();
 
 export const GLOBAL_EFFECT_UNHANDLED_ERROR$ =
   GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.asObservable();
 
-function emitGlobalUnhandledError(event: unknown, error: unknown): void {
+function emitGlobalUnhandledError(
+  effectError: EffectError<unknown, unknown>,
+): void {
   if (GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.observed) {
-    GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.next({ event, error });
+    GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.next(effectError);
   } else {
-    console.error('Uncaught error in Effect', { event, error });
+    console.error('Uncaught error in Effect', effectError);
   }
 }
 
@@ -43,33 +69,21 @@ export type EffectHandler<Event, Result> = (
 ) => Result | Promise<Result> | Observable<Result>;
 
 /**
- * Options for handling an action or observable.
- *
- * @deprecated Will be removed at 0.8 version.
- */
-export type HandlerOptions<ErrorType = Error> = Readonly<{
-  /** @deprecated Will be removed at 0.8 version. */
-  onSourceCompleted?: () => void;
-
-  /** @deprecated Will be removed at 0.8 version. */
-  onSourceFailed?: (error: ErrorType) => void;
-}>;
-
-/**
  * Details about performing the effect.
  */
 export type EffectState<Event, Result = void, ErrorType = Error> = Readonly<{
-  /** `result$` provides a result of successful execution of the handler */
+  /** Provides a result of successful execution of the handler */
   result$: Observable<Result>;
 
-  /** `done$` provides a source event and a result of successful execution of the handler */
-  done$: Observable<{ event: Event; result: Result }>;
+  /** Provides a source event and a result of successful execution of the handler */
+  done$: Observable<EffectResult<Event, Result>>;
 
-  /** `done$` provides a source event and an error if the handler fails */
-  error$: Observable<{ event: Event; error: ErrorType }>;
+  /** Provides an error emitter by a source (`event` is `undefined`)
+   * or by the handler (`event` is not `undefined`) */
+  error$: Observable<EffectError<Event, ErrorType>>;
 
-  /** `final$` provides a source event after execution of the handler, for both success and error result */
-  final$: Observable<Event>;
+  /** Provides a notification after execution of the handler for both success or error result  */
+  final$: Observable<EffectNotification<Event, Result, ErrorType>>;
 
   /** Provides `true` if there is any execution of the handler in progress */
   pending: Query<boolean>;
@@ -110,8 +124,7 @@ export type EffectOptions<Event, Result> = Readonly<{
 export type Effect<Event, Result = void, ErrorType = Error> = Controller<
   EffectState<Event, Result, ErrorType> & {
     handle: (
-      source: Action<Event> | Observable<Event>,
-      options?: HandlerOptions<ErrorType>,
+      source: Action<Event> | Observable<Event> | Query<Event>,
     ) => Subscription;
   }
 >;
@@ -139,9 +152,9 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
 
   const subscriptions = new Subscription();
 
-  const event$ = new Subject<Event>();
-  const done$ = new Subject<{ event: Event; result: Result }>();
-  const error$ = new Subject<{ event: Event; error: ErrorType }>();
+  const event$: Subject<Event> = new Subject();
+  const done$: Subject<EffectResult<Event, Result>> = new Subject();
+  const error$: Subject<EffectError<Event, ErrorType>> = new Subject();
   const pendingCount = PENDING_COUNT_STATE.createStore();
 
   subscriptions.add(() => {
@@ -150,6 +163,14 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
     error$.complete();
     pendingCount.destroy();
   });
+
+  function emitError(effectError: EffectError<Event, ErrorType>) {
+    if (error$.observed) {
+      error$.next(effectError);
+    } else {
+      emitGlobalUnhandledError(effectError);
+    }
+  }
 
   const eventProject: EffectEventProject<Event, Result> = (event: Event) => {
     return defer(() => {
@@ -171,11 +192,7 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
         error: (error) => {
           pendingCount.update(decreaseCount);
 
-          if (error$.observed) {
-            error$.next({ event, error });
-          } else {
-            emitGlobalUnhandledError(event, error);
-          }
+          emitError({ origin: 'handler', event, error });
         },
       }),
     );
@@ -183,29 +200,43 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
 
   subscriptions.add(event$.pipe(pipeline(eventProject), retry()).subscribe());
 
-  function handle<SourceErrorType = Error>(
-    source: Observable<Event> | Action<Event>,
-    options?: HandlerOptions<SourceErrorType>,
+  function handle(
+    source: Observable<Event> | Action<Event> | Query<Event>,
   ): Subscription {
-    const observable = (
-      source instanceof Observable ? source : source.event$
-    ) as Observable<Event>;
+    const observable = getSourceObservable(source);
 
     const subscription = observable.subscribe({
       next: (event) => event$.next(event),
-      error: (error) => options?.onSourceFailed?.(error),
-      complete: () => options?.onSourceCompleted?.(),
+      error: (error) => emitError({ origin: 'source', error }),
     });
     subscriptions.add(subscription);
 
     return subscription;
   }
 
+  const notifications$: Observable<
+    EffectNotification<Event, Result, ErrorType>
+  > = merge(
+    done$.pipe(
+      map<
+        EffectResult<Event, Result>,
+        EffectNotification<Event, Result, ErrorType>
+      >((entry) => ({ type: 'result', ...entry })),
+    ),
+
+    error$.pipe(
+      map<
+        EffectError<Event, ErrorType>,
+        EffectNotification<Event, Result, ErrorType>
+      >((entry) => ({ type: 'error', ...entry })),
+    ),
+  );
+
   return {
     done$: done$.asObservable(),
     result$: done$.pipe(map(({ result }) => result)),
     error$: error$.asObservable(),
-    final$: merge(done$, error$).pipe(map(({ event }) => event)),
+    final$: notifications$,
     pending: pendingCount.query((count) => count > 0),
     pendingCount: pendingCount.query(identity),
 
@@ -215,4 +246,24 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
       subscriptions.unsubscribe();
     },
   };
+}
+
+function getSourceObservable<T>(
+  source: Observable<T> | Action<T> | Query<T>,
+): Observable<T> {
+  const type = typeof source;
+
+  if (type === 'function' && 'event$' in source) {
+    return source.event$;
+  }
+
+  if (type === 'object' && 'value$' in source) {
+    return source.value$;
+  }
+
+  if (source instanceof Observable) {
+    return source;
+  }
+
+  throw new TypeError('Unexpected source type');
 }

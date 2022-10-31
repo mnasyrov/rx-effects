@@ -102,25 +102,17 @@ function createCalculatorController(
   subtractEffect.handle(subtractAction);
   resetEffect.handle(resetAction);
 
-  scope.add(
-    incrementEffect.done$.subscribe(() =>
-      eventBus({ type: 'added', value: 1 }),
-    ),
+  scope.subscribe(incrementEffect.done$, () =>
+    eventBus({ type: 'added', value: 1 }),
   );
-  scope.add(
-    decrementEffect.done$.subscribe(() =>
-      eventBus({ type: 'subtracted', value: 1 }),
-    ),
+  scope.subscribe(decrementEffect.done$, () =>
+    eventBus({ type: 'subtracted', value: 1 }),
   );
-  scope.add(
-    sumEffect.done$.subscribe(({ event }) =>
-      eventBus({ type: 'added', value: event }),
-    ),
+  scope.subscribe(sumEffect.done$, ({ event }) =>
+    eventBus({ type: 'added', value: event }),
   );
-  scope.add(
-    subtractEffect.done$.subscribe(({ event }) =>
-      eventBus({ type: 'subtracted', value: event }),
-    ),
+  scope.subscribe(subtractEffect.done$, ({ event }) =>
+    eventBus({ type: 'subtracted', value: event }),
   );
 
   return {

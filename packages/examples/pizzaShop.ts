@@ -4,7 +4,6 @@ import {
   createScope,
   declareState,
   EffectState,
-  StateMutation,
   Query,
 } from 'rx-effects';
 import { delay, filter, map, mapTo, of } from 'rxjs';
@@ -12,20 +11,22 @@ import { delay, filter, map, mapTo, of } from 'rxjs';
 // The state
 type CartState = { orders: Array<string> };
 
-// State mutation can be exported and tested separately
-const addPizzaToCart =
-  (name: string): StateMutation<CartState> =>
-  (state) => ({ ...state, orders: [...state.orders, name] });
-
-const removePizzaFromCart =
-  (name: string): StateMutation<CartState> =>
-  (state) => ({
-    ...state,
-    orders: state.orders.filter((order) => order !== name),
-  });
-
 // Declaring the state. `declareState()` returns a few factories for the store.
 const CART_STATE = declareState<CartState>(() => ({ orders: [] }));
+
+// Create a factory of store updates. It is a convenient form to declare state mutation.
+// Also, there is another way to declare state mutation functions which can be exported and tested separately.
+const createCartStoreUpdates = CART_STATE.createStoreActions({
+  addPizzaToCart: (name: string) => (state) => ({
+    ...state,
+    orders: [...state.orders, name],
+  }),
+
+  removePizzaFromCart: (name: string) => (state) => ({
+    ...state,
+    orders: state.orders.filter((order) => order !== name),
+  }),
+});
 
 // Declaring the controller.
 // It should provide methods for triggering the actions,
@@ -40,8 +41,12 @@ export type PizzaShopController = Controller<{
 }>;
 
 export function createPizzaShopController(): PizzaShopController {
+  // Creates the scope to track subscriptions
+  const scope = createScope();
+
   // Creates the state store
-  const store = CART_STATE.createStore();
+  const store = scope.createDeclaredStore(CART_STATE);
+  const storeUpdates = createCartStoreUpdates(store);
 
   // Creates queries for the state data
   const ordersQuery = store.query((state) => state.orders);
@@ -51,15 +56,10 @@ export function createPizzaShopController(): PizzaShopController {
   const removePizza = createAction<string>();
   const submitCart = createAction();
 
-  // Creates the scope for effects to track internal subscriptions
-  const scope = createScope();
-
   // Handle simple actions
-  scope.handleAction(addPizza, (order) => store.update(addPizzaToCart(order)));
+  scope.handle(addPizza, (order) => storeUpdates.addPizzaToCart(order));
 
-  scope.handleAction(removePizza, (name) =>
-    store.update(removePizzaFromCart(name)),
-  );
+  scope.handle(removePizza, (name) => storeUpdates.removePizzaFromCart(name));
 
   // Create a effect in a general way
   const submitEffect = scope.createEffect<Array<string>>((orders) => {
@@ -77,9 +77,7 @@ export function createPizzaShopController(): PizzaShopController {
   );
 
   // Effect's results can be used as actions
-  scope.handleAction(submitEffect.done$, () =>
-    store.set(CART_STATE.initialState),
-  );
+  scope.handle(submitEffect.done$, () => store.set(CART_STATE.initialState));
 
   return {
     ordersQuery,

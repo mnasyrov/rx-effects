@@ -72,7 +72,7 @@ describe('createStoreLoggerExtension()', () => {
 
     const scope = createScope();
     const action = createAction<number>();
-    scope.handleAction(action, () => {
+    scope.handle(action, () => {
       // Do nothing
     });
     action(1);

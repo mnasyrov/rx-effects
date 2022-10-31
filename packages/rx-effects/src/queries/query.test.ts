@@ -1,6 +1,6 @@
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import { mapQuery, mergeQueries, Query } from './queries';
-import { createStore } from './store';
+import { mapQuery, mergeQueries, Query } from './index';
+import { createStore } from '../store';
 
 describe('mapQuery()', () => {
   it('should return a new state query with applied mapper which transforms the selected value', async () => {
