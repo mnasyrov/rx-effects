@@ -1,5 +1,5 @@
 import { StateMutations } from './stateMutation';
-import { createStore, Store } from './store';
+import { createStore, Store, StoreOptions } from './store';
 import {
   createStoreActions,
   StoreActions,
@@ -25,7 +25,10 @@ export type StateDeclaration<State> = Readonly<{
   createState: StateFactory<State>;
 
   /** Creates a store. It can take optional values to modify the initial state. */
-  createStore: (initialState?: Partial<State>) => Store<State>;
+  createStore: (
+    initialState?: Partial<State>,
+    options?: StoreOptions<State>,
+  ) => Store<State>;
 
   /** Creates store actions for the store by state mutations. */
   createStoreActions<Mutations extends StateMutations<State>>(
@@ -39,28 +42,16 @@ export type StateDeclaration<State> = Readonly<{
   ): StoreActionsFactory<State, Mutations>;
 }>;
 
-export type StateDeclarationOptions<State> = Readonly<{
-  name?: string;
-
-  /** A comparator for detecting changes between old and new states */
-  stateComparator?: (prevState: State, nextState: State) => boolean;
-
-  /** @internal */
-  internal?: boolean;
-}>;
-
 /**
  * Declares the state.
  *
  * @param stateOrFactory an initial state or a factory for the initial state
- * @param options Parameters for declaring a state
+ * @param storeOptions Parameters for declaring a state
  */
 export function declareState<State>(
   stateOrFactory: State | StateFactory<State>,
-  options?: StateDeclarationOptions<State>,
+  storeOptions?: StoreOptions<State>,
 ): StateDeclaration<State> {
-  const { name, stateComparator, internal } = options ?? {};
-
   let initialState: State;
   let stateFactory: StateFactory<State>;
 
@@ -80,9 +71,12 @@ export function declareState<State>(
     };
   }
 
-  const storeFactory = (values?: Partial<State>): Store<State> => {
+  const storeFactory = (
+    values?: Partial<State>,
+    options?: StoreOptions<State>,
+  ): Store<State> => {
     const state = stateFactory(values);
-    return createStore(state, { name, stateComparator, internal });
+    return createStore(state, { ...storeOptions, ...options });
   };
 
   return {
