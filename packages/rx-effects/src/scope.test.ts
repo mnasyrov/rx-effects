@@ -1,7 +1,6 @@
 import { firstValueFrom, materialize, Subject, toArray } from 'rxjs';
 import { createAction } from './action';
 import { createScope } from './scope';
-import { declareState } from './stateDeclaration';
 import { createStore } from './store';
 
 describe('Scope', () => {
@@ -69,21 +68,6 @@ describe('Scope', () => {
       const scope = createScope();
 
       const store = scope.createStore(1);
-      const valuePromise = firstValueFrom(store.value$.pipe(toArray()));
-
-      store.set(2);
-      scope.destroy();
-      store.set(3);
-      expect(await valuePromise).toEqual([1, 2]);
-    });
-  });
-
-  describe('createDeclaredStore()', () => {
-    it('should be able to unsubscribe the created store bya declaration', async () => {
-      const scope = createScope();
-
-      const declaration = declareState(1);
-      const store = scope.createDeclaredStore(declaration);
       const valuePromise = firstValueFrom(store.value$.pipe(toArray()));
 
       store.set(2);

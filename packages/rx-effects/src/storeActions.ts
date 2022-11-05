@@ -18,18 +18,18 @@ export type StoreActionsFactory<
 /** Creates store actions for the store by state mutations */
 export function createStoreActions<
   State,
-  Mutations extends StateMutations<State>,
+  Mutations extends StateMutations<State> = StateMutations<State>,
 >(store: Store<State>, mutations: Mutations): StoreActions<State, Mutations>;
 
 /** Creates a factory of store actions by state mutations */
 export function createStoreActions<
   State,
-  Mutations extends StateMutations<State>,
+  Mutations extends StateMutations<State> = StateMutations<State>,
 >(mutations: Mutations): StoreActionsFactory<State, Mutations>;
 
 export function createStoreActions<
   State,
-  Mutations extends StateMutations<State>,
+  Mutations extends StateMutations<State> = StateMutations<State>,
 >(
   storeOrMutations: Store<State> | Mutations,
   mutations?: Mutations,

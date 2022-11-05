@@ -3,7 +3,6 @@ import { Action } from './action';
 import { Controller } from './controller';
 import { createEffect, Effect, EffectHandler, EffectOptions } from './effect';
 import { Query } from './queries';
-import { StateDeclaration } from './stateDeclaration';
 import { createStore, Store, StoreOptions } from './store';
 
 /**
@@ -28,15 +27,6 @@ export type Scope = Controller<{
   createStore<State>(
     initialState: State,
     options?: StoreOptions<State>,
-  ): Store<State>;
-
-  /**
-   * Creates a store from its declaration which will be destroyed with the
-   * scope.
-   */
-  createDeclaredStore<State>(
-    stateDeclaration: StateDeclaration<State>,
-    initialState?: Partial<State>,
   ): Store<State>;
 
   /**
@@ -109,13 +99,6 @@ export function createScope(): Scope {
       options?: StoreOptions<State>,
     ): Store<State> {
       return createController(() => createStore(initialState, options));
-    },
-
-    createDeclaredStore<State>(
-      stateDeclaration: StateDeclaration<State>,
-      initialState?: Partial<State>,
-    ): Store<State> {
-      return createController(() => stateDeclaration.createStore(initialState));
     },
 
     createEffect<Event, Result, ErrorType>(

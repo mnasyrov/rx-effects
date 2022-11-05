@@ -1,4 +1,3 @@
-import { declareState } from './stateDeclaration';
 import { createStore } from './store';
 import { createStoreActions } from './storeActions';
 
@@ -19,14 +18,14 @@ describe('StoreActions', () => {
   });
 
   it('should return a factory in case a store is not specified', () => {
-    const declaration = declareState(1);
+    type State = number;
 
-    const getStoreActions = declaration.createStoreActions({
+    const getStoreActions = createStoreActions<State>({
       add: (value: number) => (state: number) => state + value,
       multiply: (value: number) => (state: number) => state * value,
     });
 
-    const store = declaration.createStore();
+    const store = createStore(1);
     const storeActions = getStoreActions(store);
 
     storeActions.add(2);

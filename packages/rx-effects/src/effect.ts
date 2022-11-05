@@ -15,7 +15,7 @@ import {
 import { Action } from './action';
 import { Controller } from './controller';
 import { Query } from './queries';
-import { declareState } from './stateDeclaration';
+import { createStore } from './store';
 
 export type EffectResult<Event, Value> = Readonly<{
   event: Event;
@@ -129,7 +129,6 @@ export type Effect<Event, Result = void, ErrorType = Error> = Controller<
   }
 >;
 
-const PENDING_COUNT_STATE = declareState(0, { internal: true });
 const increaseCount = (count: number): number => count + 1;
 const decreaseCount = (count: number): number => count - 1;
 
@@ -155,7 +154,7 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
   const event$: Subject<Event> = new Subject();
   const done$: Subject<EffectResult<Event, Result>> = new Subject();
   const error$: Subject<EffectError<Event, ErrorType>> = new Subject();
-  const pendingCount = PENDING_COUNT_STATE.createStore();
+  const pendingCount = createStore(0, { internal: true });
 
   subscriptions.add(() => {
     event$.complete();

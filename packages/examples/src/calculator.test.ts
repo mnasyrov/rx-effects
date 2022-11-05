@@ -3,26 +3,23 @@ import {
   Controller,
   createAction,
   createScope,
-  declareState,
   Effect,
   Scope,
-  StateDeclaration,
   StateMutation,
   Store,
 } from 'rx-effects';
+import { createStore } from 'rx-effects/src/index';
 import { firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 
 // Example usage of RxEffects: a calculator which has actions: increment,
 // decrement, add, subtract and reset.
 
-type CalculatorState = { value: number };
+type CalculatorState = Readonly<{ value: number }>;
 type CalculatorStateMutation = StateMutation<CalculatorState>;
 type CalculatorStore = Store<CalculatorState>;
 
-const CALCULATOR_STATE: StateDeclaration<CalculatorState> = declareState({
-  value: 0,
-});
+const CALCULATOR_STATE: CalculatorState = { value: 0 };
 
 const addValue: (value: number) => CalculatorStateMutation =
   (value) => (state) => ({ ...state, value: state.value + value });
@@ -49,9 +46,7 @@ function createCalculatorEffects(
     return -value;
   });
 
-  const resetEffect = scope.createEffect(() =>
-    store.set(CALCULATOR_STATE.initialState),
-  );
+  const resetEffect = scope.createEffect(() => store.set(CALCULATOR_STATE));
 
   return {
     incrementEffect,
@@ -128,7 +123,7 @@ function createCalculatorController(
 
 describe('Example usage of RxEffects: Calculator', () => {
   it('should increment the value', async () => {
-    const store = CALCULATOR_STATE.createStore();
+    const store = createStore(CALCULATOR_STATE);
     const scope = createScope();
     const incrementAction = createAction();
 
@@ -142,7 +137,7 @@ describe('Example usage of RxEffects: Calculator', () => {
   });
 
   it('should unsubscribe effects on scope.destroy()', async () => {
-    const store = CALCULATOR_STATE.createStore({ value: 10 });
+    const store = createStore({ ...CALCULATOR_STATE, value: 10 });
     const scope = createScope();
     const decrementAction = createAction();
 
@@ -158,7 +153,7 @@ describe('Example usage of RxEffects: Calculator', () => {
   });
 
   it('should create actions inside the controller', async () => {
-    const store = CALCULATOR_STATE.createStore({ value: 0 });
+    const store = createStore({ ...CALCULATOR_STATE, value: 0 });
     const eventBus = createAction<ControllerEvents>();
 
     const controller = createCalculatorController(store, eventBus);
