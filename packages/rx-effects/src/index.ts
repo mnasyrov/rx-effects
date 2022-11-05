@@ -6,7 +6,10 @@ export { createScope } from './scope';
 
 export * from './controller';
 export * from './stateMutation';
-export * from './queries';
+
+export type { Query, QueryOptions } from './query';
+export { mapQuery, mergeQueries } from './queryMappers';
+
 export * from './store';
 export type { StoreEvent } from './storeEvents';
 export * from './storeActions';

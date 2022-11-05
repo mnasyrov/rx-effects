@@ -1,6 +1,6 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen, toArray } from 'rxjs/operators';
-import { mapQuery, mergeQueries } from './queries';
+import { mapQuery, mergeQueries } from './queryMappers';
 import { StateMutation } from './stateMutation';
 import { createStore, Store } from './store';
 import { OBJECT_COMPARATOR } from './utils';

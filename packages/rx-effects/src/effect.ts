@@ -14,7 +14,7 @@ import {
 } from 'rxjs';
 import { Action } from './action';
 import { Controller } from './controller';
-import { Query } from './queries';
+import { Query } from './query';
 import { createStore } from './store';
 
 export type EffectResult<Event, Value> = Readonly<{

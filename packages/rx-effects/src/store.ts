@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Controller } from './controller';
-import { mapQuery, Query, QueryOptions } from './queries';
+import { Query, QueryOptions } from './query';
+import { mapQuery } from './queryMappers';
 import { StateMutation } from './stateMutation';
 import { STORE_EVENT_BUS } from './storeEvents';
 import { setInternalStoreFlag } from './storeMetadata';

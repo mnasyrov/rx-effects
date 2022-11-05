@@ -2,7 +2,7 @@ import { Observable, Observer, Subscription, TeardownLogic } from 'rxjs';
 import { Action } from './action';
 import { Controller } from './controller';
 import { createEffect, Effect, EffectHandler, EffectOptions } from './effect';
-import { Query } from './queries';
+import { Query } from './query';
 import { createStore, Store, StoreOptions } from './store';
 
 /**
