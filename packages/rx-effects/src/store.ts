@@ -77,7 +77,7 @@ export type StoreOptions<State> = Readonly<{
   name?: string;
 
   /** A comparator for detecting changes between old and new states */
-  stateComparator?: (prevState: State, nextState: State) => boolean;
+  comparator?: (prevState: State, nextState: State) => boolean;
 
   /** @internal */
   internal?: boolean;
@@ -93,7 +93,7 @@ export function createStore<State>(
   initialState: State,
   options?: StoreOptions<State>,
 ): Store<State> {
-  const stateComparator = options?.stateComparator ?? DEFAULT_COMPARATOR;
+  const stateComparator = options?.comparator ?? DEFAULT_COMPARATOR;
 
   const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
   const state$ = store$.asObservable();
