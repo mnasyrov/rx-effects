@@ -1,10 +1,10 @@
 /**
- * This function mutates the state.
+ * A function to update a state.
  *
  * It is recommended to return a new state or the previous one.
  *
  * Actually, the function can change the state in place, but it is responsible
- * for a developer to provide `stateCompare` function to the store which handles
+ * for a developer to provide `comparator` function to the store which handles
  * the changes.
  *
  * For making changes use a currying function to provide arguments:
@@ -24,6 +24,13 @@ export type StateMutation<State> = (state: State) => State;
 export type StateMutations<State> = Readonly<
   Record<string, (...args: any[]) => StateMutation<State>>
 >;
+
+export function declareStateUpdates<
+  State,
+  Mutations extends StateMutations<State> = StateMutations<State>,
+>(mutations: Mutations): Mutations {
+  return mutations;
+}
 
 /**
  * Returns a mutation which applies all provided mutations for a state.

@@ -2,10 +2,10 @@ import {
   Controller,
   createAction,
   createScope,
-  createStoreActions,
   EffectState,
   Query,
 } from 'rx-effects';
+import { declareStateUpdates, withStoreUpdates } from 'rx-effects/src/index';
 import { delay, filter, map, mapTo, of } from 'rxjs';
 
 // The state
@@ -14,9 +14,8 @@ type CartState = Readonly<{ orders: Array<string> }>;
 // Declare the initial state.
 const CART_STATE: CartState = { orders: [] };
 
-// Create a factory of store updates. It is a convenient form to declare state mutation.
-// Also, there is another way to declare state mutation functions which can be exported and tested separately.
-const createCartStoreUpdates = createStoreActions<CartState>({
+// Declare updates of the state.
+const CART_STATE_UPDATES = declareStateUpdates<CartState>({
   addPizzaToCart: (name: string) => (state) => ({
     ...state,
     orders: [...state.orders, name],
@@ -45,8 +44,10 @@ export function createPizzaShopController(): PizzaShopController {
   const scope = createScope();
 
   // Creates the state store
-  const store = scope.createStore(CART_STATE);
-  const storeUpdates = createCartStoreUpdates(store);
+  const store = withStoreUpdates(
+    scope.createStore(CART_STATE),
+    CART_STATE_UPDATES,
+  );
 
   // Creates queries for the state data
   const ordersQuery = store.query((state) => state.orders);
@@ -57,9 +58,9 @@ export function createPizzaShopController(): PizzaShopController {
   const submitCart = createAction();
 
   // Handle simple actions
-  scope.handle(addPizza, (order) => storeUpdates.addPizzaToCart(order));
+  scope.handle(addPizza, (order) => store.updates.addPizzaToCart(order));
 
-  scope.handle(removePizza, (name) => storeUpdates.removePizzaFromCart(name));
+  scope.handle(removePizza, (name) => store.updates.removePizzaFromCart(name));
 
   // Create a effect in a general way
   const submitEffect = scope.createEffect<Array<string>>((orders) => {

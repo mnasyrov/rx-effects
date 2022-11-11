@@ -2,7 +2,7 @@ import { createAction } from './action';
 import { createScope } from './scope';
 import { StateMutation } from './stateMutation';
 import { createStore } from './store';
-import { createStoreActions } from './storeActions';
+import { createStoreUpdates } from './storeUpdates';
 import { registerStoreExtension } from './storeExtensions';
 import { createStoreLoggerExtension } from './storeLoggerExtension';
 
@@ -15,7 +15,7 @@ describe('createStoreLoggerExtension()', () => {
     const increment: StateMutation<number> = (state) => state + 1;
 
     const store = createStore<number>(0, { name: 'test' });
-    const actions = createStoreActions(store, {
+    const actions = createStoreUpdates(store, {
       increment: () => increment,
     });
 

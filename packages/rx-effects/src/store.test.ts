@@ -14,7 +14,7 @@ describe('Store', () => {
       expect(store.get().value).toBe(1);
     });
 
-    it('should use a custom "stateCompare" predicate', async () => {
+    it('should use a custom comparator', async () => {
       const store = createStore<State>(
         { value: 1, data: 'a' },
         { comparator: (s1, s2) => s1.value === s2.value },
