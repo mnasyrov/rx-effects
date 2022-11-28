@@ -1,5 +1,4 @@
-import { StateMutation } from './stateMutation';
-import { Store } from './store';
+import { StateMutation, Store } from './store';
 
 const MUTATION_NAME_SYMBOL = Symbol();
 const INTERNAL_STORE_SYMBOL = Symbol();

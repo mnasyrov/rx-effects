@@ -1,8 +1,6 @@
 import { createAction } from './action';
 import { createScope } from './scope';
-import { StateMutation } from './stateMutation';
-import { createStore } from './store';
-import { createStoreUpdates } from './storeUpdates';
+import { createStore, createStoreUpdates, StateMutation } from './store';
 import { registerStoreExtension } from './storeExtensions';
 import { createStoreLoggerExtension } from './storeLoggerExtension';
 

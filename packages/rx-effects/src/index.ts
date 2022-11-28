@@ -5,14 +5,12 @@ export type { Scope, ExternalScope } from './scope';
 export { createScope } from './scope';
 
 export * from './controller';
-export * from './stateMutation';
 
 export type { Query, QueryOptions } from './query';
 export { mapQuery, mergeQueries } from './queryMappers';
 
 export * from './store';
 export type { StoreEvent } from './storeEvents';
-export * from './storeUpdates';
 
 export type { StateMutationMetadata } from './storeMetadata';
 

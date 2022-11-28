@@ -1,6 +1,5 @@
 import { Subject } from 'rxjs';
-import { StateMutation } from './stateMutation';
-import { Store } from './store';
+import { StateMutation, Store } from './store';
 
 export type StoreEvent<State> =
   | {

@@ -2,6 +2,9 @@ export const DEFAULT_COMPARATOR = (a: unknown, b: unknown): boolean => a === b;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
+export type AnyObject = Record<string, any>;
+export type EmptyObject = Record<string, never>;
+
 /**
  * Makes shallow comparison of two objects.
  */

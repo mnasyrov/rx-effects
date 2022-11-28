@@ -1,4 +1,4 @@
-import { createStore } from './store';
+import { createStore, InternalStoreOptions } from './store';
 import { registerStoreExtension } from './storeExtensions';
 
 describe('registerStoreExtension()', () => {
@@ -30,7 +30,10 @@ describe('registerStoreExtension()', () => {
       onStoreEvent: eventHandler,
     }));
 
-    createStore<number>(0, { name: 'test', internal: true });
+    createStore<number>(0, {
+      name: 'test',
+      internal: true,
+    } as InternalStoreOptions<number>);
 
     expect(eventHandler).toBeCalledTimes(0);
   });

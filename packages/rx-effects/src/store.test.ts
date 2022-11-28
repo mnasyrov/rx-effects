@@ -1,9 +1,33 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen, toArray } from 'rxjs/operators';
 import { mapQuery, mergeQueries } from './queryMappers';
-import { StateMutation } from './stateMutation';
-import { createStore, Store } from './store';
+import {
+  createStore,
+  createStoreUpdates,
+  createStoreUpdatesFactory,
+  pipeStateMutations,
+  StateMutation,
+  StateUpdates,
+  Store,
+  withStoreUpdates,
+} from './store';
 import { OBJECT_COMPARATOR } from './utils';
+
+describe('pipeStateMutations()', () => {
+  type State = { value: number };
+
+  it('should compose the provided mutations to a single mutation', () => {
+    const composedMutation: StateMutation<State> = pipeStateMutations([
+      () => ({ value: 10 }),
+      (state) => ({ value: state.value + 1 }),
+      (state) => ({ value: state.value * 2 }),
+    ]);
+
+    const store: Store<State> = createStore<State>({ value: 0 });
+    store.update(composedMutation);
+    expect(store.get().value).toBe(22);
+  });
+});
 
 describe('Store', () => {
   type State = { value: number; data?: string };
@@ -280,6 +304,85 @@ describe('Concurrent Store updates', () => {
     store.set(3);
 
     expect(history).toEqual([0, 1, 10, 100, 2, 20, 200, 3, 30, 300]);
+  });
+});
+
+describe('createStoreUpdates()', () => {
+  it('should provide actions to change a state of a store', () => {
+    const store = createStore(1);
+
+    const storeUpdates = createStoreUpdates(store, {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    });
+
+    storeUpdates.add(2);
+    expect(store.get()).toBe(3);
+
+    storeUpdates.multiply(3);
+    expect(store.get()).toBe(9);
+  });
+});
+
+describe('createStoreUpdatesFactory()', () => {
+  it('should return a factory in case a store is not specified', () => {
+    type State = number;
+
+    const getStoreUpdates = createStoreUpdatesFactory<State>({
+      add: (value: number) => (state: number) => state + value,
+      multiply: (value: number) => (state: number) => state * value,
+    });
+
+    const store = createStore(1);
+    const storeUpdates = getStoreUpdates(store);
+
+    storeUpdates.add(2);
+    expect(store.get()).toBe(3);
+
+    storeUpdates.multiply(3);
+    expect(store.get()).toBe(9);
+  });
+});
+
+describe('withStoreUpdates()', () => {
+  it('should use return a proxy for the store which is enhanced by update actions', () => {
+    const store = withStoreUpdates(createStore(1), {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    });
+
+    store.updates.add(2);
+    expect(store.get()).toBe(3);
+
+    store.updates.multiply(3);
+    expect(store.get()).toBe(9);
+  });
+
+  it('should use a declared state mutations', () => {
+    const stateUpdates: StateUpdates<number> = {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    };
+
+    const store = withStoreUpdates(createStore(1), stateUpdates);
+
+    store.updates.add(2);
+    expect(store.get()).toBe(3);
+
+    store.updates.multiply(3);
+    expect(store.get()).toBe(9);
+  });
+
+  it('should return a proxy which shares the state with the original store', () => {
+    const originalStore = createStore(1);
+
+    const proxyStore = withStoreUpdates(originalStore, {
+      add: (value: number) => (state) => state + value,
+    });
+
+    proxyStore.updates.add(2);
+    expect(proxyStore.get()).toBe(3);
+    expect(originalStore.get()).toBe(3);
   });
 });
 

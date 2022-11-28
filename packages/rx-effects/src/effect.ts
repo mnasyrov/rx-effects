@@ -15,7 +15,7 @@ import {
 import { Action } from './action';
 import { Controller } from './controller';
 import { Query } from './query';
-import { createStore } from './store';
+import { createStore, InternalStoreOptions } from './store';
 
 export type EffectResult<Event, Value> = Readonly<{
   event: Event;
@@ -154,7 +154,9 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
   const event$: Subject<Event> = new Subject();
   const done$: Subject<EffectResult<Event, Result>> = new Subject();
   const error$: Subject<EffectError<Event, ErrorType>> = new Subject();
-  const pendingCount = createStore(0, { internal: true });
+  const pendingCount = createStore<number>(0, {
+    internal: true,
+  } as InternalStoreOptions<number>);
 
   subscriptions.add(() => {
     event$.complete();
