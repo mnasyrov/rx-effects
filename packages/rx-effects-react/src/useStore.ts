@@ -1,25 +1,25 @@
-import { useMemo } from 'react';
-import { createStore, Store, StoreOptions, StoreUpdater } from 'rx-effects';
+import { createStore, StoreOptions } from 'rx-effects';
+import {
+  StateUpdates,
+  StoreWithUpdates,
+  withStoreUpdates,
+} from 'rx-effects/src/index';
 import { useController } from './useController';
 import { useQuery } from './useQuery';
 
-export type ReactStore<T> = Readonly<{ value: T } & StoreUpdater<T>>;
+export function useStore<State, Updates extends StateUpdates<State>>(
+  initialState: State,
+  updates: Updates,
+  options?: StoreOptions<State>,
+): [State, Updates] {
+  const store: StoreWithUpdates<State, Updates> = useController(() => {
+    return withStoreUpdates<State, Updates>(
+      createStore<State>(initialState, options),
+      updates,
+    );
+  });
 
-export function useStore<T>(store: Store<T>): ReactStore<T> {
-  const value = useQuery(store);
+  const state = useQuery(store);
 
-  return useMemo(() => {
-    const { set, update, updates } = store;
-
-    return { value, set, update, updates };
-  }, [store, value]);
-}
-
-export function useStoreFactory<T>(
-  initialState: T,
-  options?: StoreOptions<T>,
-): ReactStore<T> {
-  const store = useController(() => createStore(initialState, options));
-
-  return useStore(store);
+  return [state, store.updates] as [State, Updates];
 }

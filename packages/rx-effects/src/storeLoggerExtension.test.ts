@@ -13,13 +13,13 @@ describe('createStoreLoggerExtension()', () => {
     const increment: StateMutation<number> = (state) => state + 1;
 
     const store = createStore<number>(0, { name: 'test' });
-    const actions = createStoreUpdates(store, {
+    const updates = createStoreUpdates(store.update, {
       increment: () => increment,
     });
 
     store.set(1);
     store.update(increment);
-    actions.increment();
+    updates.increment();
     store.destroy();
 
     expect(logger).nthCalledWith(1, 'test#1', 'created');

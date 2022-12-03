@@ -130,20 +130,21 @@ export type StoreUpdateRecord = Readonly<Record<string, StoreUpdate<any>>>;
 /**
  * Write-only interface of a store.
  */
-export type StoreUpdater<
-  State,
-  Updates extends StoreUpdateRecord = StoreUpdateRecord,
-> = Readonly<{
+export type StoreUpdater<State> = Readonly<{
   /** Sets a new state to the store */
   set: (state: State) => void;
 
   /** Updates the store by provided mutations */
   update: StoreUpdateFunction<State>;
-
-  updates: Updates;
 }>;
 
 export type Store<State> = Controller<StoreQuery<State> & StoreUpdater<State>>;
+
+/** Store with `updates` property updating store's state */
+export type StoreWithUpdates<
+  State,
+  Updates extends StateUpdates<State>,
+> = Store<State> & Readonly<{ updates: StoreUpdates<State, Updates> }>;
 
 type StateMutationQueue<State> = ReadonlyArray<
   StateMutation<State> | undefined | null | false
@@ -210,8 +211,6 @@ export function createStore<State>(
     },
 
     update,
-
-    updates: {},
 
     destroy() {
       store$.complete();
@@ -287,12 +286,9 @@ export function createStore<State>(
   return store;
 }
 
-/** @internal */
-export function createStoreUpdatesObject<
-  State,
-  Updates extends StateUpdates<State>,
->(
-  storeUpdate: StoreUpdateFunction<State>,
+/** Creates StateUpdates for updating the store by provided state mutations */
+export function createStoreUpdates<State, Updates extends StateUpdates<State>>(
+  storeUpdate: Store<State>['update'],
   stateUpdates: Updates,
 ): StoreUpdates<State, Updates> {
   const updates: any = {};
@@ -309,14 +305,6 @@ export function createStoreUpdatesObject<
   return updates;
 }
 
-/** Creates StateUpdates for updating the store by provided state mutations */
-export function createStoreUpdates<
-  State,
-  Mutations extends StateUpdates<State> = StateUpdates<State>,
->(store: Store<State>, mutations: Mutations): StoreUpdates<State, Mutations> {
-  return createStoreUpdatesObject<State, Mutations>(store.update, mutations);
-}
-
 /** A factory to produce StateUpdates for a store by declared state mutations */
 export type StoreUpdatesFactory<State, Updates extends StateUpdates<State>> = (
   store: Store<State>,
@@ -328,28 +316,18 @@ export function createStoreUpdatesFactory<
   Updates extends StateUpdates<State> = StateUpdates<State>,
 >(stateUpdates: Updates): StoreUpdatesFactory<State, Updates> {
   return (store) =>
-    createStoreUpdatesObject<State, Updates>(store.update, stateUpdates);
+    createStoreUpdates<State, Updates>(store.update, stateUpdates);
 }
-
-/** Store with `updates` property updating store's state */
-export type StoreWithUpdates<State, Updates extends StateUpdates<State>> = Omit<
-  Store<State>,
-  'updates'
-> &
-  Readonly<{ updates: StoreUpdates<State, Updates> }>;
 
 /** Creates a proxy for the store with "updates" to change a state by provided mutations */
 export function withStoreUpdates<
   State,
   Updates extends StateUpdates<State> = StateUpdates<State>,
->(
-  store: Store<State>,
-  stateUpdates: Updates,
-): StoreWithUpdates<State, Updates> {
-  const updates: StoreUpdates<State, Updates> = createStoreUpdatesObject<
+>(store: Store<State>, updates: Updates): StoreWithUpdates<State, Updates> {
+  const storeUpdates: StoreUpdates<State, Updates> = createStoreUpdates<
     State,
     Updates
-  >(store.update, stateUpdates);
+  >(store.update, updates);
 
-  return { ...store, updates };
+  return { ...store, updates: storeUpdates };
 }

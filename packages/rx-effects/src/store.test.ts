@@ -23,8 +23,11 @@ describe('pipeStateMutations()', () => {
       (state) => ({ value: state.value * 2 }),
     ]);
 
-    const store: Store<State> = createStore<State>({ value: 0 });
+    const store = withStoreUpdates(createStore({ value: 0 }), {
+      increment: () => (state: State) => state,
+    });
     store.update(composedMutation);
+    store.updates.increment();
     expect(store.get().value).toBe(22);
   });
 });
@@ -311,15 +314,15 @@ describe('createStoreUpdates()', () => {
   it('should provide actions to change a state of a store', () => {
     const store = createStore(1);
 
-    const storeUpdates = createStoreUpdates(store, {
+    const updates = createStoreUpdates(store.update, {
       add: (value: number) => (state) => state + value,
       multiply: (value: number) => (state) => state * value,
     });
 
-    storeUpdates.add(2);
+    updates.add(2);
     expect(store.get()).toBe(3);
 
-    storeUpdates.multiply(3);
+    updates.multiply(3);
     expect(store.get()).toBe(9);
   });
 });
