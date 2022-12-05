@@ -125,26 +125,24 @@ export type StoreUpdates<
   [K in keyof Updates]: StoreUpdate<Parameters<Updates[K]>>;
 }>;
 
-export type StoreUpdateRecord = Readonly<Record<string, StoreUpdate<any>>>;
-
 /**
- * Write-only interface of a store.
+ * Store of a state
  */
-export type StoreUpdater<State> = Readonly<{
-  /** Sets a new state to the store */
-  set: (state: State) => void;
+export type Store<State> = Controller<
+  StoreQuery<State> & {
+    /** Sets a new state to the store */
+    set: (state: State) => void;
 
-  /** Updates the store by provided mutations */
-  update: StoreUpdateFunction<State>;
-}>;
+    /** Updates the store by provided mutations */
+    update: StoreUpdateFunction<State>;
+  }
+>;
 
-export type Store<State> = Controller<StoreQuery<State> & StoreUpdater<State>>;
-
-/** Store with `updates` property updating store's state */
+/** Store of a state with updating functions */
 export type StoreWithUpdates<
   State,
   Updates extends StateUpdates<State>,
-> = Store<State> & Readonly<{ updates: StoreUpdates<State, Updates> }>;
+> = Readonly<Store<State> & { updates: StoreUpdates<State, Updates> }>;
 
 type StateMutationQueue<State> = ReadonlyArray<
   StateMutation<State> | undefined | null | false
@@ -303,20 +301,6 @@ export function createStoreUpdates<State, Updates extends StateUpdates<State>>(
   });
 
   return updates;
-}
-
-/** A factory to produce StateUpdates for a store by declared state mutations */
-export type StoreUpdatesFactory<State, Updates extends StateUpdates<State>> = (
-  store: Store<State>,
-) => StoreUpdates<State, Updates>;
-
-/** Creates a factory to produce StateUpdates for a store by declared state mutations */
-export function createStoreUpdatesFactory<
-  State,
-  Updates extends StateUpdates<State> = StateUpdates<State>,
->(stateUpdates: Updates): StoreUpdatesFactory<State, Updates> {
-  return (store) =>
-    createStoreUpdates<State, Updates>(store.update, stateUpdates);
 }
 
 /** Creates a proxy for the store with "updates" to change a state by provided mutations */

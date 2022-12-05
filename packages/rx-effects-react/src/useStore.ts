@@ -11,7 +11,7 @@ export function useStore<State, Updates extends StateUpdates<State>>(
   initialState: State,
   updates: Updates,
   options?: StoreOptions<State>,
-): [State, Updates] {
+): [State, Updates, StoreWithUpdates<State, Updates>] {
   const store: StoreWithUpdates<State, Updates> = useController(() => {
     return withStoreUpdates<State, Updates>(
       createStore<State>(initialState, options),
@@ -21,5 +21,9 @@ export function useStore<State, Updates extends StateUpdates<State>>(
 
   const state = useQuery(store);
 
-  return [state, store.updates] as [State, Updates];
+  return [state, store.updates, store] as [
+    State,
+    Updates,
+    StoreWithUpdates<State, Updates>,
+  ];
 }
