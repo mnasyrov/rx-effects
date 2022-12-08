@@ -1,10 +1,33 @@
-export * from './action';
-export * from './effect';
+export type { Action } from './action';
+export { createAction } from './action';
+
+export type {
+  EffectError,
+  EffectNotification,
+  EffectState,
+  EffectErrorOrigin,
+  EffectResult,
+} from './effectState';
+
+export {
+  createEffectController,
+  GLOBAL_EFFECT_UNHANDLED_ERROR$,
+} from './effectController';
+export type { EffectController } from './effectController';
+
+export type {
+  Effect,
+  EffectHandler,
+  EffectOptions,
+  EffectPipeline,
+  EffectEventProject,
+} from './effect';
+export { createEffect } from './effect';
 
 export type { Scope, ExternalScope } from './scope';
 export { createScope } from './scope';
 
-export * from './controller';
+export type { Controller } from './controller';
 
 export type { Query, QueryOptions } from './query';
 export { mapQuery, mergeQueries } from './queryMappers';

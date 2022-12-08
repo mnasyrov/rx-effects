@@ -12,7 +12,8 @@ import {
 } from 'rxjs';
 import { switchMap, take, toArray } from 'rxjs/operators';
 import { createAction } from './action';
-import { createEffect, GLOBAL_EFFECT_UNHANDLED_ERROR$ } from './effect';
+import { createEffect } from './effect';
+import { GLOBAL_EFFECT_UNHANDLED_ERROR$ } from './effectController';
 
 describe('Effect', () => {
   describe('result$', () => {

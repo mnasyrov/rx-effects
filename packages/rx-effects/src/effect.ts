@@ -1,8 +1,5 @@
 import {
   defer,
-  identity,
-  map,
-  merge,
   mergeMap,
   Observable,
   of,
@@ -14,50 +11,9 @@ import {
 } from 'rxjs';
 import { Action } from './action';
 import { Controller } from './controller';
+import { createEffectController } from './effectController';
+import { EffectState } from './effectState';
 import { Query } from './query';
-import { createStore, InternalStoreOptions } from './store';
-
-export type EffectResult<Event, Value> = Readonly<{
-  event: Event;
-  result: Value;
-}>;
-
-export type EffectErrorOrigin = 'source' | 'handler';
-
-export type EffectError<Event, ErrorType> = Readonly<
-  | {
-      origin: 'source';
-      event?: undefined;
-      error: any;
-    }
-  | {
-      origin: 'handler';
-      event: Event;
-      error: ErrorType;
-    }
->;
-
-export type EffectNotification<Event, Result, ErrorType> = Readonly<
-  | ({ type: 'result' } & EffectResult<Event, Result>)
-  | ({ type: 'error' } & EffectError<Event, ErrorType>)
->;
-
-const GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT = new Subject<
-  EffectError<unknown, unknown>
->();
-
-export const GLOBAL_EFFECT_UNHANDLED_ERROR$ =
-  GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.asObservable();
-
-function emitGlobalUnhandledError(
-  effectError: EffectError<unknown, unknown>,
-): void {
-  if (GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.observed) {
-    GLOBAL_EFFECT_UNHANDLED_ERROR_SUBJECT.next(effectError);
-  } else {
-    console.error('Uncaught error in Effect', effectError);
-  }
-}
 
 /**
  * Handler for an event. It can be asynchronous.
@@ -67,30 +23,6 @@ function emitGlobalUnhandledError(
 export type EffectHandler<Event, Result> = (
   event: Event,
 ) => Result | Promise<Result> | Observable<Result>;
-
-/**
- * Details about performing the effect.
- */
-export type EffectState<Event, Result = void, ErrorType = Error> = Readonly<{
-  /** Provides a result of successful execution of the handler */
-  result$: Observable<Result>;
-
-  /** Provides a source event and a result of successful execution of the handler */
-  done$: Observable<EffectResult<Event, Result>>;
-
-  /** Provides an error emitter by a source (`event` is `undefined`)
-   * or by the handler (`event` is not `undefined`) */
-  error$: Observable<EffectError<Event, ErrorType>>;
-
-  /** Provides a notification after execution of the handler for both success or error result  */
-  final$: Observable<EffectNotification<Event, Result, ErrorType>>;
-
-  /** Provides `true` if there is any execution of the handler in progress */
-  pending: Query<boolean>;
-
-  /** Provides a count of the handler in progress */
-  pendingCount: Query<number>;
-}>;
 
 export type EffectEventProject<Event, Result> = (
   event: Event,
@@ -129,9 +61,6 @@ export type Effect<Event, Result = void, ErrorType = Error> = Controller<
   }
 >;
 
-const increaseCount = (count: number): number => count + 1;
-const decreaseCount = (count: number): number => count - 1;
-
 /**
  * Creates `Effect` from the provided handler.
  *
@@ -149,33 +78,17 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
   const pipeline: EffectPipeline<Event, Result> =
     options?.pipeline ?? DEFAULT_MERGE_MAP_PIPELINE;
 
-  const subscriptions = new Subscription();
-
   const event$: Subject<Event> = new Subject();
-  const done$: Subject<EffectResult<Event, Result>> = new Subject();
-  const error$: Subject<EffectError<Event, ErrorType>> = new Subject();
-  const pendingCount = createStore<number>(0, {
-    internal: true,
-  } as InternalStoreOptions<number>);
+  const controller = createEffectController<Event, Result, ErrorType>();
 
-  subscriptions.add(() => {
+  const subscriptions = new Subscription(() => {
     event$.complete();
-    done$.complete();
-    error$.complete();
-    pendingCount.destroy();
+    controller.destroy();
   });
-
-  function emitError(effectError: EffectError<Event, ErrorType>) {
-    if (error$.observed) {
-      error$.next(effectError);
-    } else {
-      emitGlobalUnhandledError(effectError);
-    }
-  }
 
   const eventProject: EffectEventProject<Event, Result> = (event: Event) => {
     return defer(() => {
-      pendingCount.update(increaseCount);
+      controller.start();
 
       const result = handler(event);
 
@@ -185,15 +98,13 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
     }).pipe(
       tap({
         next: (result) => {
-          done$.next({ event, result });
+          controller.next({ event, result });
         },
         complete: () => {
-          pendingCount.update(decreaseCount);
+          controller.complete();
         },
         error: (error) => {
-          pendingCount.update(decreaseCount);
-
-          emitError({ origin: 'handler', event, error });
+          controller.error({ origin: 'handler', event, error });
         },
       }),
     );
@@ -201,47 +112,22 @@ export function createEffect<Event = void, Result = void, ErrorType = Error>(
 
   subscriptions.add(event$.pipe(pipeline(eventProject), retry()).subscribe());
 
-  function handle(
-    source: Observable<Event> | Action<Event> | Query<Event>,
-  ): Subscription {
-    const observable = getSourceObservable(source);
-
-    const subscription = observable.subscribe({
-      next: (event) => event$.next(event),
-      error: (error) => emitError({ origin: 'source', error }),
-    });
-    subscriptions.add(subscription);
-
-    return subscription;
-  }
-
-  const notifications$: Observable<
-    EffectNotification<Event, Result, ErrorType>
-  > = merge(
-    done$.pipe(
-      map<
-        EffectResult<Event, Result>,
-        EffectNotification<Event, Result, ErrorType>
-      >((entry) => ({ type: 'result', ...entry })),
-    ),
-
-    error$.pipe(
-      map<
-        EffectError<Event, ErrorType>,
-        EffectNotification<Event, Result, ErrorType>
-      >((entry) => ({ type: 'error', ...entry })),
-    ),
-  );
-
   return {
-    done$: done$.asObservable(),
-    result$: done$.pipe(map(({ result }) => result)),
-    error$: error$.asObservable(),
-    final$: notifications$,
-    pending: pendingCount.query((count) => count > 0),
-    pendingCount: pendingCount.query(identity),
+    ...controller.state,
 
-    handle,
+    handle(
+      source: Observable<Event> | Action<Event> | Query<Event>,
+    ): Subscription {
+      const observable = getSourceObservable(source);
+
+      const subscription = observable.subscribe({
+        next: (event) => event$.next(event),
+        error: (error) => controller.error({ origin: 'source', error }),
+      });
+      subscriptions.add(subscription);
+
+      return subscription;
+    },
 
     destroy: () => {
       subscriptions.unsubscribe();

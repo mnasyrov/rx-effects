@@ -54,6 +54,9 @@ export type Scope = Controller<{
     options?: EffectOptions<Event, Result>,
   ) => Effect<Event, Result, ErrorType>;
 
+  /**
+   * Subscribes to the `source` observable until the scope will be destroyed.
+   */
   subscribe: {
     <T>(source: Observable<T>): Subscription;
     <T>(source: Observable<T>, next: (value: T) => void): Subscription;
