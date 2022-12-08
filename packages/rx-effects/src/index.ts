@@ -33,6 +33,7 @@ export type { Query, QueryOptions } from './query';
 export { mapQuery, mergeQueries } from './queryMappers';
 
 export * from './store';
+export { pipeStore } from './storeUtils';
 export type { StoreEvent } from './storeEvents';
 
 export type { StateMutationMetadata } from './storeMetadata';

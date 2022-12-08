@@ -64,9 +64,6 @@ export function pipeStateMutations<State>(
  */
 export type StoreQuery<State> = Readonly<
   Query<State> & {
-    id: number;
-    name?: string;
-
     /**
      * Returns a part of the state as `Observable`
      * The result observable produces distinct values by default.
@@ -130,6 +127,9 @@ export type StoreUpdates<
  */
 export type Store<State> = Controller<
   StoreQuery<State> & {
+    id: number;
+    name?: string;
+
     /** Sets a new state to the store */
     set: (state: State) => void;
 
@@ -153,6 +153,9 @@ export type StoreOptions<State> = Readonly<{
 
   /** A comparator for detecting changes between old and new states */
   comparator?: (prevState: State, nextState: State) => boolean;
+
+  /** Callback is called when the store is destroyed */
+  onDestroy?: () => void;
 }>;
 
 /** @internal */
@@ -213,6 +216,7 @@ export function createStore<State>(
     destroy() {
       store$.complete();
       STORE_EVENT_BUS.next({ type: 'destroyed', store });
+      options?.onDestroy?.();
     },
   };
 
