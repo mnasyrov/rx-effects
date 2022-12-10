@@ -17,7 +17,7 @@ export type Scope = Controller<{
    * Register subscription-like or teardown function to be called with
    * `destroy()` method.
    */
-  onDestroy: (teardown: TeardownLogic) => void;
+  add: (teardown: TeardownLogic) => void;
 
   /**
    * Creates a store which will be destroyed with the scope.
@@ -76,7 +76,7 @@ export type ExternalScope = Omit<Scope, 'destroy'>;
 export function createScope(): Scope {
   const subscriptions = new Subscription();
 
-  function onDestroy(teardown: TeardownLogic): void {
+  function registerTeardown(teardown: TeardownLogic): void {
     subscriptions.add(teardown);
   }
 
@@ -88,15 +88,16 @@ export function createScope(): Scope {
     factory: () => Controller<ControllerProps>,
   ) {
     const controller = factory();
-    onDestroy(controller.destroy);
+    registerTeardown(controller.destroy);
 
     return controller;
   }
 
   return {
-    createController,
-    onDestroy,
+    add: registerTeardown,
     destroy,
+
+    createController,
 
     createStore<State>(
       initialState: State,
@@ -137,7 +138,7 @@ export function createScope(): Scope {
           ? source.subscribe(nextOrObserver)
           : source.subscribe(nextOrObserver);
 
-      onDestroy(subscription);
+      registerTeardown(subscription);
 
       return subscription;
     },

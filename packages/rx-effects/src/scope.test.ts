@@ -9,7 +9,7 @@ describe('Scope', () => {
       const scope = createScope();
       const teardown = jest.fn();
 
-      scope.onDestroy(teardown);
+      scope.add(teardown);
       scope.destroy();
 
       expect(teardown).toHaveBeenCalledTimes(1);
