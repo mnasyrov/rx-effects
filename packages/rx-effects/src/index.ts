@@ -29,6 +29,8 @@ export { createScope } from './scope';
 
 export type { Controller } from './controller';
 
+export * from './mvc';
+
 export type { Query, QueryOptions } from './query';
 export { mapQuery, mergeQueries } from './queryMappers';
 

@@ -5,6 +5,9 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 export type AnyObject = Record<string, any>;
 export type EmptyObject = Record<string, never>;
 
+export type PartialProp<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;
+
 /**
  * Makes shallow comparison of two objects.
  */

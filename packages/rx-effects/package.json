@@ -44,6 +44,7 @@
     "build:esm": "tsc -p tsconfig.build.json --outDir dist/esm --module es2015"
   },
   "peerDependencies": {
+    "ditox": ">=2.2.0",
     "rxjs": ">=7.0.0"
   },
   "gitHead": "666d5b8672ebe6cb02174366a799d1da27d387a9"
