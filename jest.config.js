@@ -8,12 +8,4 @@ export default {
   roots: fastGlob.sync(['packages/*/src'], { onlyDirectories: true }),
   collectCoverageFrom: ['packages/*/src/**/{!(index|testUtils),}.ts'],
   preset: 'ts-jest',
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        module: 'commonjs',
-        jsx: 'react',
-      },
-    },
-  },
 };

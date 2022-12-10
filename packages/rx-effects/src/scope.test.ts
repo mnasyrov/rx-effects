@@ -12,7 +12,7 @@ describe('Scope', () => {
       scope.onDestroy(teardown);
       scope.destroy();
 
-      expect(teardown).toBeCalledTimes(1);
+      expect(teardown).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -59,7 +59,7 @@ describe('Scope', () => {
       scope.createController(() => ({ destroy }));
 
       scope.destroy();
-      expect(destroy).toBeCalledTimes(1);
+      expect(destroy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -116,9 +116,9 @@ describe('Scope', () => {
       scope.destroy();
       subject.next(3);
 
-      expect(handler).toBeCalledTimes(1);
-      expect(handler).lastCalledWith(2);
-      expect(handler).lastReturnedWith(6);
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenLastCalledWith(2);
+      expect(handler).toHaveLastReturnedWith(6);
     });
 
     it('should be subscribe an observer', async () => {
@@ -136,9 +136,9 @@ describe('Scope', () => {
       scope.destroy();
       subject.next(3);
 
-      expect(handler).toBeCalledTimes(1);
-      expect(handler).lastCalledWith(2);
-      expect(handler).lastReturnedWith(6);
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenLastCalledWith(2);
+      expect(handler).toHaveLastReturnedWith(6);
     });
   });
 });

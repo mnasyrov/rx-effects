@@ -11,7 +11,7 @@ describe('registerStoreExtension()', () => {
 
     createStore<number>(0, { name: 'test' });
 
-    expect(eventHandler).nthCalledWith(1, {
+    expect(eventHandler).toHaveBeenNthCalledWith(1, {
       type: 'created',
       store: expect.objectContaining({ name: 'test' }),
     });
@@ -35,6 +35,6 @@ describe('registerStoreExtension()', () => {
       internal: true,
     } as InternalStoreOptions<number>);
 
-    expect(eventHandler).toBeCalledTimes(0);
+    expect(eventHandler).toHaveBeenCalledTimes(0);
   });
 });

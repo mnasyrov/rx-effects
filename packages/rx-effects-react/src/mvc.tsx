@@ -18,17 +18,20 @@ export function useInjectableController<Result extends Record<string, unknown>>(
 
 export const useViewController = useInjectableController;
 
-export function useControllerFactory<Args extends unknown[], Result>(
-  factoryDeclaration: (...args: Args) => ControllerFactory<Controller<Result>>,
+export function useControllerFactory<
+  Args extends unknown[],
+  Service extends AnyObject,
+>(
+  factoryDeclaration: (...args: Args) => ControllerFactory<Controller<Service>>,
   ...args: Args
-): Controller<Result> {
+): Controller<Service> {
   const controllerFactory = useMemo(
     () => factoryDeclaration(...args),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [factoryDeclaration, ...args],
   );
 
-  return useInjectableController<Controller<Result>>(controllerFactory);
+  return useInjectableController<Controller<Service>>(controllerFactory);
 }
 
 export function createViewControllerContainer<T extends AnyObject>(

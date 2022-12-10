@@ -21,10 +21,10 @@ describe('useController()', () => {
     expect(result.current.value).toBe(1);
 
     result.current.action();
-    expect(action).toBeCalledTimes(1);
+    expect(action).toHaveBeenCalledTimes(1);
 
     unmount();
-    expect(destroy).toBeCalledTimes(1);
+    expect(destroy).toHaveBeenCalledTimes(1);
   });
 
   it('should not recreate the controller with empty dependencies after rerendering', () => {
@@ -43,7 +43,7 @@ describe('useController()', () => {
     expect(controller1 === controller2).toBe(true);
 
     unmount();
-    expect(destroy).toBeCalledTimes(1);
+    expect(destroy).toHaveBeenCalledTimes(1);
   });
 
   it('should recreate the controller if a dependency is changed', () => {
@@ -70,6 +70,6 @@ describe('useController()', () => {
     expect(controller3.value).toBe(2);
 
     unmount();
-    expect(destroy).toBeCalledTimes(2);
+    expect(destroy).toHaveBeenCalledTimes(2);
   });
 });

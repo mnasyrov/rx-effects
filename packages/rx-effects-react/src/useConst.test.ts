@@ -28,7 +28,7 @@ describe('useConst()', () => {
     rerender({ factory: factory2 });
     expect(result.current).toBe(1);
 
-    expect(factory1).toBeCalledTimes(1);
-    expect(factory2).toBeCalledTimes(0);
+    expect(factory1).toHaveBeenCalledTimes(1);
+    expect(factory2).toHaveBeenCalledTimes(0);
   });
 });

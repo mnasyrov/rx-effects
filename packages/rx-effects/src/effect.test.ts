@@ -137,7 +137,7 @@ describe('Effect', () => {
   describe('handle()', () => {
     it('should fail in case the source is not observable, action or query', () => {
       const effect = createEffect(() => undefined);
-      expect(() => effect.handle('invalid-value' as any)).toThrowError(
+      expect(() => effect.handle('invalid-value' as any)).toThrow(
         new TypeError('Unexpected source type'),
       );
     });
@@ -205,9 +205,7 @@ describe('Effect', () => {
 
       const theError = new Error('test error');
 
-      expect(() =>
-        effect.handle(throwError(() => theError)),
-      ).not.toThrowError();
+      expect(() => effect.handle(throwError(() => theError))).not.toThrow();
 
       await expect(errorPromise).resolves.toEqual({
         origin: 'source',
@@ -227,7 +225,10 @@ describe('Effect', () => {
       effect.error$.subscribe(({ error }) => onSourceFailed(error));
       effect.handle(throwError(() => new Error('test error')));
 
-      expect(onSourceFailed).nthCalledWith(1, new Error('test error'));
+      expect(onSourceFailed).toHaveBeenNthCalledWith(
+        1,
+        new Error('test error'),
+      );
     });
 
     it('should execute an observable in case the handler returns it', async () => {
@@ -288,9 +289,9 @@ describe('Effect', () => {
       effect.destroy();
       action(3);
 
-      expect(listener).toBeCalledTimes(2);
-      expect(listener).nthCalledWith(1, 1);
-      expect(listener).nthCalledWith(2, 2);
+      expect(listener).toHaveBeenCalledTimes(2);
+      expect(listener).toHaveBeenNthCalledWith(1, 1);
+      expect(listener).toHaveBeenNthCalledWith(2, 2);
     });
 
     it('should completes result observables', async () => {
@@ -400,7 +401,7 @@ describe('GLOBAL_EFFECT_UNHANDLED_ERROR$', () => {
 
     effect.handle(of(1));
 
-    expect(consoleError).toBeCalledWith('Uncaught error in Effect', {
+    expect(consoleError).toHaveBeenCalledWith('Uncaught error in Effect', {
       origin: 'handler',
       event: 1,
       error: 'test error',

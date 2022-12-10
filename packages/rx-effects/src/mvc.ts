@@ -1,10 +1,11 @@
 import { Container, injectable, Token } from 'ditox';
 import { Controller } from './controller';
 import { createScope, Scope } from './scope';
+import { AnyObject } from './utils';
 
-export function createController<T>(
-  factory: (scope: Scope) => T & { destroy?: () => void },
-): Controller<T> {
+export function createController<Service extends AnyObject>(
+  factory: (scope: Scope) => Service & { destroy?: () => void },
+): Controller<Service> {
   const scope = createScope();
 
   const controller = factory(scope);
@@ -19,9 +20,9 @@ export function createController<T>(
   };
 }
 
-export type ControllerFactory<Result> = (
+export type ControllerFactory<Service extends AnyObject> = (
   container: Container,
-) => Controller<Result>;
+) => Controller<Service>;
 
 export type InferredService<Factory> = Factory extends ControllerFactory<
   infer Service
@@ -36,10 +37,13 @@ declare type TokenProps<Props extends ValuesProps> = {
   [K in keyof Props]: Token<Props[K]>;
 };
 
-export function createInjectableController<Props extends ValuesProps, Result>(
+export function createInjectableController<
+  Props extends ValuesProps,
+  Service extends AnyObject,
+>(
   tokens: TokenProps<Props>,
-  factory: (scope: Scope, props: Props) => Result,
-): ControllerFactory<Result> {
+  factory: (scope: Scope, props: Props) => Service,
+): ControllerFactory<Service> {
   return injectable(
     (props) => createController((scope) => factory(scope, props as Props)),
     tokens,
@@ -48,8 +52,11 @@ export function createInjectableController<Props extends ValuesProps, Result>(
 
 export const createViewController = createInjectableController;
 
-export function declareControllerFactory<Result, Args extends unknown[]>(
-  factory: (...args: Args) => ControllerFactory<Result>,
-): (...args: Args) => ControllerFactory<Result> {
+export function declareControllerFactory<
+  Service extends AnyObject,
+  Args extends unknown[],
+>(
+  factory: (...args: Args) => ControllerFactory<Service>,
+): (...args: Args) => ControllerFactory<Service> {
   return factory;
 }
