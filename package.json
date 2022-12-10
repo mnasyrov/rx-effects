@@ -15,7 +15,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "lerna bootstrap",
-    "clean": "lerna run clean",
+    "clean": "rm -rf dist && lerna run clean",
     "lint": "npm run lint:eslint && npm run lint:tsc",
     "lint:eslint": "eslint \"packages/*/{src,test*}/**\"",
     "lint:tsc": "tsc --noEmit --jsx react",
@@ -26,7 +26,8 @@
     "prepare": "husky install",
     "prepublishOnly": "npm run clean && npm run build",
     "lerna-version": "lerna version",
-    "lerna-publish": "lerna publish from-git"
+    "lerna-publish": "lerna publish from-git",
+    "pack": "npm run build && mkdir -p dist && npx lerna exec 'npm pack --pack-destination ../../dist'"
   },
   "devDependencies": {
     "@types/jest": "29.2.4",
