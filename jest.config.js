@@ -6,6 +6,6 @@ import fastGlob from 'fast-glob';
 
 export default {
   roots: fastGlob.sync(['packages/*/src'], { onlyDirectories: true }),
-  collectCoverageFrom: ['packages/*/src/**/{!(index|testUtils),}.ts'],
+  collectCoverageFrom: ['packages/*/src/**/{!(index|testUtils),}.{ts,tsx}'],
   preset: 'ts-jest',
 };

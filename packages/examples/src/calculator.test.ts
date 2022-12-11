@@ -3,12 +3,12 @@ import {
   Controller,
   createAction,
   createScope,
+  createStore,
   Effect,
   Scope,
   StateMutation,
   Store,
 } from 'rx-effects';
-import { createStore } from 'rx-effects/src/index';
 import { firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 

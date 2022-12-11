@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import { AnyObject, EmptyObject } from './utils';
+import { AnyObject } from './utils';
 
 /**
  * Effects and business logic controller.
@@ -15,7 +15,7 @@ import { AnyObject, EmptyObject } from './utils';
  * }>;
  * ```
  */
-export type Controller<ControllerProps extends AnyObject = EmptyObject> =
+export type Controller<ControllerProps extends AnyObject = AnyObject> =
   Readonly<
     ControllerProps & {
       /** Dispose the controller and clean its resources */

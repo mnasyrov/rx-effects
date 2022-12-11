@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import { MonoTypeOperatorFunction, Observable, Subject } from 'rxjs';
 
 /**
  * Action is an event emitter
@@ -29,7 +29,7 @@ export type Action<Event> = {
   : { (event: Event): void });
 
 export function createAction<Event = void>(
-  operator?: (source$: Observable<Event>) => Observable<Event>,
+  operator?: MonoTypeOperatorFunction<Event>,
 ): Action<Event> {
   const source$ = new Subject<Event>();
 

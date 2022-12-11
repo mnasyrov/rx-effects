@@ -1,5 +1,5 @@
-import { debounceTime, firstValueFrom, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { debounceTime, filter, firstValueFrom, materialize, timer } from 'rxjs';
+import { bufferWhen, map } from 'rxjs/operators';
 import { createStore } from './store';
 import { pipeStore } from './storeUtils';
 
@@ -18,7 +18,7 @@ describe('pipeStore', () => {
     expect(result.get()).toBe(20);
   });
 
-  it('should unsubscribe the view when the source store is destroyed', () => {
+  it('should unsubscribe the view when the source store is destroyed', async () => {
     const source = createStore(1);
 
     const result = pipeStore(
@@ -26,9 +26,25 @@ describe('pipeStore', () => {
       map((value) => value * 10),
     );
 
+    const notifications$ = result.value$.pipe(materialize());
+
+    const notificationsPromise = firstValueFrom(
+      notifications$.pipe(
+        bufferWhen(() => notifications$.pipe(filter((e) => e.kind === 'C'))),
+      ),
+    );
+
     source.destroy();
     source.set(2);
     expect(result.get()).toBe(10);
+
+    expect(await notificationsPromise).toEqual([
+      {
+        hasValue: true,
+        kind: 'N',
+        value: 10,
+      },
+    ]);
   });
 
   it('should creates a debounced view of the source store', async () => {

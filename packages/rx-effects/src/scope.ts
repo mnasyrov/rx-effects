@@ -4,7 +4,7 @@ import { Controller } from './controller';
 import { createEffect, Effect, EffectHandler, EffectOptions } from './effect';
 import { Query } from './query';
 import { createStore, Store, StoreOptions } from './store';
-import { AnyObject, EmptyObject } from './utils';
+import { AnyObject } from './utils';
 
 /**
  * A controller-like boundary for effects and business logic.
@@ -33,7 +33,7 @@ export type Scope = Controller<{
   /**
    * Creates a controller which will be destroyed with the scope.
    */
-  createController: <ControllerProps extends AnyObject = EmptyObject>(
+  createController: <ControllerProps extends AnyObject = AnyObject>(
     factory: () => Controller<ControllerProps>,
   ) => Controller<ControllerProps>;
 
@@ -84,7 +84,7 @@ export function createScope(): Scope {
     subscriptions.unsubscribe();
   }
 
-  function createController<ControllerProps extends AnyObject = EmptyObject>(
+  function createController<ControllerProps extends AnyObject = AnyObject>(
     factory: () => Controller<ControllerProps>,
   ) {
     const controller = factory();

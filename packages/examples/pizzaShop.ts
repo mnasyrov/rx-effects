@@ -2,10 +2,11 @@ import {
   Controller,
   createAction,
   createScope,
+  declareStateUpdates,
   EffectState,
   Query,
+  withStoreUpdates,
 } from 'rx-effects';
-import { declareStateUpdates, withStoreUpdates } from 'rx-effects/src/index';
 import { delay, filter, map, mapTo, of } from 'rxjs';
 
 // The state

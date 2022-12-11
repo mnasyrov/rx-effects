@@ -1,9 +1,10 @@
-import { createStore, StoreOptions } from 'rx-effects';
 import {
+  createStore,
   StateUpdates,
+  StoreOptions,
   StoreWithUpdates,
   withStoreUpdates,
-} from 'rx-effects/src/index';
+} from 'rx-effects';
 import { useController } from './useController';
 import { useQuery } from './useQuery';
 

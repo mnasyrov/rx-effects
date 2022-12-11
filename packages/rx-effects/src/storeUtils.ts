@@ -1,4 +1,4 @@
-import { MonoTypeOperatorFunction } from 'rxjs';
+import { MonoTypeOperatorFunction, Subscription } from 'rxjs';
 import { createStore, InternalStoreOptions, Store, StoreQuery } from './store';
 
 /**
@@ -8,19 +8,26 @@ export function pipeStore<T>(
   store: Store<T>,
   operator: MonoTypeOperatorFunction<T>,
 ): StoreQuery<T> {
+  let subscription: Subscription | undefined;
+
   const clone = createStore<T>(store.get(), {
     internal: true,
-    onDestroy,
+    onDestroy: () => {
+      if (subscription) {
+        subscription.unsubscribe();
+        subscription = undefined;
+      }
+    },
   } as InternalStoreOptions<T>);
 
-  const subscription = store.value$.pipe(operator).subscribe((state) => {
-    clone.set(state);
+  subscription = store.value$.pipe(operator).subscribe({
+    next: (state) => {
+      clone.set(state);
+    },
+    complete: () => {
+      clone.destroy();
+    },
   });
-
-  function onDestroy() {
-    subscription.unsubscribe();
-    clone.destroy();
-  }
 
   return clone;
 }
