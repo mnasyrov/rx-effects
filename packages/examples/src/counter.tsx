@@ -4,7 +4,7 @@ import { useStore } from 'rx-effects-react';
 
 const COUNTER_STATE = 0;
 
-const COUNTER_UPDATES = declareStateUpdates<number>({
+const COUNTER_UPDATES = declareStateUpdates<number>()({
   decrement: () => (state) => state - 1,
   increment: () => (state) => state + 1,
 });
