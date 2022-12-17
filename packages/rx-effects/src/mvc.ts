@@ -14,7 +14,7 @@ export function createController<Service extends AnyObject>(
     ...controller,
 
     destroy: () => {
-      controller?.destroy?.();
+      controller.destroy?.();
       scope.destroy();
     },
   };

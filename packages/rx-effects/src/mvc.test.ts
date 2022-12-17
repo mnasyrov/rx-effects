@@ -1,4 +1,9 @@
-import { createController } from './mvc';
+import { createContainer, token } from 'ditox';
+import {
+  createController,
+  createInjectableController,
+  declareControllerFactory,
+} from './mvc';
 
 describe('createController()', () => {
   it('should create a controller', () => {
@@ -63,13 +68,42 @@ describe('createController()', () => {
 });
 
 describe('createInjectableController()', () => {
-  it.todo(
-    'should create a factory which accepts a DI container, revoles dependencies and constructs a controller',
-  );
+  it('should create a factory which accepts a DI container, resolves dependencies and constructs a controller', () => {
+    const VALUE_TOKEN = token<number>();
+
+    const injectableController = createInjectableController(
+      { value: VALUE_TOKEN },
+      (scope, { value }) => {
+        return {
+          getValue: () => value * 10,
+        };
+      },
+    );
+
+    const container = createContainer();
+    container.bindValue(VALUE_TOKEN, 1);
+
+    const controller = injectableController(container);
+    expect(controller.getValue()).toBe(10);
+  });
 });
 
 describe('declareControllerFactory()', () => {
-  it.todo(
-    'should declare a factory which accepts some args and return a factory of an injectable controller',
-  );
+  it('should declare a factory which accepts some args and return a factory of an injectable controller', () => {
+    const VALUE_TOKEN = token<number>();
+
+    const factory = declareControllerFactory((value2: number) =>
+      createInjectableController({ value: VALUE_TOKEN }, (scope, { value }) => {
+        return {
+          getValue: () => value * 10 + value2,
+        };
+      }),
+    );
+
+    const container = createContainer();
+    container.bindValue(VALUE_TOKEN, 1);
+
+    const controller = factory(2)(container);
+    expect(controller.getValue()).toBe(12);
+  });
 });
