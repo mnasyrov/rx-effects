@@ -16,7 +16,7 @@ type CartState = Readonly<{ orders: Array<string> }>;
 const CART_STATE: CartState = { orders: [] };
 
 // Declare updates of the state.
-const CART_STATE_UPDATES = declareStateUpdates<CartState>({
+const CART_STATE_UPDATES = declareStateUpdates(CART_STATE, {
   addPizzaToCart: (name: string) => (state) => ({
     ...state,
     orders: [...state.orders, name],

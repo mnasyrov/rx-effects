@@ -5,7 +5,10 @@
 import fastGlob from 'fast-glob';
 
 export default {
-  roots: fastGlob.sync(['packages/*/src'], { onlyDirectories: true }),
+  roots: fastGlob.sync(['packages/*/src'], {
+    onlyDirectories: true,
+    ignore: ['packages/examples/*'],
+  }),
   collectCoverageFrom: ['packages/*/src/**/{!(index|testUtils),}.{ts,tsx}'],
   preset: 'ts-jest',
 };

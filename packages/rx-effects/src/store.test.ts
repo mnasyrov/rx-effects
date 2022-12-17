@@ -403,8 +403,8 @@ describe('withStoreUpdates()', () => {
 });
 
 describe('declareStateUpdates()', () => {
-  it('should declare a record of state mutations', () => {
-    const stateUpdates = declareStateUpdates<number>({
+  it('should declare a record of state mutations #1', () => {
+    const stateUpdates = declareStateUpdates<number>()({
       add: (value: number) => (state) => state + value,
       multiply: (value: number) => (state) => state * value,
     });
@@ -414,7 +414,20 @@ describe('declareStateUpdates()', () => {
 
     storeUpdates.add(2);
     storeUpdates.multiply(4);
-    storeUpdates.something(4);
+    expect(store.get()).toBe(12);
+  });
+
+  it('should declare a record of state mutations #2', () => {
+    const stateUpdates = declareStateUpdates(0, {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    });
+
+    const store = createStore<number>(1);
+    const storeUpdates = createStoreUpdates(store.update, stateUpdates);
+
+    storeUpdates.add(2);
+    storeUpdates.multiply(4);
     expect(store.get()).toBe(12);
   });
 });

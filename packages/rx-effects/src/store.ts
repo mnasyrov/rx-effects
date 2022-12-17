@@ -37,15 +37,46 @@ export type StateUpdates<State> = Readonly<
 
 /**
  * Declare a record of factories for creating state mutations.
- *
- * This is a utility function for a proper type inferring.
+ */
+export function declareStateUpdates<State>(): <
+  Updates extends StateUpdates<State> = StateUpdates<State>,
+>(
+  updates: Updates,
+) => Updates;
+
+/**
+ * Declare a record of factories for creating state mutations.
  */
 export function declareStateUpdates<
   State,
   Updates extends StateUpdates<State> = StateUpdates<State>,
->(updates: Updates): Updates {
-  return updates;
+>(stateExample: State, updates: Updates): Updates;
+
+export function declareStateUpdates<
+  State,
+  Updates extends StateUpdates<State> = StateUpdates<State>,
+>(
+  stateExample?: State,
+  updates?: Updates,
+):
+  | Updates
+  | (<Updates extends StateUpdates<State> = StateUpdates<State>>(
+      updates: Updates,
+    ) => Updates) {
+  if (updates) {
+    return updates;
+  }
+
+  return (updates) => updates;
 }
+
+// export function declareStateUpdates<State>(
+//   _state: State | undefined,
+// ): <Updates extends StateUpdates<State> = StateUpdates<State>>(
+//   updates: Updates,
+// ) => Updates {
+//   return (updates) => updates;
+// }
 
 /**
  * Returns a mutation which applies all provided mutations for a state.

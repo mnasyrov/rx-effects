@@ -4,7 +4,7 @@ import { declareStateUpdates } from 'rx-effects';
 import { useStore } from './useStore';
 
 describe('useStore()', () => {
-  const STATE_UPDATES = declareStateUpdates<number>({
+  const STATE_UPDATES = declareStateUpdates<number>()({
     increase: () => (state) => state + 1,
     decrease: () => (state) => state - 1,
   });
