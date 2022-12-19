@@ -1,5 +1,14 @@
 import { MonoTypeOperatorFunction, Subscription } from 'rxjs';
-import { createStore, InternalStoreOptions, Store, StoreQuery } from './store';
+import {
+  createStore,
+  InternalStoreOptions,
+  StateUpdates,
+  Store,
+  StoreOptions,
+  StoreQuery,
+  StoreWithUpdates,
+  withStoreUpdates,
+} from './store';
 
 /**
  * Creates a deferred or transformed view of the store.
@@ -30,4 +39,23 @@ export function pipeStore<T>(
   });
 
   return clone;
+}
+
+export function declareStoreWithUpdates<
+  State,
+  Updates extends StateUpdates<State>,
+>(
+  initialState: State,
+  updates: Updates,
+  baseOptions?: StoreOptions<State>,
+): (
+  state?: State,
+  options?: StoreOptions<State>,
+) => StoreWithUpdates<State, Updates> {
+  return (state = initialState, options?: StoreOptions<State>) => {
+    return withStoreUpdates(
+      createStore(state, { ...baseOptions, ...options }),
+      updates,
+    );
+  };
 }

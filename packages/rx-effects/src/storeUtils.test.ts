@@ -1,7 +1,7 @@
 import { debounceTime, filter, firstValueFrom, materialize, timer } from 'rxjs';
 import { bufferWhen, map } from 'rxjs/operators';
-import { createStore } from './store';
-import { pipeStore } from './storeUtils';
+import { createStore, declareStateUpdates } from './store';
+import { declareStoreWithUpdates, pipeStore } from './storeUtils';
 
 describe('pipeStore', () => {
   it('should creates a transformed view of the source store', () => {
@@ -67,5 +67,44 @@ describe('pipeStore', () => {
 
     await firstValueFrom(timer(20));
     expect(result.get()).toBe(20);
+  });
+});
+
+describe('declareStoreWithUpdates()', () => {
+  const COUNTER_UPDATES = declareStateUpdates<number>()({
+    increase: () => (state) => state + 1,
+    decrease: () => (state) => state - 1,
+  });
+
+  it('should declare a store with updates', () => {
+    const createStore = declareStoreWithUpdates(0, COUNTER_UPDATES, {
+      name: 'counterStore',
+    });
+
+    const store = createStore();
+    expect(store.get()).toBe(0);
+    expect(store.name).toBe('counterStore');
+
+    store.updates.increase();
+    expect(store.get()).toBe(1);
+
+    store.updates.decrease();
+    expect(store.get()).toBe(0);
+  });
+
+  it('should return a factory which can override initial parameters', () => {
+    const createStore = declareStoreWithUpdates(0, COUNTER_UPDATES, {
+      name: 'counterStore',
+    });
+
+    const store = createStore(10, { name: 'myCounter' });
+    expect(store.get()).toBe(10);
+    expect(store.name).toBe('myCounter');
+
+    store.updates.increase();
+    expect(store.get()).toBe(11);
+
+    store.updates.decrease();
+    expect(store.get()).toBe(10);
   });
 });
