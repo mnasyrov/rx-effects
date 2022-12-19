@@ -1,9 +1,11 @@
 import { createContainer, token } from 'ditox';
 import {
   createController,
-  createInjectableController,
-  declareControllerFactory,
+  declareController,
+  declareViewController,
 } from './mvc';
+import { Query } from './query';
+import { createStore } from './store';
 
 describe('createController()', () => {
   it('should create a controller', () => {
@@ -67,43 +69,69 @@ describe('createController()', () => {
   });
 });
 
-describe('createInjectableController()', () => {
+describe('declareController()', () => {
   it('should create a factory which accepts a DI container, resolves dependencies and constructs a controller', () => {
     const VALUE_TOKEN = token<number>();
 
-    const injectableController = createInjectableController(
+    const controllerFactory = declareController(
       { value: VALUE_TOKEN },
-      (scope, { value }) => {
-        return {
-          getValue: () => value * 10,
-        };
-      },
-    );
-
-    const container = createContainer();
-    container.bindValue(VALUE_TOKEN, 1);
-
-    const controller = injectableController(container);
-    expect(controller.getValue()).toBe(10);
-  });
-});
-
-describe('declareControllerFactory()', () => {
-  it('should declare a factory which accepts some args and return a factory of an injectable controller', () => {
-    const VALUE_TOKEN = token<number>();
-
-    const factory = declareControllerFactory((value2: number) =>
-      createInjectableController({ value: VALUE_TOKEN }, (scope, { value }) => {
-        return {
-          getValue: () => value * 10 + value2,
-        };
+      ({ value }) => ({
+        getValue: () => value * 10,
       }),
     );
 
     const container = createContainer();
     container.bindValue(VALUE_TOKEN, 1);
 
-    const controller = factory(2)(container);
+    const controller = controllerFactory(container);
+    expect(controller.getValue()).toBe(10);
+  });
+});
+
+describe('declareViewController()', () => {
+  it('should create a factory which accepts a DI container, resolves dependencies and constructs a controller', () => {
+    const VALUE_TOKEN = token<number>();
+
+    const controllerFactory = declareViewController(
+      { value: VALUE_TOKEN },
+      ({ value }) => ({
+        getValue: () => value * 10,
+      }),
+    );
+
+    const container = createContainer();
+    container.bindValue(VALUE_TOKEN, 1);
+
+    const controller = controllerFactory(container);
+    expect(controller.getValue()).toBe(10);
+  });
+
+  it('should create a factory without DI dependencies', () => {
+    const controllerFactory = declareViewController(() => ({
+      getValue: () => 10,
+    }));
+
+    const container = createContainer();
+
+    const controller = controllerFactory(container);
+    expect(controller.getValue()).toBe(10);
+  });
+
+  it('should create a factory which accepts resolved dependencies and parameters as Queries', () => {
+    const VALUE_TOKEN = token<number>();
+
+    const controllerFactory = declareViewController(
+      { value: VALUE_TOKEN },
+      ({ value }) =>
+        (arg: Query<number>) => ({
+          getValue: () => value * 10 + arg.get(),
+        }),
+    );
+
+    const container = createContainer();
+    container.bindValue(VALUE_TOKEN, 1);
+
+    const controller = controllerFactory(container, createStore(2));
     expect(controller.getValue()).toBe(12);
   });
 });

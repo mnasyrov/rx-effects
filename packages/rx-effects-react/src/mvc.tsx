@@ -1,7 +1,14 @@
 import { declareModule, Token } from 'ditox';
 import { DependencyModule, useDependencyContainer } from 'ditox-react';
 import React, { FC, useEffect, useMemo } from 'react';
-import { Controller, ControllerFactory } from 'rx-effects';
+import {
+  Controller,
+  ControllerFactory,
+  createScope,
+  Query,
+  ViewControllerFactory,
+} from 'rx-effects';
+import { useConst } from './useConst';
 
 type AnyObject = Record<string, any>;
 
@@ -16,25 +23,43 @@ export function useInjectableController<Result extends Record<string, unknown>>(
   return controller;
 }
 
-export const useViewController = useInjectableController;
+declare type ParamQueries<Params extends unknown[]> = {
+  [K in keyof Params]: Query<Params[K]>;
+};
 
-export function useControllerFactory<
-  Args extends unknown[],
-  Service extends AnyObject,
+export function useViewController<
+  Result extends Record<string, unknown>,
+  Params extends unknown[],
+  PQueries extends ParamQueries<Params>,
 >(
-  factoryDeclaration: (...args: Args) => ControllerFactory<Controller<Service>>,
-  ...args: Args
-): Controller<Service> {
-  const controllerFactory = useMemo(
-    () => factoryDeclaration(...args),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [factoryDeclaration, ...args],
+  factory: ViewControllerFactory<Result, PQueries>,
+  ...params: Params
+): Controller<Result> {
+  const container = useDependencyContainer('strict');
+
+  const scope = useConst(() => createScope());
+  const paramStores = useConst(() =>
+    params.map((value) => scope.createStore(value)),
   );
 
-  return useInjectableController<Controller<Service>>(controllerFactory);
+  useEffect(() => {
+    params.forEach((value, index) => paramStores[index].set(value));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, params);
+
+  const controller = useMemo(() => {
+    const paramQueries = paramStores.map((store) => store.asQuery());
+
+    return factory(container, ...(paramQueries as any as PQueries));
+  }, [container, factory, paramStores]);
+
+  useEffect(() => () => controller.destroy(), [controller]);
+  useEffect(() => () => scope.destroy(), [scope]);
+
+  return controller;
 }
 
-export function createViewControllerContainer<T extends AnyObject>(
+export function createControllerContainer<T extends AnyObject>(
   token: Token<T>,
   factory: ControllerFactory<T>,
 ): FC {

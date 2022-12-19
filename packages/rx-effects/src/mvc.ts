@@ -1,5 +1,6 @@
 import { Container, injectable, Token } from 'ditox';
 import { Controller } from './controller';
+import { Query } from './query';
 import { createScope, Scope } from './scope';
 import { AnyObject } from './utils';
 
@@ -30,33 +31,80 @@ export type InferredService<Factory> = Factory extends ControllerFactory<
   ? Service
   : never;
 
-declare type ValuesProps = {
+declare type DependencyProps = {
   [key: string]: unknown;
 };
-declare type TokenProps<Props extends ValuesProps> = {
+
+declare type TokenProps<Props extends DependencyProps> = {
   [K in keyof Props]: Token<Props[K]>;
 };
 
-export function createInjectableController<
-  Props extends ValuesProps,
+export function declareController<
+  Dependencies extends DependencyProps,
   Service extends AnyObject,
 >(
-  tokens: TokenProps<Props>,
-  factory: (scope: Scope, props: Props) => Service,
+  tokens: TokenProps<Dependencies>,
+  factory: (deps: Dependencies, scope: Scope) => Service,
 ): ControllerFactory<Service> {
   return injectable(
-    (props) => createController((scope) => factory(scope, props as Props)),
+    (deps) => createController((scope) => factory(deps as Dependencies, scope)),
     tokens,
   );
 }
 
-export const createViewController = createInjectableController;
-
-export function declareControllerFactory<
+export type ViewControllerFactory<
   Service extends AnyObject,
-  Args extends unknown[],
+  ParamQueries extends Query<unknown>[],
+> = (container: Container, ...params: ParamQueries) => Controller<Service>;
+
+export function declareViewController<
+  Service extends AnyObject,
+  Params extends Query<unknown>[],
 >(
-  factory: (...args: Args) => ControllerFactory<Service>,
-): (...args: Args) => ControllerFactory<Service> {
-  return factory;
+  factory: (...params: Params) => Service,
+): ViewControllerFactory<Service, Params>;
+
+export function declareViewController<
+  Dependencies extends DependencyProps,
+  Service extends AnyObject,
+  Params extends Query<unknown>[],
+>(
+  tokens: TokenProps<Dependencies>,
+  factory: (
+    deps: Dependencies,
+    scope: Scope,
+  ) => Service | ((...params: Params) => Service),
+): ViewControllerFactory<Service, Params>;
+
+export function declareViewController<
+  Dependencies extends DependencyProps,
+  Service extends AnyObject,
+  Params extends Query<unknown>[],
+  Factory extends (
+    deps: Dependencies,
+    scope: Scope,
+  ) => Service | ((...params: Params) => Service),
+>(
+  tokensOrFactory: TokenProps<Dependencies> | Factory,
+  factory?: Factory,
+): ViewControllerFactory<Service, Params> {
+  const factoryValue = (factory ?? tokensOrFactory) as Factory;
+
+  const tokensValue = (
+    factory ? tokensOrFactory : {}
+  ) as TokenProps<Dependencies>;
+
+  return (container: Container, ...params: Params) => {
+    return injectable((dependencies) => {
+      return createController((scope) => {
+        const result = factoryValue(dependencies as Dependencies, scope);
+
+        if (typeof result === 'function') {
+          return result(...params);
+        } else {
+          return result;
+        }
+      });
+    }, tokensValue)(container);
+  };
 }
