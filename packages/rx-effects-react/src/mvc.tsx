@@ -31,7 +31,8 @@ export function useViewController<
 
   const controller = useMemo(
     () => factory(container, ...params),
-    [container, factory, params],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [container, factory, ...params],
   );
 
   useEffect(() => () => controller.destroy(), [controller]);
