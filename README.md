@@ -27,6 +27,12 @@ It is recommended to use RxEffects together with [Ditox.js] – a dependency inj
 - Functional API
 - Typescript typings
 
+### Breaking changes
+
+Version 1.0 contains breaking changes due stabilizing API from the early stage. The previous API is available in 0.7.2 version.
+
+Documentation is coming soon.
+
 ### Packages
 
 | Package                                       | Description                                | Links                                                      |
