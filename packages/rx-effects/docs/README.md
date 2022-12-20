@@ -8,33 +8,37 @@ rx-effects
 
 - [Action](README.md#action)
 - [Controller](README.md#controller)
+- [ControllerFactory](README.md#controllerfactory)
 - [Effect](README.md#effect)
+- [EffectController](README.md#effectcontroller)
+- [EffectError](README.md#effecterror)
+- [EffectErrorOrigin](README.md#effecterrororigin)
 - [EffectEventProject](README.md#effecteventproject)
 - [EffectHandler](README.md#effecthandler)
+- [EffectNotification](README.md#effectnotification)
 - [EffectOptions](README.md#effectoptions)
 - [EffectPipeline](README.md#effectpipeline)
+- [EffectResult](README.md#effectresult)
 - [EffectState](README.md#effectstate)
 - [ExternalScope](README.md#externalscope)
-- [HandlerOptions](README.md#handleroptions)
+- [InferredService](README.md#inferredservice)
+- [InternalStoreOptions](README.md#internalstoreoptions)
 - [Query](README.md#query)
 - [QueryOptions](README.md#queryoptions)
 - [Scope](README.md#scope)
-- [StateDeclaration](README.md#statedeclaration)
-- [StateDeclarationOptions](README.md#statedeclarationoptions)
-- [StateFactory](README.md#statefactory)
 - [StateMutation](README.md#statemutation)
 - [StateMutationMetadata](README.md#statemutationmetadata)
-- [StateMutations](README.md#statemutations)
-- [StateQuery](README.md#statequery)
-- [StateQueryOptions](README.md#statequeryoptions)
-- [StateReader](README.md#statereader)
+- [StateUpdates](README.md#stateupdates)
 - [Store](README.md#store)
-- [StoreAction](README.md#storeaction)
-- [StoreActions](README.md#storeactions)
-- [StoreActionsFactory](README.md#storeactionsfactory)
 - [StoreEvent](README.md#storeevent)
 - [StoreExtension](README.md#storeextension)
 - [StoreOptions](README.md#storeoptions)
+- [StoreQuery](README.md#storequery)
+- [StoreUpdate](README.md#storeupdate)
+- [StoreUpdateFunction](README.md#storeupdatefunction)
+- [StoreUpdates](README.md#storeupdates)
+- [StoreWithUpdates](README.md#storewithupdates)
+- [ViewControllerFactory](README.md#viewcontrollerfactory)
 
 ### Variables
 
@@ -44,25 +48,35 @@ rx-effects
 
 - [OBJECT_COMPARATOR](README.md#object_comparator)
 - [createAction](README.md#createaction)
+- [createController](README.md#createcontroller)
 - [createEffect](README.md#createeffect)
+- [createEffectController](README.md#createeffectcontroller)
 - [createScope](README.md#createscope)
 - [createStore](README.md#createstore)
-- [createStoreActions](README.md#createstoreactions)
 - [createStoreLoggerExtension](README.md#createstoreloggerextension)
-- [declareState](README.md#declarestate)
-- [handleAction](README.md#handleaction)
+- [createStoreUpdates](README.md#createstoreupdates)
+- [declareController](README.md#declarecontroller)
+- [declareStateUpdates](README.md#declarestateupdates)
+- [declareStoreWithUpdates](README.md#declarestorewithupdates)
+- [declareViewController](README.md#declareviewcontroller)
 - [mapQuery](README.md#mapquery)
 - [mergeQueries](README.md#mergequeries)
 - [pipeStateMutations](README.md#pipestatemutations)
+- [pipeStore](README.md#pipestore)
 - [registerStoreExtension](README.md#registerstoreextension)
+- [withStoreUpdates](README.md#withstoreupdates)
 
 ## Type Aliases
 
 ### Action
 
-Ƭ **Action**<`Event`\>: (`event`: `Event`) => `void` & `Event` extends `undefined` \| `void` ? (`event?`: `Event`) => `void` : (`event`: `Event`) => `void`
+Ƭ **Action**<`Event`\>: (`event`: `Event`) => `void` & [`Event`] extends [`undefined` \| `void`] ? (`event?`: `Event`) => `void` : (`event`: `Event`) => `void`
 
 Action is an event emitter
+
+**`Param`**
+
+Optional transformation or handler for an event
 
 **`Field`**
 
@@ -91,13 +105,13 @@ submitForm.even$.subscribe((formData) => {
 
 #### Defined in
 
-[packages/rx-effects/src/action.ts:22](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/action.ts#L22)
+[packages/rx-effects/src/action.ts:24](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/action.ts#L24)
 
 ---
 
 ### Controller
 
-Ƭ **Controller**<`ControllerProps`\>: `Readonly`<{ `destroy`: () => `void` } & `ControllerProps`\>
+Ƭ **Controller**<`ControllerProps`\>: `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\>
 
 Effects and business logic controller.
 
@@ -114,19 +128,49 @@ type LoggerController = Controller<{
 
 #### Type parameters
 
-| Name              | Type                  |
-| :---------------- | :-------------------- |
-| `ControllerProps` | extends `Object` = {} |
+| Name              | Type                              |
+| :---------------- | :-------------------------------- |
+| `ControllerProps` | extends `AnyObject` = `AnyObject` |
 
 #### Defined in
 
-[packages/rx-effects/src/controller.ts:16](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/controller.ts#L16)
+[packages/rx-effects/src/controller.ts:18](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/controller.ts#L18)
+
+---
+
+### ControllerFactory
+
+Ƭ **ControllerFactory**<`Service`\>: (`container`: `Container`) => [`Controller`](README.md#controller)<`Service`\>
+
+#### Type parameters
+
+| Name      | Type                |
+| :-------- | :------------------ |
+| `Service` | extends `AnyObject` |
+
+#### Type declaration
+
+▸ (`container`): [`Controller`](README.md#controller)<`Service`\>
+
+##### Parameters
+
+| Name        | Type        |
+| :---------- | :---------- |
+| `container` | `Container` |
+
+##### Returns
+
+[`Controller`](README.md#controller)<`Service`\>
+
+#### Defined in
+
+[packages/rx-effects/src/mvc.ts:23](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/mvc.ts#L23)
 
 ---
 
 ### Effect
 
-Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`Controller`](README.md#controller)<[`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\>) => `Subscription` }\>
+Ƭ **Effect**<`Event`, `Result`, `ErrorType`\>: [`Controller`](README.md#controller)<[`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\> \| [`Query`](README.md#query)<`Event`\>) => `Subscription` }\>
 
 Effect encapsulates a handler for Action or Observable.
 
@@ -146,7 +190,52 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:110](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L110)
+[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effect.ts#L56)
+
+---
+
+### EffectController
+
+Ƭ **EffectController**<`Event`, `Result`, `ErrorType`\>: [`Controller`](README.md#controller)<{ `complete`: () => `void` ; `error`: (`error`: [`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>) => `void` ; `next`: (`result`: [`EffectResult`](README.md#effectresult)<`Event`, `Result`\>) => `void` ; `start`: () => `void` ; `state`: [`EffectState`](README.md#effectstate)<`Event`, `Result`, `ErrorType`\> }\>
+
+#### Type parameters
+
+| Name        | Type     |
+| :---------- | :------- |
+| `Event`     | `Event`  |
+| `Result`    | `Result` |
+| `ErrorType` | `Error`  |
+
+#### Defined in
+
+[packages/rx-effects/src/effectController.ts:28](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectController.ts#L28)
+
+---
+
+### EffectError
+
+Ƭ **EffectError**<`Event`, `ErrorType`\>: `Readonly`<{ `error`: `any` ; `event?`: `undefined` ; `origin`: `"source"` } \| { `error`: `ErrorType` ; `event`: `Event` ; `origin`: `"handler"` }\>
+
+#### Type parameters
+
+| Name        |
+| :---------- |
+| `Event`     |
+| `ErrorType` |
+
+#### Defined in
+
+[packages/rx-effects/src/effectState.ts:11](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectState.ts#L11)
+
+---
+
+### EffectErrorOrigin
+
+Ƭ **EffectErrorOrigin**: `"source"` \| `"handler"`
+
+#### Defined in
+
+[packages/rx-effects/src/effectState.ts:9](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectState.ts#L9)
 
 ---
 
@@ -177,7 +266,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:81](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L81)
+[packages/rx-effects/src/effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
@@ -214,7 +303,25 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:41](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L41)
+[packages/rx-effects/src/effect.ts:23](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effect.ts#L23)
+
+---
+
+### EffectNotification
+
+Ƭ **EffectNotification**<`Event`, `Result`, `ErrorType`\>: `Readonly`<{ `type`: `"result"` } & [`EffectResult`](README.md#effectresult)<`Event`, `Result`\> \| { `type`: `"error"` } & [`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\>
+
+#### Type parameters
+
+| Name        |
+| :---------- |
+| `Event`     |
+| `Result`    |
+| `ErrorType` |
+
+#### Defined in
+
+[packages/rx-effects/src/effectState.ts:24](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectState.ts#L24)
 
 ---
 
@@ -231,7 +338,7 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:92](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L92)
+[packages/rx-effects/src/effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effect.ts#L38)
 
 ---
 
@@ -262,13 +369,30 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:85](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L85)
+[packages/rx-effects/src/effect.ts:31](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effect.ts#L31)
+
+---
+
+### EffectResult
+
+Ƭ **EffectResult**<`Event`, `Value`\>: `Readonly`<{ `event`: `Event` ; `result`: `Value` }\>
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `Event` |
+| `Value` |
+
+#### Defined in
+
+[packages/rx-effects/src/effectState.ts:4](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectState.ts#L4)
 
 ---
 
 ### EffectState
 
-Ƭ **EffectState**<`Event`, `Result`, `ErrorType`\>: `Readonly`<{ `done$`: `Observable`<{ `event`: `Event` ; `result`: `Result` }\> ; `error$`: `Observable`<{ `error`: `ErrorType` ; `event`: `Event` }\> ; `final$`: `Observable`<`Event`\> ; `pending`: [`Query`](README.md#query)<`boolean`\> ; `pendingCount`: [`Query`](README.md#query)<`number`\> ; `result$`: `Observable`<`Result`\> }\>
+Ƭ **EffectState**<`Event`, `Result`, `ErrorType`\>: `Readonly`<{ `done$`: `Observable`<[`EffectResult`](README.md#effectresult)<`Event`, `Result`\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: [`Query`](README.md#query)<`boolean`\> ; `pendingCount`: [`Query`](README.md#query)<`number`\> ; `result$`: `Observable`<`Result`\> }\>
 
 Details about performing the effect.
 
@@ -282,7 +406,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:61](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L61)
+[packages/rx-effects/src/effectState.ts:32](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectState.ts#L32)
 
 ---
 
@@ -294,29 +418,39 @@ Details about performing the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:109](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/scope.ts#L109)
+[packages/rx-effects/src/scope.ts:71](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/scope.ts#L71)
 
 ---
 
-### HandlerOptions
+### InferredService
 
-Ƭ **HandlerOptions**<`ErrorType`\>: `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\>
-
-Options for handling an action or observable.
-
-**`Deprecated`**
-
-Will be removed at 0.8 version.
+Ƭ **InferredService**<`Factory`\>: `Factory` extends [`ControllerFactory`](README.md#controllerfactory)<infer Service\> ? `Service` : `never`
 
 #### Type parameters
 
-| Name        | Type    |
-| :---------- | :------ |
-| `ErrorType` | `Error` |
+| Name      |
+| :-------- |
+| `Factory` |
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:50](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L50)
+[packages/rx-effects/src/mvc.ts:27](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/mvc.ts#L27)
+
+---
+
+### InternalStoreOptions
+
+Ƭ **InternalStoreOptions**<`State`\>: `Readonly`<[`StoreOptions`](README.md#storeoptions)<`State`\> & { `internal?`: `boolean` }\>
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:185](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L185)
 
 ---
 
@@ -334,7 +468,7 @@ Provider for a value of a state.
 
 #### Defined in
 
-[packages/rx-effects/src/queries/query.ts:6](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/queries/query.ts#L6)
+[packages/rx-effects/src/query.ts:6](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/query.ts#L6)
 
 ---
 
@@ -365,13 +499,13 @@ Getter for keys of values to compare. Values itself are used for comparing by de
 
 #### Defined in
 
-[packages/rx-effects/src/queries/query.ts:21](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/queries/query.ts#L21)
+[packages/rx-effects/src/query.ts:21](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/query.ts#L21)
 
 ---
 
 ### Scope
 
-Ƭ **Scope**: [`Controller`](README.md#controller)<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => [`Controller`](README.md#controller)<`ControllerProps`\>) => [`Controller`](README.md#controller)<`ControllerProps`\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `handleAction`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: [`HandlerOptions`](README.md#handleroptions)<`ErrorType`\> & [`EffectOptions`](README.md#effectoptions)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `handleQuery`: <Value, Result, ErrorType\>(`query`: [`Query`](README.md#query)<`Value`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Value`, `Result`\>, `options?`: [`EffectOptions`](README.md#effectoptions)<`Value`, `Result`\>) => [`Effect`](README.md#effect)<`Value`, `Result`, `ErrorType`\> ; `observe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `onDestroy`: (`teardown`: `TeardownLogic`) => `void` ; `subscribe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `createDeclaredStore`: <State\>(`stateDeclaration`: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStoreActions`: <Mutations\>(`store`: `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `id`: `number` ; `name?`: `string` ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\>) => `void` }\>\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>, `initialState?`: `Partial`<`State`\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `id`: `number` ; `name?`: `string` ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\>) => `void` }\>\> ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `id`: `number` ; `name?`: `string` ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\>) => `void` }\>\> }\>
+Ƭ **Scope**: [`Controller`](README.md#controller)<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => [`Controller`](README.md#controller)<`ControllerProps`\>) => [`Controller`](README.md#controller)<`ControllerProps`\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: [`EffectOptions`](README.md#effectoptions)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `handle`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| [`Query`](README.md#query)<`Event`\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: [`EffectOptions`](README.md#effectoptions)<`Event`, `Result`\>) => [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\> ; `subscribe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> }\>
 
 A controller-like boundary for effects and business logic.
 
@@ -380,74 +514,7 @@ A controller-like boundary for effects and business logic.
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:21](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/scope.ts#L21)
-
----
-
-### StateDeclaration
-
-Ƭ **StateDeclaration**<`State`\>: `Readonly`<{ `createState`: [`StateFactory`](README.md#statefactory)<`State`\> ; `createStore`: (`initialState?`: `Partial`<`State`\>) => [`Store`](README.md#store)<`State`\> ; `initialState`: `State` ; `name?`: `string` ; `createStoreActions`: <Mutations\>(`store`: `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `id`: `number` ; `name?`: `string` ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\>) => `void` }\>\>, `mutations`: `Mutations`) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\><Mutations\>(`mutations`: `Mutations`) => [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\> }\>
-
-Declaration of a state.
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `State` |
-
-#### Defined in
-
-[packages/rx-effects/src/stateDeclaration.ts:18](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/stateDeclaration.ts#L18)
-
----
-
-### StateDeclarationOptions
-
-Ƭ **StateDeclarationOptions**<`State`\>: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `State` |
-
-#### Defined in
-
-[packages/rx-effects/src/stateDeclaration.ts:42](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/stateDeclaration.ts#L42)
-
----
-
-### StateFactory
-
-Ƭ **StateFactory**<`State`\>: (`values?`: `Partial`<`State`\>) => `State`
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `State` |
-
-#### Type declaration
-
-▸ (`values?`): `State`
-
-Factory which creates a state. It can take optional values to modify the
-state.
-
-##### Parameters
-
-| Name      | Type                |
-| :-------- | :------------------ |
-| `values?` | `Partial`<`State`\> |
-
-##### Returns
-
-`State`
-
-#### Defined in
-
-[packages/rx-effects/src/stateDeclaration.ts:13](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/stateDeclaration.ts#L13)
+[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
@@ -465,12 +532,12 @@ state.
 
 ▸ (`state`): `State`
 
-This function mutates the state.
+A function to update a state.
 
 It is recommended to return a new state or the previous one.
 
 Actually, the function can change the state in place, but it is responsible
-for a developer to provide `stateCompare` function to the store which handles
+for a developer to provide `comparator` function to the store which handles
 the changes.
 
 For making changes use a currying function to provide arguments:
@@ -496,7 +563,7 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/stateMutation.ts:19](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/stateMutation.ts#L19)
+[packages/rx-effects/src/store.ts:29](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L29)
 
 ---
 
@@ -506,15 +573,15 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/storeMetadata.ts:7](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/storeMetadata.ts#L7)
+[packages/rx-effects/src/storeMetadata.ts:6](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/storeMetadata.ts#L6)
 
 ---
 
-### StateMutations
+### StateUpdates
 
-Ƭ **StateMutations**<`State`\>: `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\>
+Ƭ **StateUpdates**<`State`\>: `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\>
 
-A record of state mutations.
+A record of factories which create state mutations.
 
 #### Type parameters
 
@@ -524,72 +591,15 @@ A record of state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/stateMutation.ts:24](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/stateMutation.ts#L24)
-
----
-
-### StateQuery
-
-Ƭ **StateQuery**<`T`\>: [`Query`](README.md#query)<`T`\>
-
-**`Deprecated`**
-
-Deprecated, use `Query` type. Will be removed at 0.8 version.
-
-#### Type parameters
-
-| Name |
-| :--- |
-| `T`  |
-
-#### Defined in
-
-[packages/rx-effects/src/queries/query.ts:33](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/queries/query.ts#L33)
-
----
-
-### StateQueryOptions
-
-Ƭ **StateQueryOptions**<`T`, `K`\>: [`QueryOptions`](README.md#queryoptions)<`T`, `K`\>
-
-**`Deprecated`**
-
-Deprecated, use `QueryOptions` type. Will be removed at 0.8 version.
-
-#### Type parameters
-
-| Name |
-| :--- |
-| `T`  |
-| `K`  |
-
-#### Defined in
-
-[packages/rx-effects/src/queries/query.ts:38](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/queries/query.ts#L38)
-
----
-
-### StateReader
-
-Ƭ **StateReader**<`State`\>: `Readonly`<[`Query`](README.md#query)<`State`\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `id`: `number` ; `name?`: `string` ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\>
-
-Read-only type of the state store.
-
-#### Type parameters
-
-| Name    |
-| :------ |
-| `State` |
-
-#### Defined in
-
-[packages/rx-effects/src/store.ts:14](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/store.ts#L14)
+[packages/rx-effects/src/store.ts:34](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L34)
 
 ---
 
 ### Store
 
-Ƭ **Store**<`State`\>: `Readonly`<[`StateReader`](README.md#statereader)<`State`\> & [`Controller`](README.md#controller)<{ `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\>) => `void` }\>\>
+Ƭ **Store**<`State`\>: [`Controller`](README.md#controller)<[`StoreQuery`](README.md#storequery)<`State`\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> }\>
+
+Store of a state
 
 #### Type parameters
 
@@ -599,89 +609,7 @@ Read-only type of the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:56](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/store.ts#L56)
-
----
-
-### StoreAction
-
-Ƭ **StoreAction**<`Args`\>: (...`args`: `Args`) => `void`
-
-#### Type parameters
-
-| Name   | Type                |
-| :----- | :------------------ |
-| `Args` | extends `unknown`[] |
-
-#### Type declaration
-
-▸ (...`args`): `void`
-
-Store's action for changing its state
-
-##### Parameters
-
-| Name      | Type   |
-| :-------- | :----- |
-| `...args` | `Args` |
-
-##### Returns
-
-`void`
-
-#### Defined in
-
-[packages/rx-effects/src/storeActions.ts:6](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/storeActions.ts#L6)
-
----
-
-### StoreActions
-
-Ƭ **StoreActions**<`State`, `Mutations`\>: { [K in keyof Mutations]: StoreAction<Parameters<Mutations[K]\>\> }
-
-Record of store actions
-
-#### Type parameters
-
-| Name        | Type                                                           |
-| :---------- | :------------------------------------------------------------- |
-| `State`     | `State`                                                        |
-| `Mutations` | extends [`StateMutations`](README.md#statemutations)<`State`\> |
-
-#### Defined in
-
-[packages/rx-effects/src/storeActions.ts:9](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/storeActions.ts#L9)
-
----
-
-### StoreActionsFactory
-
-Ƭ **StoreActionsFactory**<`State`, `Mutations`\>: (`store`: [`Store`](README.md#store)<`State`\>) => [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
-
-#### Type parameters
-
-| Name        | Type                                                           |
-| :---------- | :------------------------------------------------------------- |
-| `State`     | `State`                                                        |
-| `Mutations` | extends [`StateMutations`](README.md#statemutations)<`State`\> |
-
-#### Type declaration
-
-▸ (`store`): [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
-
-##### Parameters
-
-| Name    | Type                                 |
-| :------ | :----------------------------------- |
-| `store` | [`Store`](README.md#store)<`State`\> |
-
-##### Returns
-
-[`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
-
-#### Defined in
-
-[packages/rx-effects/src/storeActions.ts:13](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/storeActions.ts#L13)
+[packages/rx-effects/src/store.ts:151](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L151)
 
 ---
 
@@ -697,7 +625,7 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeEvents.ts:5](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/storeEvents.ts#L5)
+[packages/rx-effects/src/storeEvents.ts:4](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/storeEvents.ts#L4)
 
 ---
 
@@ -731,13 +659,13 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/storeExtensions.ts#L9)
+[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/storeExtensions.ts#L9)
 
 ---
 
 ### StoreOptions
 
-Ƭ **StoreOptions**<`State`\>: `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\>
+Ƭ **StoreOptions**<`State`\>: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\>
 
 #### Type parameters
 
@@ -747,17 +675,169 @@ Record of store actions
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:75](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/store.ts#L75)
+[packages/rx-effects/src/store.ts:174](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L174)
+
+---
+
+### StoreQuery
+
+Ƭ **StoreQuery**<`State`\>: `Readonly`<[`Query`](README.md#query)<`State`\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\>
+
+Read-only interface of a store.
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:88](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L88)
+
+---
+
+### StoreUpdate
+
+Ƭ **StoreUpdate**<`Args`\>: (...`args`: `Args`) => `void`
+
+#### Type parameters
+
+| Name   | Type                |
+| :----- | :------------------ |
+| `Args` | extends `unknown`[] |
+
+#### Type declaration
+
+▸ (`...args`): `void`
+
+Function which changes a state of the store
+
+##### Parameters
+
+| Name      | Type   |
+| :-------- | :----- |
+| `...args` | `Args` |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:138](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L138)
+
+---
+
+### StoreUpdateFunction
+
+Ƭ **StoreUpdateFunction**<`State`\>: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\>) => `void`
+
+#### Type parameters
+
+| Name    |
+| :------ |
+| `State` |
+
+#### Type declaration
+
+▸ (`mutation`): `void`
+
+Updates the state by provided mutations
+
+##### Parameters
+
+| Name       | Type                                                                                                                                                               |
+| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mutation` | [`StateMutation`](README.md#statemutation)<`State`\> \| `ReadonlyArray`<[`StateMutation`](README.md#statemutation)<`State`\> \| `undefined` \| `null` \| `false`\> |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:131](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L131)
+
+---
+
+### StoreUpdates
+
+Ƭ **StoreUpdates**<`State`, `Updates`\>: `Readonly`<{ [K in keyof Updates]: StoreUpdate<Parameters<Updates[K]\>\> }\>
+
+Record of store update functions
+
+#### Type parameters
+
+| Name      | Type                                                       |
+| :-------- | :--------------------------------------------------------- |
+| `State`   | `State`                                                    |
+| `Updates` | extends [`StateUpdates`](README.md#stateupdates)<`State`\> |
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:141](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L141)
+
+---
+
+### StoreWithUpdates
+
+Ƭ **StoreWithUpdates**<`State`, `Updates`\>: `Readonly`<[`Store`](README.md#store)<`State`\> & { `updates`: [`StoreUpdates`](README.md#storeupdates)<`State`, `Updates`\> }\>
+
+Store of a state with updating functions
+
+#### Type parameters
+
+| Name      | Type                                                       |
+| :-------- | :--------------------------------------------------------- |
+| `State`   | `State`                                                    |
+| `Updates` | extends [`StateUpdates`](README.md#stateupdates)<`State`\> |
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:165](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L165)
+
+---
+
+### ViewControllerFactory
+
+Ƭ **ViewControllerFactory**<`Service`, `Params`\>: (`container`: `Container`, ...`params`: `Params`) => [`Controller`](README.md#controller)<`Service`\>
+
+#### Type parameters
+
+| Name      | Type                |
+| :-------- | :------------------ |
+| `Service` | extends `AnyObject` |
+| `Params`  | extends `unknown`[] |
+
+#### Type declaration
+
+▸ (`container`, `...params`): [`Controller`](README.md#controller)<`Service`\>
+
+##### Parameters
+
+| Name        | Type        |
+| :---------- | :---------- |
+| `container` | `Container` |
+| `...params` | `Params`    |
+
+##### Returns
+
+[`Controller`](README.md#controller)<`Service`\>
+
+#### Defined in
+
+[packages/rx-effects/src/mvc.ts:54](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/mvc.ts#L54)
 
 ## Variables
 
 ### GLOBAL_EFFECT_UNHANDLED_ERROR$
 
-• `Const` **GLOBAL_EFFECT_UNHANDLED_ERROR$**: `Observable`<{ `error`: `unknown` ; `event`: `unknown` }\>
+• `Const` **GLOBAL_EFFECT_UNHANDLED_ERROR$**: `Observable`<[`EffectError`](README.md#effecterror)<`unknown`, `unknown`\>\>
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:25](https://github.com/mnasyrov/rx-effects/blob/4467782/packages/rx-effects/src/effect.ts#L25)
+[packages/rx-effects/src/effectController.ts:15](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectController.ts#L15)
 
 ## Functions
 
@@ -778,11 +858,15 @@ Makes shallow comparison of two objects.
 
 `boolean`
 
+#### Defined in
+
+[packages/rx-effects/src/utils.ts:14](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/utils.ts#L14)
+
 ---
 
 ### createAction
 
-▸ **createAction**<`Event`\>(): [`Action`](README.md#action)<`Event`\>
+▸ **createAction**<`Event`\>(`operator?`): [`Action`](README.md#action)<`Event`\>
 
 #### Type parameters
 
@@ -790,9 +874,45 @@ Makes shallow comparison of two objects.
 | :------ | :----- |
 | `Event` | `void` |
 
+#### Parameters
+
+| Name        | Type                                 |
+| :---------- | :----------------------------------- |
+| `operator?` | `MonoTypeOperatorFunction`<`Event`\> |
+
 #### Returns
 
 [`Action`](README.md#action)<`Event`\>
+
+#### Defined in
+
+[packages/rx-effects/src/action.ts:31](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/action.ts#L31)
+
+---
+
+### createController
+
+▸ **createController**<`Service`\>(`factory`): [`Controller`](README.md#controller)<`Service`\>
+
+#### Type parameters
+
+| Name      | Type                |
+| :-------- | :------------------ |
+| `Service` | extends `AnyObject` |
+
+#### Parameters
+
+| Name      | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| :-------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `factory` | (`scope`: `Readonly`<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\>) => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `handle`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `subscribe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> } & { `destroy`: () => `void` }\>) => `Service` & { `destroy?`: () => `void` } |
+
+#### Returns
+
+[`Controller`](README.md#controller)<`Service`\>
+
+#### Defined in
+
+[packages/rx-effects/src/mvc.ts:6](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/mvc.ts#L6)
 
 ---
 
@@ -829,6 +949,32 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
 
+#### Defined in
+
+[packages/rx-effects/src/effect.ts:74](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effect.ts#L74)
+
+---
+
+### createEffectController
+
+▸ **createEffectController**<`Event`, `Result`, `ErrorType`\>(): [`EffectController`](README.md#effectcontroller)<`Event`, `Result`, `ErrorType`\>
+
+#### Type parameters
+
+| Name        | Type     |
+| :---------- | :------- |
+| `Event`     | `Event`  |
+| `Result`    | `Result` |
+| `ErrorType` | `Error`  |
+
+#### Returns
+
+[`EffectController`](README.md#effectcontroller)<`Event`, `Result`, `ErrorType`\>
+
+#### Defined in
+
+[packages/rx-effects/src/effectController.ts:40](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/effectController.ts#L40)
+
 ---
 
 ### createScope
@@ -840,6 +986,10 @@ Creates `Scope` instance.
 #### Returns
 
 [`Scope`](README.md#scope)
+
+#### Defined in
+
+[packages/rx-effects/src/scope.ts:76](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/scope.ts#L76)
 
 ---
 
@@ -857,61 +1007,18 @@ Creates the state store.
 
 #### Parameters
 
-| Name           | Type                                                                                                                                        | Description              |
-| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------- |
-| `initialState` | `State`                                                                                                                                     | Initial state            |
-| `options?`     | `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\> | Parameters for the store |
+| Name           | Type                                                                                                                                       | Description              |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------- | :----------------------- |
+| `initialState` | `State`                                                                                                                                    | Initial state            |
+| `options?`     | `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\> | Parameters for the store |
 
 #### Returns
 
 [`Store`](README.md#store)<`State`\>
 
----
+#### Defined in
 
-### createStoreActions
-
-▸ **createStoreActions**<`State`, `Mutations`\>(`store`, `mutations`): [`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
-
-Creates store actions for the store by state mutations
-
-#### Type parameters
-
-| Name        | Type                                                                                                                   |
-| :---------- | :--------------------------------------------------------------------------------------------------------------------- |
-| `State`     | `State`                                                                                                                |
-| `Mutations` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
-
-#### Parameters
-
-| Name        | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| :---------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `store`     | `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> ; `id`: `number` ; `name?`: `string` ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & `Readonly`<{ `destroy`: () => `void` } & { `set`: (`state`: `State`) => `void` ; `update`: (`mutation`: [`StateMutation`](README.md#statemutation)<`State`\> \| readonly (`undefined` \| `null` \| `false` \| [`StateMutation`](README.md#statemutation)<`State`\>)[]) => `void` }\>\> |
-| `mutations` | `Mutations`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-
-#### Returns
-
-[`StoreActions`](README.md#storeactions)<`State`, `Mutations`\>
-
-▸ **createStoreActions**<`State`, `Mutations`\>(`mutations`): [`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\>
-
-Creates a factory of store actions by state mutations
-
-#### Type parameters
-
-| Name        | Type                                                                                                                   |
-| :---------- | :--------------------------------------------------------------------------------------------------------------------- |
-| `State`     | `State`                                                                                                                |
-| `Mutations` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
-
-#### Parameters
-
-| Name        | Type        |
-| :---------- | :---------- |
-| `mutations` | `Mutations` |
-
-#### Returns
-
-[`StoreActionsFactory`](README.md#storeactionsfactory)<`State`, `Mutations`\>
+[packages/rx-effects/src/store.ts:195](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L195)
 
 ---
 
@@ -929,13 +1036,75 @@ Creates a factory of store actions by state mutations
 
 [`StoreExtension`](README.md#storeextension)<`unknown`\>
 
+#### Defined in
+
+[packages/rx-effects/src/storeLoggerExtension.ts:3](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/storeLoggerExtension.ts#L3)
+
 ---
 
-### declareState
+### createStoreUpdates
 
-▸ **declareState**<`State`\>(`stateOrFactory`, `options?`): [`StateDeclaration`](README.md#statedeclaration)<`State`\>
+▸ **createStoreUpdates**<`State`, `Updates`\>(`storeUpdate`, `stateUpdates`): [`StoreUpdates`](README.md#storeupdates)<`State`, `Updates`\>
 
-Declares the state.
+Creates StateUpdates for updating the store by provided state mutations
+
+#### Type parameters
+
+| Name      | Type                                                                                                                   |
+| :-------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `State`   | `State`                                                                                                                |
+| `Updates` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
+
+#### Parameters
+
+| Name           | Type                                                             |
+| :------------- | :--------------------------------------------------------------- |
+| `storeUpdate`  | [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> |
+| `stateUpdates` | `Updates`                                                        |
+
+#### Returns
+
+[`StoreUpdates`](README.md#storeupdates)<`State`, `Updates`\>
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:315](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L315)
+
+---
+
+### declareController
+
+▸ **declareController**<`Dependencies`, `Service`\>(`tokens`, `factory`): [`ControllerFactory`](README.md#controllerfactory)<`Service`\>
+
+#### Type parameters
+
+| Name           | Type                      |
+| :------------- | :------------------------ |
+| `Dependencies` | extends `DependencyProps` |
+| `Service`      | extends `AnyObject`       |
+
+#### Parameters
+
+| Name      | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tokens`  | `TokenProps`<`Dependencies`\>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `factory` | (`deps`: `Dependencies`, `scope`: `Readonly`<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\>) => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `handle`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `subscribe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> } & { `destroy`: () => `void` }\>) => `Service` |
+
+#### Returns
+
+[`ControllerFactory`](README.md#controllerfactory)<`Service`\>
+
+#### Defined in
+
+[packages/rx-effects/src/mvc.ts:41](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/mvc.ts#L41)
+
+---
+
+### declareStateUpdates
+
+▸ **declareStateUpdates**<`State`\>(): <Updates\>(`updates`: `Updates`) => `Updates`
+
+Declare a record of factories for creating state mutations.
 
 #### Type parameters
 
@@ -943,48 +1112,151 @@ Declares the state.
 | :------ |
 | `State` |
 
-#### Parameters
-
-| Name             | Type                                                                                                                                        | Description                                         |
-| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------- |
-| `stateOrFactory` | `State` \| [`StateFactory`](README.md#statefactory)<`State`\>                                                                               | an initial state or a factory for the initial state |
-| `options?`       | `Readonly`<{ `internal?`: `boolean` ; `name?`: `string` ; `stateComparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` }\> | Parameters for declaring a state                    |
-
 #### Returns
 
-[`StateDeclaration`](README.md#statedeclaration)<`State`\>
+`fn`
 
----
+▸ <`Updates`\>(`updates`): `Updates`
 
-### handleAction
+##### Type parameters
 
-▸ **handleAction**<`Event`, `Result`, `ErrorType`\>(`source`, `handler`, `options?`): [`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+| Name      | Type                                                                                                            |
+| :-------- | :-------------------------------------------------------------------------------------------------------------- |
+| `Updates` | extends [`StateUpdates`](README.md#stateupdates)<`State`\> = [`StateUpdates`](README.md#stateupdates)<`State`\> |
 
-This helper creates `Effect` from `handler` and subscribes it to `source`.
+##### Parameters
 
-**`Deprecated`**
+| Name      | Type      |
+| :-------- | :-------- |
+| `updates` | `Updates` |
 
-This function will be removed at 0.8 version.
+##### Returns
+
+`Updates`
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:41](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L41)
+
+▸ **declareStateUpdates**<`State`, `Updates`\>(`stateExample`, `updates`): `Updates`
+
+Declare a record of factories for creating state mutations.
 
 #### Type parameters
 
-| Name        | Type    |
-| :---------- | :------ |
-| `Event`     | `Event` |
-| `Result`    | `void`  |
-| `ErrorType` | `Error` |
+| Name      | Type                                                                                                                                                                                                                                    |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `State`   | `State`                                                                                                                                                                                                                                 |
+| `Updates` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> = `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
 
 #### Parameters
 
-| Name       | Type                                                                                                                                                                                                       |
-| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `source`   | `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\>                                                                                                                                           |
-| `handler`  | [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>                                                                                                                                             |
-| `options?` | `Readonly`<{ `onSourceCompleted?`: () => `void` ; `onSourceFailed?`: (`error`: `ErrorType`) => `void` }\> & `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\> |
+| Name           | Type      |
+| :------------- | :-------- |
+| `stateExample` | `State`   |
+| `updates`      | `Updates` |
 
 #### Returns
 
-[`Effect`](README.md#effect)<`Event`, `Result`, `ErrorType`\>
+`Updates`
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:50](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L50)
+
+---
+
+### declareStoreWithUpdates
+
+▸ **declareStoreWithUpdates**<`State`, `Updates`\>(`initialState`, `updates`, `baseOptions?`): (`state?`: `State`, `options?`: [`StoreOptions`](README.md#storeoptions)<`State`\>) => [`StoreWithUpdates`](README.md#storewithupdates)<`State`, `Updates`\>
+
+#### Type parameters
+
+| Name      | Type                                                                                                                   |
+| :-------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `State`   | `State`                                                                                                                |
+| `Updates` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
+
+#### Parameters
+
+| Name           | Type                                                                                                                                       |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| `initialState` | `State`                                                                                                                                    |
+| `updates`      | `Updates`                                                                                                                                  |
+| `baseOptions?` | `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\> |
+
+#### Returns
+
+`fn`
+
+▸ (`state?`, `options?`): [`StoreWithUpdates`](README.md#storewithupdates)<`State`, `Updates`\>
+
+##### Parameters
+
+| Name       | Type                                               |
+| :--------- | :------------------------------------------------- |
+| `state?`   | `State`                                            |
+| `options?` | [`StoreOptions`](README.md#storeoptions)<`State`\> |
+
+##### Returns
+
+[`StoreWithUpdates`](README.md#storewithupdates)<`State`, `Updates`\>
+
+#### Defined in
+
+[packages/rx-effects/src/storeUtils.ts:44](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/storeUtils.ts#L44)
+
+---
+
+### declareViewController
+
+▸ **declareViewController**<`Service`, `Params`\>(`factory`): [`ViewControllerFactory`](README.md#viewcontrollerfactory)<`Service`, `Params`\>
+
+#### Type parameters
+
+| Name      | Type                |
+| :-------- | :------------------ |
+| `Service` | extends `AnyObject` |
+| `Params`  | extends `unknown`[] |
+
+#### Parameters
+
+| Name      | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `factory` | (`scope`: `Readonly`<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\>) => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `handle`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `subscribe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> } & { `destroy`: () => `void` }\>, ...`params`: `Params`) => `Service` |
+
+#### Returns
+
+[`ViewControllerFactory`](README.md#viewcontrollerfactory)<`Service`, `Params`\>
+
+#### Defined in
+
+[packages/rx-effects/src/mvc.ts:59](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/mvc.ts#L59)
+
+▸ **declareViewController**<`Dependencies`, `Service`, `Params`\>(`tokens`, `factory`): [`ViewControllerFactory`](README.md#viewcontrollerfactory)<`Service`, `Params`\>
+
+#### Type parameters
+
+| Name           | Type                      |
+| :------------- | :------------------------ |
+| `Dependencies` | extends `DependencyProps` |
+| `Service`      | extends `AnyObject`       |
+| `Params`       | extends `unknown`[]       |
+
+#### Parameters
+
+| Name      | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tokens`  | `TokenProps`<`Dependencies`\>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `factory` | (`deps`: `Dependencies`, `scope`: `Readonly`<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\>) => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `handle`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `subscribe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> } & { `destroy`: () => `void` }\>) => `Service` \| (`scope`: `Readonly`<{ `add`: (`teardown`: `TeardownLogic`) => `void` ; `createController`: <ControllerProps\>(`factory`: () => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\>) => `Readonly`<`ControllerProps` & { `destroy`: () => `void` }\> ; `createEffect`: <Event, Result, ErrorType\>(`handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: [`Action`](README.md#action)<`Event`\> \| `Observable`<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `handle`: <Event, Result, ErrorType\>(`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>, `handler`: [`EffectHandler`](README.md#effecthandler)<`Event`, `Result`\>, `options?`: `Readonly`<{ `pipeline?`: [`EffectPipeline`](README.md#effectpipeline)<`Event`, `Result`\> }\>) => `Readonly`<`Readonly`<{ `done$`: `Observable`<`Readonly`<{ `event`: `Event` ; `result`: `Result` }\>\> ; `error$`: `Observable`<[`EffectError`](README.md#effecterror)<`Event`, `ErrorType`\>\> ; `final$`: `Observable`<[`EffectNotification`](README.md#effectnotification)<`Event`, `Result`, `ErrorType`\>\> ; `pending`: `Readonly`<{ `get`: () => `boolean` ; `value$`: `Observable`<`boolean`\> }\> ; `pendingCount`: `Readonly`<{ `get`: () => `number` ; `value$`: `Observable`<`number`\> }\> ; `result$`: `Observable`<`Result`\> }\> & { `handle`: (`source`: `Observable`<`Event`\> \| [`Action`](README.md#action)<`Event`\> \| `Readonly`<{ `get`: () => `Event` ; `value$`: `Observable`<`Event`\> }\>) => `Subscription` } & { `destroy`: () => `void` }\> ; `subscribe`: <T\>(`source`: `Observable`<`T`\>) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `next`: (`value`: `T`) => `void`) => `Subscription`<T\>(`source`: `Observable`<`T`\>, `observer`: `Partial`<`Observer`<`T`\>\>) => `Subscription` ; `createStore`: <State\>(`initialState`: `State`, `options?`: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\>) => `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> } & { `destroy`: () => `void` }\>, ...`params`: `Params`) => `Service` |
+
+#### Returns
+
+[`ViewControllerFactory`](README.md#viewcontrollerfactory)<`Service`, `Params`\>
+
+#### Defined in
+
+[packages/rx-effects/src/mvc.ts:66](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/mvc.ts#L66)
 
 ---
 
@@ -1015,6 +1287,10 @@ function.
 
 [`Query`](README.md#query)<`R`\>
 
+#### Defined in
+
+[packages/rx-effects/src/queryMappers.ts:14](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/queryMappers.ts#L14)
+
 ---
 
 ### mergeQueries
@@ -1044,6 +1320,10 @@ and merges them into a single value.
 
 [`Query`](README.md#query)<`Result`\>
 
+#### Defined in
+
+[packages/rx-effects/src/queryMappers.ts:39](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/queryMappers.ts#L39)
+
 ---
 
 ### pipeStateMutations
@@ -1070,6 +1350,39 @@ You can use this helper to apply multiple changes at the same time.
 
 [`StateMutation`](README.md#statemutation)<`State`\>
 
+#### Defined in
+
+[packages/rx-effects/src/store.ts:78](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L78)
+
+---
+
+### pipeStore
+
+▸ **pipeStore**<`T`\>(`store`, `operator`): [`StoreQuery`](README.md#storequery)<`T`\>
+
+Creates a deferred or transformed view of the store.
+
+#### Type parameters
+
+| Name |
+| :--- |
+| `T`  |
+
+#### Parameters
+
+| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `store`    | `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> ; `query`: <R, K\>(`selector`: (`state`: `T`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `T`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `T`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`T`\> } & { `destroy`: () => `void` }\> |
+| `operator` | `MonoTypeOperatorFunction`<`T`\>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+
+#### Returns
+
+[`StoreQuery`](README.md#storequery)<`T`\>
+
+#### Defined in
+
+[packages/rx-effects/src/storeUtils.ts:16](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/storeUtils.ts#L16)
+
 ---
 
 ### registerStoreExtension
@@ -1085,3 +1398,37 @@ You can use this helper to apply multiple changes at the same time.
 #### Returns
 
 `Subscription`
+
+#### Defined in
+
+[packages/rx-effects/src/storeExtensions.ts:13](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/storeExtensions.ts#L13)
+
+---
+
+### withStoreUpdates
+
+▸ **withStoreUpdates**<`State`, `Updates`\>(`store`, `updates`): [`StoreWithUpdates`](README.md#storewithupdates)<`State`, `Updates`\>
+
+Creates a proxy for the store with "updates" to change a state by provided mutations
+
+#### Type parameters
+
+| Name      | Type                                                                                                                                                                                                                                    |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `State`   | `State`                                                                                                                                                                                                                                 |
+| `Updates` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> = `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
+
+#### Parameters
+
+| Name      | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `store`   | `Readonly`<`Readonly`<`Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> & { `asQuery`: () => `Readonly`<{ `get`: () => `State` ; `value$`: `Observable`<`State`\> }\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Readonly`<{ `get`: () => `R` ; `value$`: `Observable`<`R`\> }\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: `Readonly`<{ `distinct?`: `boolean` \| { `comparator?`: (`previous`: `K`, `current`: `K`) => `boolean` ; `keySelector?`: (`value`: `R`) => `K` } }\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> |
+| `updates` | `Updates`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+
+#### Returns
+
+[`StoreWithUpdates`](README.md#storewithupdates)<`State`, `Updates`\>
+
+#### Defined in
+
+[packages/rx-effects/src/store.ts:334](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects/src/store.ts#L334)

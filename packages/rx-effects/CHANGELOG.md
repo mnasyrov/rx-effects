@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/mnasyrov/rx-effects/compare/v0.7.2...v1.0.0) (2022-12-20)
+
+### Features
+
+- Updated API for the library. Introduced tooling for ViewControllers with Ditox.js DI container. ([7cffcd0](https://github.com/mnasyrov/rx-effects/commit/7cffcd03f915337fa27e3b55f30fd1ad0c45a087))
+
 ## [0.7.2](https://github.com/mnasyrov/rx-effects/compare/v0.7.1...v0.7.2) (2022-10-29)
 
 ### Features

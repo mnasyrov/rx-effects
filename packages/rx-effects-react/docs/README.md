@@ -6,15 +6,45 @@ rx-effects-react
 
 ### Functions
 
+- [createControllerContainer](README.md#createcontrollercontainer)
 - [useConst](README.md#useconst)
 - [useController](README.md#usecontroller)
+- [useInjectableController](README.md#useinjectablecontroller)
 - [useObservable](README.md#useobservable)
 - [useObserver](README.md#useobserver)
 - [useQuery](README.md#usequery)
 - [useSelector](README.md#useselector)
-- [useStateQuery](README.md#usestatequery)
+- [useStore](README.md#usestore)
+- [useViewController](README.md#useviewcontroller)
 
 ## Functions
+
+### createControllerContainer
+
+▸ **createControllerContainer**<`T`\>(`token`, `factory`): `FC`
+
+#### Type parameters
+
+| Name | Type                |
+| :--- | :------------------ |
+| `T`  | extends `AnyObject` |
+
+#### Parameters
+
+| Name      | Type                      |
+| :-------- | :------------------------ |
+| `token`   | `Token`<`T`\>             |
+| `factory` | `ControllerFactory`<`T`\> |
+
+#### Returns
+
+`FC`
+
+#### Defined in
+
+[rx-effects-react/src/mvc.tsx:43](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/mvc.tsx#L43)
+
+---
 
 ### useConst
 
@@ -40,6 +70,10 @@ If the factory is provided, it is called only once.
 
 `T`
 
+#### Defined in
+
+[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useConst.ts#L12)
+
 ---
 
 ### useController
@@ -56,7 +90,7 @@ included explicitly when it is needed.
 
 | Name | Type                                                                          |
 | :--- | :---------------------------------------------------------------------------- |
-| `T`  | extends `Readonly`<{ `destroy`: () => `void` } & `Record`<`string`, `any`\>\> |
+| `T`  | extends `Readonly`<`Record`<`string`, `any`\> & { `destroy`: () => `void` }\> |
 
 #### Parameters
 
@@ -69,11 +103,41 @@ included explicitly when it is needed.
 
 `T`
 
+#### Defined in
+
+[rx-effects-react/src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useController.ts#L18)
+
+---
+
+### useInjectableController
+
+▸ **useInjectableController**<`Result`\>(`factory`): `Controller`<`Result`\>
+
+#### Type parameters
+
+| Name     | Type                                   |
+| :------- | :------------------------------------- |
+| `Result` | extends `Record`<`string`, `unknown`\> |
+
+#### Parameters
+
+| Name      | Type                           |
+| :-------- | :----------------------------- |
+| `factory` | `ControllerFactory`<`Result`\> |
+
+#### Returns
+
+`Controller`<`Result`\>
+
+#### Defined in
+
+[rx-effects-react/src/mvc.tsx:12](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/mvc.tsx#L12)
+
 ---
 
 ### useObservable
 
-▸ **useObservable**<`T`\>(`source$`, `initialValue`, `compare?`): `T`
+▸ **useObservable**<`T`\>(`source$`, `initialValue`, `comparator?`): `T`
 
 Returns a value provided by `source$`.
 
@@ -98,11 +162,15 @@ const value = useObservable<string>(source$, undefined);
 | :------------- | :---------------------------------- | :------------------------------------------- |
 | `source$`      | `Observable`<`T`\>                  | an observable for values                     |
 | `initialValue` | `T`                                 | th first value which is returned by the hook |
-| `compare?`     | (`v1`: `T`, `v2`: `T`) => `boolean` | -                                            |
+| `comparator?`  | (`v1`: `T`, `v2`: `T`) => `boolean` | a comparator for previous and next values    |
 
 #### Returns
 
 `T`
+
+#### Defined in
+
+[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useObservable.ts#L19)
 
 ---
 
@@ -140,6 +208,10 @@ useObserver(source$, observer);
 
 `Subscription`
 
+#### Defined in
+
+[rx-effects-react/src/useObserver.ts:21](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useObserver.ts#L21)
+
 ---
 
 ### useQuery
@@ -163,6 +235,10 @@ Returns a value which is provided by the query.
 #### Returns
 
 `T`
+
+#### Defined in
+
+[rx-effects-react/src/useQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useQuery.ts#L9)
 
 ---
 
@@ -206,30 +282,63 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 `R`
 
+#### Defined in
+
+[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useSelector.ts#L27)
+
 ---
 
-### useStateQuery
+### useStore
 
-▸ **useStateQuery**<`T`\>(`query`): `T`
-
-Returns a value which is provided by the query.
-
-**`Deprecated`**
-
-Use `useQuery()`. This function will be removed at 0.8 version.
+▸ **useStore**<`State`, `Updates`\>(`initialState`, `updates`, `options?`): [`State`, `Updates`, `StoreWithUpdates`<`State`, `Updates`\>]
 
 #### Type parameters
 
-| Name |
-| :--- |
-| `T`  |
+| Name      | Type                                                                                        |
+| :-------- | :------------------------------------------------------------------------------------------ |
+| `State`   | `State`                                                                                     |
+| `Updates` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => `StateMutation`<`State`\>\>\> |
 
 #### Parameters
 
-| Name    | Type                                                             | Description           |
-| :------ | :--------------------------------------------------------------- | :-------------------- |
-| `query` | `Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> | – a query for a value |
+| Name           | Type                                                                                                                                       |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| `initialState` | `State`                                                                                                                                    |
+| `updates`      | `Updates`                                                                                                                                  |
+| `options?`     | `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\> |
 
 #### Returns
 
-`T`
+[`State`, `Updates`, `StoreWithUpdates`<`State`, `Updates`\>]
+
+#### Defined in
+
+[rx-effects-react/src/useStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useStore.ts#L11)
+
+---
+
+### useViewController
+
+▸ **useViewController**<`Result`, `Params`\>(`factory`, `...params`): `Controller`<`Result`\>
+
+#### Type parameters
+
+| Name     | Type                                   |
+| :------- | :------------------------------------- |
+| `Result` | extends `Record`<`string`, `unknown`\> |
+| `Params` | extends `unknown`[]                    |
+
+#### Parameters
+
+| Name        | Type                                         |
+| :---------- | :------------------------------------------- |
+| `factory`   | `ViewControllerFactory`<`Result`, `Params`\> |
+| `...params` | `Params`                                     |
+
+#### Returns
+
+`Controller`<`Result`\>
+
+#### Defined in
+
+[rx-effects-react/src/mvc.tsx:23](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/mvc.tsx#L23)
