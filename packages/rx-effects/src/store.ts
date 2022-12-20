@@ -70,14 +70,6 @@ export function declareStateUpdates<
   return (updates) => updates;
 }
 
-// export function declareStateUpdates<State>(
-//   _state: State | undefined,
-// ): <Updates extends StateUpdates<State> = StateUpdates<State>>(
-//   updates: Updates,
-// ) => Updates {
-//   return (updates) => updates;
-// }
-
 /**
  * Returns a mutation which applies all provided mutations for a state.
  *
