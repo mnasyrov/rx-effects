@@ -1,6 +1,5 @@
 import { Container, injectable, Token } from 'ditox';
 import { Controller } from './controller';
-import { Query } from './query';
 import { createScope, Scope } from './scope';
 import { AnyObject } from './utils';
 
@@ -54,36 +53,36 @@ export function declareController<
 
 export type ViewControllerFactory<
   Service extends AnyObject,
-  ParamQueries extends Query<unknown>[],
-> = (container: Container, ...params: ParamQueries) => Controller<Service>;
+  Params extends unknown[],
+> = (container: Container, ...params: Params) => Controller<Service>;
 
 export function declareViewController<
   Service extends AnyObject,
-  Params extends Query<unknown>[],
+  Params extends unknown[],
 >(
-  factory: (...params: Params) => Service,
+  factory: (scope: Scope, ...params: Params) => Service,
 ): ViewControllerFactory<Service, Params>;
 
 export function declareViewController<
   Dependencies extends DependencyProps,
   Service extends AnyObject,
-  Params extends Query<unknown>[],
+  Params extends unknown[],
 >(
   tokens: TokenProps<Dependencies>,
   factory: (
     deps: Dependencies,
     scope: Scope,
-  ) => Service | ((...params: Params) => Service),
+  ) => Service | ((scope: Scope, ...params: Params) => Service),
 ): ViewControllerFactory<Service, Params>;
 
 export function declareViewController<
   Dependencies extends DependencyProps,
   Service extends AnyObject,
-  Params extends Query<unknown>[],
+  Params extends unknown[],
   Factory extends (
     deps: Dependencies,
     scope: Scope,
-  ) => Service | ((...params: Params) => Service),
+  ) => Service | ((scope: Scope, ...params: Params) => Service),
 >(
   tokensOrFactory: TokenProps<Dependencies> | Factory,
   factory?: Factory,
@@ -100,7 +99,7 @@ export function declareViewController<
         const result = factoryValue(dependencies as Dependencies, scope);
 
         if (typeof result === 'function') {
-          return result(...params);
+          return result(scope, ...params);
         } else {
           return result;
         }

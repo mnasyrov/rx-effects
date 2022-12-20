@@ -123,7 +123,7 @@ describe('declareViewController()', () => {
     const controllerFactory = declareViewController(
       { value: VALUE_TOKEN },
       ({ value }) =>
-        (arg: Query<number>) => ({
+        (scope, arg: Query<number>) => ({
           getValue: () => value * 10 + arg.get(),
         }),
     );
