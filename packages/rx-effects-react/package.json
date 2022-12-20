@@ -48,6 +48,7 @@
     "rx-effects": "0.7.2"
   },
   "peerDependencies": {
+    "ditox-react": ">=2.2.0",
     "react": ">=17.0.0",
     "rxjs": ">=7.0.0"
   },

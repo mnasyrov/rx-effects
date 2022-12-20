@@ -1,5 +1,4 @@
-import { StateMutation } from './stateMutation';
-import { Store } from './store';
+import { StateMutation, Store } from './store';
 
 const MUTATION_NAME_SYMBOL = Symbol();
 const INTERNAL_STORE_SYMBOL = Symbol();
@@ -24,10 +23,12 @@ export function setStateMutationName<State>(
   (mutation as any)[MUTATION_NAME_SYMBOL] = name;
 }
 
+/** @internal */
 export function isInternalStore(store: Store<any>): boolean {
   return (store as any)[INTERNAL_STORE_SYMBOL] === true;
 }
 
+/** @internal */
 export function setInternalStoreFlag(store: Store<any>): void {
   (store as any)[INTERNAL_STORE_SYMBOL] = true;
 }

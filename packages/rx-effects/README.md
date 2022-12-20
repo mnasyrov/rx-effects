@@ -194,45 +194,9 @@ The store implements `Controller` type and has `destroy()` method.
 
 After calling `destroy()` the store stops sending updates for state changes.
 
-### State Declaration
-
-`StateDeclaration` describes the initial state and how to create specific state and store. The type has three fields:
-
-- `initialState` is the initial state.
-- `createState()` returns a state.
-- `createStore()` returns a store for the state.
-
-`createState()` and `createStore()` can take optional state values for overriding the initial state, it's useful for unit tests.
-
-There is `declareState()` helper which returns the declaration:
-
-```ts
-const CART_STATE = declareState<{
-  orders: Array<string>;
-}>({ orders: [] });
-
-// Later...
-const cartStore = CART_STATE.createStore();
-```
-
-Example of a unit test:
-
-```ts
-describe('Some unit', () => {
-  it('should remove an item', () => {
-    const store = CART_STATE.createStore({ orders: ['item1', 'item2'] });
-
-    store.update(removeItem('item2'));
-
-    const expectedState = CART_STATE.createState({ orders: ['item1'] });
-    expect(store.get()).toEqual(expectedState);
-  });
-});
-```
-
 ### Usage of libraries for immutable state
 
-Types and factories for states and store are compatible with external libraries for immutable values like Immer.js or Immutable.js. All state changes are encapsulated by `StateMutation` functions so using the API remains the same. The one thing which should be considered is providing the right state comparators to `StateDeclaration` and `Store`.
+Types and factories for states and store are compatible with external libraries for immutable values like Immer.js or Immutable.js. All state changes are encapsulated by `StateMutation` functions so using the API remains the same. The one thing which should be considered is providing the right state comparators to the `Store`.
 
 #### Immer.js
 

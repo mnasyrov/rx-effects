@@ -8,12 +8,12 @@ import {
   of,
   tap,
   throwError,
-  timeout,
   timer,
 } from 'rxjs';
 import { switchMap, take, toArray } from 'rxjs/operators';
 import { createAction } from './action';
-import { createEffect, GLOBAL_EFFECT_UNHANDLED_ERROR$ } from './effect';
+import { createEffect } from './effect';
+import { GLOBAL_EFFECT_UNHANDLED_ERROR$ } from './effectController';
 
 describe('Effect', () => {
   describe('result$', () => {
@@ -50,7 +50,7 @@ describe('Effect', () => {
 
       effect.handle(from([1, 2, 3]));
       expect(await results).toEqual([
-        { event: 2, error: new Error('test error') },
+        { origin: 'handler', event: 2, error: new Error('test error') },
       ]);
     });
 
@@ -63,6 +63,7 @@ describe('Effect', () => {
       effect.handle(of(1));
 
       expect(await promise).toEqual({
+        origin: 'handler',
         event: 1,
         error: new Error('test error'),
       });
@@ -78,7 +79,24 @@ describe('Effect', () => {
       const results = getFirstValues(effect.final$, 3);
 
       effect.handle(from([1, 2, 3]));
-      expect(await results).toEqual([1, 2, 3]);
+      expect(await results).toEqual([
+        {
+          type: 'result',
+          event: 1,
+          result: 2,
+        },
+        {
+          type: 'error',
+          error: new Error('test error'),
+          event: 2,
+          origin: 'handler',
+        },
+        {
+          type: 'result',
+          event: 3,
+          result: 6,
+        },
+      ]);
     });
   });
 
@@ -117,6 +135,13 @@ describe('Effect', () => {
   });
 
   describe('handle()', () => {
+    it('should fail in case the source is not observable, action or query', () => {
+      const effect = createEffect(() => undefined);
+      expect(() => effect.handle('invalid-value' as any)).toThrow(
+        new TypeError('Unexpected source type'),
+      );
+    });
+
     it('should handle an action', async () => {
       const action = createAction<number>();
       const effect = createEffect((value: number) => value * 2);
@@ -130,7 +155,7 @@ describe('Effect', () => {
 
       expect(await result).toBe(2);
       expect(await done).toEqual({ event: 1, result: 2 });
-      expect(await final).toBe(1);
+      expect(await final).toEqual({ type: 'result', event: 1, result: 2 });
     });
 
     it('should propagate in error from the handler', async () => {
@@ -146,10 +171,16 @@ describe('Effect', () => {
       action(1);
 
       await expect(errorPromise).resolves.toEqual({
+        origin: 'handler',
         event: 1,
         error: new Error('test error'),
       });
-      await expect(finalPromise).resolves.toBe(1);
+      await expect(finalPromise).resolves.toEqual({
+        type: 'error',
+        origin: 'handler',
+        event: 1,
+        error: new Error('test error'),
+      });
     });
 
     it('should handle an observable', async () => {
@@ -163,57 +194,41 @@ describe('Effect', () => {
 
       expect(await result).toBe(2);
       expect(await done).toEqual({ event: 1, result: 2 });
-      expect(await final).toBe(1);
+      expect(await final).toEqual({ type: 'result', event: 1, result: 2 });
     });
 
-    it('should handle completion of the observable', async () => {
+    it('should propagate an error from the source to error$ and final$ observables', async () => {
       const effect = createEffect((value: number) => value * 2);
 
-      const onSourceCompleted = jest.fn();
-      effect.handle(of(1), {
-        onSourceCompleted,
+      const errorPromise = firstValueFrom(effect.error$);
+      const finalPromise = firstValueFrom(effect.final$);
+
+      const theError = new Error('test error');
+
+      expect(() => effect.handle(throwError(() => theError))).not.toThrow();
+
+      await expect(errorPromise).resolves.toEqual({
+        origin: 'source',
+        error: theError,
       });
-
-      expect(onSourceCompleted).toBeCalledTimes(1);
-    });
-
-    it('should handle an error of the observable', async () => {
-      const effect = createEffect((value: number) => value * 2);
-
-      const onSourceFailed = jest.fn();
-      effect.handle(
-        throwError(() => new Error('test error')),
-        {
-          onSourceFailed,
-        },
-      );
-
-      expect(onSourceFailed).toBeCalledTimes(1);
-      expect(onSourceFailed).toBeCalledWith(new Error('test error'));
-    });
-
-    it('should do nothing in case the event source throws an error and onSourceFailed callback is not provided', async () => {
-      const effect = createEffect((value: number) => value * 2);
-
-      const finalPromise = firstValueFrom(effect.final$.pipe(timeout(10)));
-
-      expect(() =>
-        effect.handle(throwError(() => new Error('test error'))),
-      ).not.toThrowError();
-
-      await expect(finalPromise).rejects.toThrowError('Timeout has occurred');
+      await expect(finalPromise).resolves.toEqual({
+        type: 'error',
+        origin: 'source',
+        error: theError,
+      });
     });
 
     it('should handle error from the source', async () => {
       const effect = createEffect((value: number) => value * 2);
 
       const onSourceFailed = jest.fn();
-      effect.handle(
-        throwError(() => new Error('test error')),
-        { onSourceFailed },
-      );
+      effect.error$.subscribe(({ error }) => onSourceFailed(error));
+      effect.handle(throwError(() => new Error('test error')));
 
-      expect(onSourceFailed).nthCalledWith(1, new Error('test error'));
+      expect(onSourceFailed).toHaveBeenNthCalledWith(
+        1,
+        new Error('test error'),
+      );
     });
 
     it('should execute an observable in case the handler returns it', async () => {
@@ -254,6 +269,7 @@ describe('Effect', () => {
       expect(await pendingCountPromise).toEqual([0, 1, 2, 1, 0]);
 
       expect(await errorPromise).toEqual({
+        origin: 'handler',
         event: 2,
         error: new Error('test error'),
       });
@@ -273,9 +289,9 @@ describe('Effect', () => {
       effect.destroy();
       action(3);
 
-      expect(listener).toBeCalledTimes(2);
-      expect(listener).nthCalledWith(1, 1);
-      expect(listener).nthCalledWith(2, 2);
+      expect(listener).toHaveBeenCalledTimes(2);
+      expect(listener).toHaveBeenNthCalledWith(1, 1);
+      expect(listener).toHaveBeenNthCalledWith(2, 2);
     });
 
     it('should completes result observables', async () => {
@@ -367,7 +383,11 @@ describe('GLOBAL_EFFECT_UNHANDLED_ERROR$', () => {
     const promise = firstValueFrom(GLOBAL_EFFECT_UNHANDLED_ERROR$);
     effect.handle(of(1));
 
-    expect(await promise).toEqual({ event: 1, error: 'test error' });
+    expect(await promise).toEqual({
+      origin: 'handler',
+      event: 1,
+      error: 'test error',
+    });
   });
 
   it('should print an error to the console in case it is not observed', async () => {
@@ -381,7 +401,8 @@ describe('GLOBAL_EFFECT_UNHANDLED_ERROR$', () => {
 
     effect.handle(of(1));
 
-    expect(consoleError).toBeCalledWith('Uncaught error in Effect', {
+    expect(consoleError).toHaveBeenCalledWith('Uncaught error in Effect', {
+      origin: 'handler',
       event: 1,
       error: 'test error',
     });

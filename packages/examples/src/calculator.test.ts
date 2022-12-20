@@ -3,10 +3,9 @@ import {
   Controller,
   createAction,
   createScope,
-  declareState,
+  createStore,
   Effect,
   Scope,
-  StateDeclaration,
   StateMutation,
   Store,
 } from 'rx-effects';
@@ -16,13 +15,11 @@ import { take, toArray } from 'rxjs/operators';
 // Example usage of RxEffects: a calculator which has actions: increment,
 // decrement, add, subtract and reset.
 
-type CalculatorState = { value: number };
+type CalculatorState = Readonly<{ value: number }>;
 type CalculatorStateMutation = StateMutation<CalculatorState>;
 type CalculatorStore = Store<CalculatorState>;
 
-const CALCULATOR_STATE: StateDeclaration<CalculatorState> = declareState({
-  value: 0,
-});
+const CALCULATOR_STATE: CalculatorState = { value: 0 };
 
 const addValue: (value: number) => CalculatorStateMutation =
   (value) => (state) => ({ ...state, value: state.value + value });
@@ -49,9 +46,7 @@ function createCalculatorEffects(
     return -value;
   });
 
-  const resetEffect = scope.createEffect(() =>
-    store.set(CALCULATOR_STATE.initialState),
-  );
+  const resetEffect = scope.createEffect(() => store.set(CALCULATOR_STATE));
 
   return {
     incrementEffect,
@@ -102,25 +97,17 @@ function createCalculatorController(
   subtractEffect.handle(subtractAction);
   resetEffect.handle(resetAction);
 
-  scope.add(
-    incrementEffect.done$.subscribe(() =>
-      eventBus({ type: 'added', value: 1 }),
-    ),
+  scope.subscribe(incrementEffect.done$, () =>
+    eventBus({ type: 'added', value: 1 }),
   );
-  scope.add(
-    decrementEffect.done$.subscribe(() =>
-      eventBus({ type: 'subtracted', value: 1 }),
-    ),
+  scope.subscribe(decrementEffect.done$, () =>
+    eventBus({ type: 'subtracted', value: 1 }),
   );
-  scope.add(
-    sumEffect.done$.subscribe(({ event }) =>
-      eventBus({ type: 'added', value: event }),
-    ),
+  scope.subscribe(sumEffect.done$, ({ event }) =>
+    eventBus({ type: 'added', value: event }),
   );
-  scope.add(
-    subtractEffect.done$.subscribe(({ event }) =>
-      eventBus({ type: 'subtracted', value: event }),
-    ),
+  scope.subscribe(subtractEffect.done$, ({ event }) =>
+    eventBus({ type: 'subtracted', value: event }),
   );
 
   return {
@@ -136,7 +123,7 @@ function createCalculatorController(
 
 describe('Example usage of RxEffects: Calculator', () => {
   it('should increment the value', async () => {
-    const store = CALCULATOR_STATE.createStore();
+    const store = createStore(CALCULATOR_STATE);
     const scope = createScope();
     const incrementAction = createAction();
 
@@ -150,7 +137,7 @@ describe('Example usage of RxEffects: Calculator', () => {
   });
 
   it('should unsubscribe effects on scope.destroy()', async () => {
-    const store = CALCULATOR_STATE.createStore({ value: 10 });
+    const store = createStore({ ...CALCULATOR_STATE, value: 10 });
     const scope = createScope();
     const decrementAction = createAction();
 
@@ -166,7 +153,7 @@ describe('Example usage of RxEffects: Calculator', () => {
   });
 
   it('should create actions inside the controller', async () => {
-    const store = CALCULATOR_STATE.createStore({ value: 0 });
+    const store = createStore({ ...CALCULATOR_STATE, value: 0 });
     const eventBus = createAction<ControllerEvents>();
 
     const controller = createCalculatorController(store, eventBus);

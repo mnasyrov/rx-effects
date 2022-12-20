@@ -26,13 +26,3 @@ export type QueryOptions<T, K> = Readonly<{
         keySelector?: (value: T) => K;
       };
 }>;
-
-/**
- * @deprecated Deprecated, use `Query` type. Will be removed at 0.8 version.
- */
-export type StateQuery<T> = Query<T>;
-
-/**
- * @deprecated Deprecated, use `QueryOptions` type. Will be removed at 0.8 version.
- */
-export type StateQueryOptions<T, K> = QueryOptions<T, K>;

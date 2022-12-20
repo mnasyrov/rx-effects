@@ -1,7 +1,6 @@
 import { firstValueFrom, materialize, Subject, toArray } from 'rxjs';
 import { createAction } from './action';
 import { createScope } from './scope';
-import { declareState } from './stateDeclaration';
 import { createStore } from './store';
 
 describe('Scope', () => {
@@ -13,7 +12,7 @@ describe('Scope', () => {
       scope.add(teardown);
       scope.destroy();
 
-      expect(teardown).toBeCalledTimes(1);
+      expect(teardown).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -24,7 +23,7 @@ describe('Scope', () => {
       const action = createAction<number>();
       const handler = jest.fn((value) => value * 3);
 
-      const effect = scope.handleAction(action, handler);
+      const effect = scope.handle(action, handler);
       scope.destroy();
 
       const resultPromise = firstValueFrom(effect.result$.pipe(materialize()));
@@ -60,7 +59,7 @@ describe('Scope', () => {
       scope.createController(() => ({ destroy }));
 
       scope.destroy();
-      expect(destroy).toBeCalledTimes(1);
+      expect(destroy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -78,21 +77,6 @@ describe('Scope', () => {
     });
   });
 
-  describe('createDeclaredStore()', () => {
-    it('should be able to unsubscribe the created store bya declaration', async () => {
-      const scope = createScope();
-
-      const declaration = declareState(1);
-      const store = scope.createDeclaredStore(declaration);
-      const valuePromise = firstValueFrom(store.value$.pipe(toArray()));
-
-      store.set(2);
-      scope.destroy();
-      store.set(3);
-      expect(await valuePromise).toEqual([1, 2]);
-    });
-  });
-
   describe('handleQuery()', () => {
     it('should be able to unsubscribe the created effect from the query', async () => {
       const store = createStore(1);
@@ -101,7 +85,7 @@ describe('Scope', () => {
 
       const handler = jest.fn((value) => value * 3);
 
-      const effect = scope.handleQuery(store, handler);
+      const effect = scope.handle(store, handler);
 
       const resultPromise = firstValueFrom(
         effect.result$.pipe(materialize(), toArray()),
@@ -132,9 +116,9 @@ describe('Scope', () => {
       scope.destroy();
       subject.next(3);
 
-      expect(handler).toBeCalledTimes(1);
-      expect(handler).lastCalledWith(2);
-      expect(handler).lastReturnedWith(6);
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenLastCalledWith(2);
+      expect(handler).toHaveLastReturnedWith(6);
     });
 
     it('should be subscribe an observer', async () => {
@@ -152,9 +136,9 @@ describe('Scope', () => {
       scope.destroy();
       subject.next(3);
 
-      expect(handler).toBeCalledTimes(1);
-      expect(handler).lastCalledWith(2);
-      expect(handler).lastReturnedWith(6);
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenLastCalledWith(2);
+      expect(handler).toHaveLastReturnedWith(6);
     });
   });
 });

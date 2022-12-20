@@ -1,6 +1,6 @@
 import { combineLatest, identity, Observable, shareReplay } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { DEFAULT_COMPARATOR } from '../utils';
+import { DEFAULT_COMPARATOR } from './utils';
 import { Query, QueryOptions } from './query';
 
 /**
@@ -44,7 +44,7 @@ export function mergeQueries<
   queries: [
     ...{
       [K in keyof Values]: Query<Values[K]>;
-    }
+    },
   ],
   merger: (...values: Values) => Result,
   options?: QueryOptions<Result, ResultKey>,

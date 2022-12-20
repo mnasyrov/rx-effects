@@ -1,5 +1,6 @@
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import { mapQuery, mergeQueries, Query } from './queries';
+import { Query } from './query';
+import { mapQuery, mergeQueries } from './queryMappers';
 import { createStore } from './store';
 
 describe('mapQuery()', () => {
@@ -34,10 +35,10 @@ describe('mapQuery()', () => {
     sourceValue$.next(1);
     sourceValue$.next(1);
 
-    expect(listener).toBeCalledTimes(3);
-    expect(listener).nthCalledWith(1, 0);
-    expect(listener).nthCalledWith(2, 1);
-    expect(listener).nthCalledWith(3, 1);
+    expect(listener).toHaveBeenCalledTimes(3);
+    expect(listener).toHaveBeenNthCalledWith(1, 0);
+    expect(listener).toHaveBeenNthCalledWith(2, 1);
+    expect(listener).toHaveBeenNthCalledWith(3, 1);
   });
 
   it('should produce distinct values by default', () => {
@@ -54,9 +55,9 @@ describe('mapQuery()', () => {
     sourceValue$.next(1);
     sourceValue$.next(1);
 
-    expect(listener).toBeCalledTimes(2);
-    expect(listener).nthCalledWith(1, 0);
-    expect(listener).nthCalledWith(2, 1);
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenNthCalledWith(1, 0);
+    expect(listener).toHaveBeenNthCalledWith(2, 1);
   });
 
   it('should produce distinct values when distinct = true', () => {
@@ -73,9 +74,9 @@ describe('mapQuery()', () => {
     sourceValue$.next(1);
     sourceValue$.next(1);
 
-    expect(listener).toBeCalledTimes(2);
-    expect(listener).nthCalledWith(1, 0);
-    expect(listener).nthCalledWith(2, 1);
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenNthCalledWith(1, 0);
+    expect(listener).toHaveBeenNthCalledWith(2, 1);
   });
 
   it('should produce distinct values with the custom comparator', () => {
@@ -96,10 +97,10 @@ describe('mapQuery()', () => {
     sourceValue$.next({ v: 1 });
     sourceValue$.next({ v: 2 });
 
-    expect(listener).toBeCalledTimes(3);
-    expect(listener).nthCalledWith(1, { v: 0 });
-    expect(listener).nthCalledWith(2, { v: 1 });
-    expect(listener).nthCalledWith(3, { v: 2 });
+    expect(listener).toHaveBeenCalledTimes(3);
+    expect(listener).toHaveBeenNthCalledWith(1, { v: 0 });
+    expect(listener).toHaveBeenNthCalledWith(2, { v: 1 });
+    expect(listener).toHaveBeenNthCalledWith(3, { v: 2 });
   });
 
   it('should produce distinct values with the custom keySelector', () => {
@@ -120,10 +121,10 @@ describe('mapQuery()', () => {
     sourceValue$.next({ v: 1 });
     sourceValue$.next({ v: 2 });
 
-    expect(listener).toBeCalledTimes(3);
-    expect(listener).nthCalledWith(1, { v: 0 });
-    expect(listener).nthCalledWith(2, { v: 1 });
-    expect(listener).nthCalledWith(3, { v: 2 });
+    expect(listener).toHaveBeenCalledTimes(3);
+    expect(listener).toHaveBeenNthCalledWith(1, { v: 0 });
+    expect(listener).toHaveBeenNthCalledWith(2, { v: 1 });
+    expect(listener).toHaveBeenNthCalledWith(3, { v: 2 });
   });
 
   it('should return the same calculated value if there is a subscription and the source was not changed', async () => {
@@ -209,10 +210,10 @@ describe('mergeQueries()', () => {
     store2.set({ k: 1, value: 0 });
     store2.set({ k: 2, value: 1 });
 
-    expect(listener).toBeCalledTimes(3);
-    expect(listener).nthCalledWith(1, { a: 0, b: 0 });
-    expect(listener).nthCalledWith(2, { a: 0, b: 0 });
-    expect(listener).nthCalledWith(3, { a: 0, b: 1 });
+    expect(listener).toHaveBeenCalledTimes(3);
+    expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });
+    expect(listener).toHaveBeenNthCalledWith(2, { a: 0, b: 0 });
+    expect(listener).toHaveBeenNthCalledWith(3, { a: 0, b: 1 });
   });
 
   it('should produce distinct values for each source emission by default', () => {
@@ -226,9 +227,9 @@ describe('mergeQueries()', () => {
     store2.set({ k: 1, value: 0 });
     store2.set({ k: 2, value: 1 });
 
-    expect(listener).toBeCalledTimes(2);
-    expect(listener).nthCalledWith(1, 0);
-    expect(listener).nthCalledWith(2, 1);
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenNthCalledWith(1, 0);
+    expect(listener).toHaveBeenNthCalledWith(2, 1);
   });
 
   it('should produce distinct values with the custom comparator', () => {
@@ -247,9 +248,9 @@ describe('mergeQueries()', () => {
     store2.set({ k: 2, value: 2 });
     store1.set(1);
 
-    expect(listener).toBeCalledTimes(2);
-    expect(listener).nthCalledWith(1, { a: 0, b: 0 });
-    expect(listener).nthCalledWith(2, { a: 1, b: 2 });
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });
+    expect(listener).toHaveBeenNthCalledWith(2, { a: 1, b: 2 });
   });
 
   it('should produce distinct values with the custom keySelector', () => {
@@ -268,9 +269,9 @@ describe('mergeQueries()', () => {
     store2.set({ k: 2, value: 2 });
     store1.set(1);
 
-    expect(listener).toBeCalledTimes(2);
-    expect(listener).nthCalledWith(1, { a: 0, b: 0 });
-    expect(listener).nthCalledWith(2, { a: 1, b: 2 });
+    expect(listener).toHaveBeenCalledTimes(2);
+    expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });
+    expect(listener).toHaveBeenNthCalledWith(2, { a: 1, b: 2 });
   });
 
   it('should return the same calculated value if there is a subscription and the source was not changed', async () => {

@@ -10,7 +10,7 @@ describe('useObserver()', () => {
     renderHook(() => useObserver(source$, listener));
 
     source$.next(1);
-    expect(listener).nthCalledWith(1, 1);
+    expect(listener).toHaveBeenNthCalledWith(1, 1);
   });
 
   it('should subscribe an observer', () => {
@@ -24,8 +24,8 @@ describe('useObserver()', () => {
     source$.next(1);
     source$.complete();
 
-    expect(observer.next).toBeCalledWith(1);
-    expect(observer.complete).toBeCalled();
+    expect(observer.next).toHaveBeenCalledWith(1);
+    expect(observer.complete).toHaveBeenCalled();
   });
 
   it('should resubscribe if a source or listener is changed', () => {
@@ -41,9 +41,9 @@ describe('useObserver()', () => {
     rerender({ source$: source2$, listener: listener1 });
     rerender({ source$: source2$, listener: listener2 });
 
-    expect(listener1).nthCalledWith(1, 1);
-    expect(listener1).nthCalledWith(2, 2);
-    expect(listener2).nthCalledWith(1, 2);
+    expect(listener1).toHaveBeenNthCalledWith(1, 1);
+    expect(listener1).toHaveBeenNthCalledWith(2, 2);
+    expect(listener2).toHaveBeenNthCalledWith(1, 2);
   });
 
   it('should return a subscription', () => {
@@ -55,8 +55,8 @@ describe('useObserver()', () => {
     result.current.unsubscribe();
     source$.next(2);
 
-    expect(listener).toBeCalledTimes(1);
-    expect(listener).toBeCalledWith(1);
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(1);
   });
 
   it('should unsubscribe on unmount', () => {
@@ -70,8 +70,8 @@ describe('useObserver()', () => {
     unmount();
     source$.next(2);
 
-    expect(listener).toBeCalledTimes(1);
-    expect(listener).toBeCalledWith(1);
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(1);
     expect(result.current.closed).toBe(true);
   });
 
@@ -89,9 +89,9 @@ describe('useObserver()', () => {
     rerender({ listener: listener2 });
     source$.next(2);
 
-    expect(listener1).toBeCalledTimes(1);
-    expect(listener1).toBeCalledWith(1);
+    expect(listener1).toHaveBeenCalledTimes(1);
+    expect(listener1).toHaveBeenCalledWith(1);
 
-    expect(listener2).toBeCalledTimes(0);
+    expect(listener2).toHaveBeenCalledTimes(0);
   });
 });

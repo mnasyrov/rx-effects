@@ -1,8 +1,6 @@
 import { createAction } from './action';
 import { createScope } from './scope';
-import { StateMutation } from './stateMutation';
-import { createStore } from './store';
-import { createStoreActions } from './storeActions';
+import { createStore, createStoreUpdates, StateMutation } from './store';
 import { registerStoreExtension } from './storeExtensions';
 import { createStoreLoggerExtension } from './storeLoggerExtension';
 
@@ -15,45 +13,63 @@ describe('createStoreLoggerExtension()', () => {
     const increment: StateMutation<number> = (state) => state + 1;
 
     const store = createStore<number>(0, { name: 'test' });
-    const actions = createStoreActions(store, {
+    const updates = createStoreUpdates(store.update, {
       increment: () => increment,
     });
 
     store.set(1);
     store.update(increment);
-    actions.increment();
+    updates.increment();
     store.destroy();
 
-    expect(logger).nthCalledWith(1, 'test#1', 'created');
+    expect(logger).toHaveBeenNthCalledWith(1, 'test#1', 'created');
 
-    expect(logger).nthCalledWith(2, 'test#1', 'mutation', 'anonymous', {
+    expect(logger).toHaveBeenNthCalledWith(
+      2,
+      'test#1',
+      'mutation',
+      'anonymous',
+      {
+        nextState: 1,
+        prevState: 0,
+      },
+    );
+    expect(logger).toHaveBeenNthCalledWith(3, 'test#1', 'updated', {
       nextState: 1,
       prevState: 0,
     });
-    expect(logger).nthCalledWith(3, 'test#1', 'updated', {
-      nextState: 1,
-      prevState: 0,
-    });
 
-    expect(logger).nthCalledWith(4, 'test#1', 'mutation', 'anonymous', {
+    expect(logger).toHaveBeenNthCalledWith(
+      4,
+      'test#1',
+      'mutation',
+      'anonymous',
+      {
+        nextState: 2,
+        prevState: 1,
+      },
+    );
+    expect(logger).toHaveBeenNthCalledWith(5, 'test#1', 'updated', {
       nextState: 2,
       prevState: 1,
     });
-    expect(logger).nthCalledWith(5, 'test#1', 'updated', {
-      nextState: 2,
-      prevState: 1,
-    });
 
-    expect(logger).nthCalledWith(6, 'test#1', 'mutation', 'increment', {
+    expect(logger).toHaveBeenNthCalledWith(
+      6,
+      'test#1',
+      'mutation',
+      'increment',
+      {
+        nextState: 3,
+        prevState: 2,
+      },
+    );
+    expect(logger).toHaveBeenNthCalledWith(7, 'test#1', 'updated', {
       nextState: 3,
       prevState: 2,
     });
-    expect(logger).nthCalledWith(7, 'test#1', 'updated', {
-      nextState: 3,
-      prevState: 2,
-    });
 
-    expect(logger).nthCalledWith(8, 'test#1', 'destroyed');
+    expect(logger).toHaveBeenNthCalledWith(8, 'test#1', 'destroyed');
   });
 
   it('should log only store ID in case its name is empty', () => {
@@ -62,7 +78,11 @@ describe('createStoreLoggerExtension()', () => {
     registerStoreExtension(createStoreLoggerExtension(logger));
 
     createStore<number>(0);
-    expect(logger).nthCalledWith(1, expect.stringMatching(/^#\d/), 'created');
+    expect(logger).toHaveBeenNthCalledWith(
+      1,
+      expect.stringMatching(/^#\d/),
+      'created',
+    );
   });
 
   it('should not log events from internal stores', () => {
@@ -72,11 +92,11 @@ describe('createStoreLoggerExtension()', () => {
 
     const scope = createScope();
     const action = createAction<number>();
-    scope.handleAction(action, () => {
+    scope.handle(action, () => {
       // Do nothing
     });
     action(1);
 
-    expect(logger).toBeCalledTimes(0);
+    expect(logger).toHaveBeenCalledTimes(0);
   });
 });

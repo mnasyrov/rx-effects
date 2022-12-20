@@ -1,9 +1,37 @@
 import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { bufferWhen, toArray } from 'rxjs/operators';
-import { mapQuery, mergeQueries } from './queries';
-import { StateMutation } from './stateMutation';
-import { createStore, Store } from './store';
+import { mapQuery, mergeQueries } from './queryMappers';
+import {
+  createStore,
+  createStoreUpdates,
+  declareStateUpdates,
+  pipeStateMutations,
+  StateMutation,
+  StateUpdates,
+  Store,
+  withStoreUpdates,
+} from './store';
+import { STORE_EVENT_BUS } from './storeEvents';
 import { OBJECT_COMPARATOR } from './utils';
+
+describe('pipeStateMutations()', () => {
+  type State = { value: number };
+
+  it('should compose the provided mutations to a single mutation', () => {
+    const composedMutation: StateMutation<State> = pipeStateMutations([
+      () => ({ value: 10 }),
+      (state) => ({ value: state.value + 1 }),
+      (state) => ({ value: state.value * 2 }),
+    ]);
+
+    const store = withStoreUpdates(createStore({ value: 0 }), {
+      increment: () => (state: State) => state,
+    });
+    store.update(composedMutation);
+    store.updates.increment();
+    expect(store.get().value).toBe(22);
+  });
+});
 
 describe('Store', () => {
   type State = { value: number; data?: string };
@@ -14,10 +42,10 @@ describe('Store', () => {
       expect(store.get().value).toBe(1);
     });
 
-    it('should use a custom "stateCompare" predicate', async () => {
+    it('should use a custom comparator', async () => {
       const store = createStore<State>(
         { value: 1, data: 'a' },
-        { stateComparator: (s1, s2) => s1.value === s2.value },
+        { comparator: (s1, s2) => s1.value === s2.value },
       );
 
       const changes = await collectChanges(store.value$, () => {
@@ -172,6 +200,38 @@ describe('Store', () => {
       expect(query).toBe(store);
     });
   });
+
+  describe('destroy()', () => {
+    it('should complete an internal store', async () => {
+      const store = createStore<number>(1);
+
+      const changes = await collectChanges(store.value$, () => {
+        store.set(2);
+        store.destroy();
+        store.set(3);
+      });
+
+      expect(changes).toEqual([1, 2]);
+    });
+
+    it('should send a signal about the destroyed store to STORE_EVENT_BUS', async () => {
+      const store = createStore<number>(1);
+
+      const events = await collectChanges(STORE_EVENT_BUS, () => {
+        store.destroy();
+      });
+
+      expect(events).toEqual([{ type: 'destroyed', store }]);
+    });
+
+    it('should call `onDestroy` callback', async () => {
+      const onDestroy = jest.fn();
+      const store = createStore<number>(1, { onDestroy });
+
+      store.destroy();
+      expect(onDestroy).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 
 describe('Concurrent Store updates', () => {
@@ -283,6 +343,95 @@ describe('Concurrent Store updates', () => {
   });
 });
 
+describe('createStoreUpdates()', () => {
+  it('should provide actions to change a state of a store', () => {
+    const store = createStore(1);
+
+    const updates = createStoreUpdates(store.update, {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    });
+
+    updates.add(2);
+    expect(store.get()).toBe(3);
+
+    updates.multiply(3);
+    expect(store.get()).toBe(9);
+  });
+});
+
+describe('withStoreUpdates()', () => {
+  it('should use return a proxy for the store which is enhanced by update actions', () => {
+    const store = withStoreUpdates(createStore(1), {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    });
+
+    store.updates.add(2);
+    expect(store.get()).toBe(3);
+
+    store.updates.multiply(3);
+    expect(store.get()).toBe(9);
+  });
+
+  it('should use a declared state mutations', () => {
+    const stateUpdates: StateUpdates<number> = {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    };
+
+    const store = withStoreUpdates(createStore(1), stateUpdates);
+
+    store.updates.add(2);
+    expect(store.get()).toBe(3);
+
+    store.updates.multiply(3);
+    expect(store.get()).toBe(9);
+  });
+
+  it('should return a proxy which shares the state with the original store', () => {
+    const originalStore = createStore(1);
+
+    const proxyStore = withStoreUpdates(originalStore, {
+      add: (value: number) => (state) => state + value,
+    });
+
+    proxyStore.updates.add(2);
+    expect(proxyStore.get()).toBe(3);
+    expect(originalStore.get()).toBe(3);
+  });
+});
+
+describe('declareStateUpdates()', () => {
+  it('should declare a record of state mutations #1', () => {
+    const stateUpdates = declareStateUpdates<number>()({
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    });
+
+    const store = createStore<number>(1);
+    const storeUpdates = createStoreUpdates(store.update, stateUpdates);
+
+    storeUpdates.add(2);
+    storeUpdates.multiply(4);
+    expect(store.get()).toBe(12);
+  });
+
+  it('should declare a record of state mutations #2', () => {
+    const stateUpdates = declareStateUpdates(0, {
+      add: (value: number) => (state) => state + value,
+      multiply: (value: number) => (state) => state * value,
+    });
+
+    const store = createStore<number>(1);
+    const storeUpdates = createStoreUpdates(store.update, stateUpdates);
+
+    storeUpdates.add(2);
+    storeUpdates.multiply(4);
+    expect(store.get()).toBe(12);
+  });
+});
+
 function collectChanges<T>(
   source$: Observable<T>,
   action: () => void,
@@ -308,7 +457,7 @@ function createTestStore<State>(
   const patch =
     (partial: Partial<State>) =>
     (state: State): State => ({ ...state, ...partial });
-  const store = createStore(initialState, { stateComparator: comparator });
+  const store = createStore(initialState, { comparator: comparator });
 
   const history: State[] = [];
   store.value$.subscribe((state) => history.push(state));
