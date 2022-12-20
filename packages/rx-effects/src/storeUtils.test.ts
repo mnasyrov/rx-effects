@@ -107,4 +107,29 @@ describe('declareStoreWithUpdates()', () => {
     store.updates.decrease();
     expect(store.get()).toBe(10);
   });
+
+  it('should work with a discriminate type of a state', () => {
+    type State = { status: 'success' } | { status: 'error'; error: string };
+
+    const initialState: State = { status: 'success' };
+
+    const stateUpdates = declareStateUpdates<State>()({
+      setSuccess: () => () => ({ status: 'success' }),
+      setError: (error: string) => () => ({ status: 'error', error: error }),
+    });
+
+    const createStore = declareStoreWithUpdates<State, typeof stateUpdates>(
+      initialState,
+      stateUpdates,
+    );
+
+    const store = createStore();
+    expect(store.get()).toEqual({ status: 'success' });
+
+    store.updates.setError('fail');
+    expect(store.get()).toEqual({ status: 'error', error: 'fail' });
+
+    store.updates.setSuccess();
+    expect(store.get()).toEqual({ status: 'success' });
+  });
 });

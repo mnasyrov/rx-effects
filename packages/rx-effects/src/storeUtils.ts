@@ -53,8 +53,8 @@ export function declareStoreWithUpdates<
   options?: StoreOptions<State>,
 ) => StoreWithUpdates<State, Updates> {
   return (state = initialState, options?: StoreOptions<State>) => {
-    return withStoreUpdates(
-      createStore(state, { ...baseOptions, ...options }),
+    return withStoreUpdates<State, Updates>(
+      createStore<State>(state, { ...baseOptions, ...options }),
       updates,
     );
   };
