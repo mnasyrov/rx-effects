@@ -15,6 +15,7 @@ describe('pipeStore', () => {
     expect(result.get()).toBe(10);
 
     source.set(2);
+    source.notify();
     expect(result.get()).toBe(20);
   });
 

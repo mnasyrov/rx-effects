@@ -71,8 +71,12 @@ describe('Scope', () => {
       const valuePromise = firstValueFrom(store.value$.pipe(toArray()));
 
       store.set(2);
+      await 0;
+
       scope.destroy();
       store.set(3);
+      await 0;
+
       expect(await valuePromise).toEqual([1, 2]);
     });
   });
@@ -91,9 +95,11 @@ describe('Scope', () => {
         effect.result$.pipe(materialize(), toArray()),
       );
       store.set(2);
+      await 0;
 
       scope.destroy();
       store.set(3);
+      await 0;
 
       expect(await resultPromise).toEqual([
         { hasValue: true, kind: 'N', value: 6 },

@@ -1,10 +1,10 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, Query } from 'rx-effects';
 import { monitorSubscriptionCount } from './test/testUtils';
 import { useQuery } from './useQuery';
 
 describe('useQuery()', () => {
-  it('should render with a current value and watch for value changes', () => {
+  it('should render with a current value and watch for value changes', async () => {
     const store = createStore(1);
     let subscriptionCount = 0;
 
@@ -20,11 +20,13 @@ describe('useQuery()', () => {
     expect(subscriptionCount).toBe(1);
 
     act(() => store.set(2));
-    expect(result.current).toBe(2);
+    await waitFor(() => expect(result.current).toBe(2));
 
     unmount();
     act(() => store.set(3));
-    expect(result.current).toBe(2);
-    expect(subscriptionCount).toBe(0);
+    await waitFor(() => {
+      expect(result.current).toBe(2);
+      expect(subscriptionCount).toBe(0);
+    });
   });
 });

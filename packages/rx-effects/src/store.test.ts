@@ -1,5 +1,6 @@
-import { firstValueFrom, Observable, Subject } from 'rxjs';
-import { bufferWhen, toArray } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
+import { toArray } from 'rxjs/operators';
+import { collectChanges } from '../test/testUtils';
 import { mapQuery, mergeQueries } from './queryMappers';
 import {
   createStore,
@@ -69,7 +70,7 @@ describe('Store', () => {
         store.set({ value: 3 });
       });
 
-      expect(changes).toEqual([{ value: 1 }, { value: 2 }, { value: 3 }]);
+      expect(changes).toEqual([{ value: 1 }, { value: 3 }]);
     });
   });
 
@@ -136,7 +137,7 @@ describe('Store', () => {
         store.set({ value: 3 });
       });
 
-      expect(changes).toEqual([1, 2, 3]);
+      expect(changes).toEqual([1, 3]);
     });
 
     it('should use the provided valueCompare', async () => {
@@ -170,7 +171,7 @@ describe('Store', () => {
       });
 
       expect(query.get()).toEqual(3);
-      expect(changes).toEqual([1, 2, 3]);
+      expect(changes).toEqual([1, 3]);
     });
 
     it('should use the provided valueCompare', async () => {
@@ -211,7 +212,7 @@ describe('Store', () => {
         store.set(3);
       });
 
-      expect(changes).toEqual([1, 2]);
+      expect(changes).toEqual([1]);
     });
 
     it('should send a signal about the destroyed store to STORE_EVENT_BUS', async () => {
@@ -235,16 +236,13 @@ describe('Store', () => {
 });
 
 describe('Concurrent Store updates', () => {
-  it('should update the store and apply derived updates until completing the current one', () => {
-    const { store, patch, history } = createTestStore<{
+  it('should update the store and apply derived updates until completing the current one', async () => {
+    const store = createStore<{
       v1: string;
       v2: string;
       merged?: string;
       uppercase?: string;
-    }>({
-      v1: 'a',
-      v2: 'b',
-    });
+    }>({ v1: 'a', v2: 'b' });
 
     const v1 = store.query((state) => state.v1);
     const v2 = store.query((state) => state.v2);
@@ -253,93 +251,104 @@ describe('Concurrent Store updates', () => {
 
     const uppercase = mapQuery(merged, (value) => value.toUpperCase());
 
-    merged.value$.subscribe((merged) => store.update(patch({ merged })));
+    const history = await collectChanges(store.value$, async () => {
+      merged.value$.subscribe((merged) =>
+        store.update((state) => ({ ...state, merged })),
+      );
 
-    uppercase.value$.subscribe((uppercase) =>
-      store.update(patch({ uppercase })),
-    );
+      uppercase.value$.subscribe((uppercase) =>
+        store.update((state) => ({ ...state, uppercase })),
+      );
 
-    expect(store.get().merged).toEqual('ab');
-    expect(store.get().uppercase).toEqual('AB');
+      await 0;
 
-    store.update((state) => ({ ...state, v1: 'c' }));
-    store.update((state) => ({ ...state, v2: 'd' }));
+      expect(store.get().merged).toEqual('ab');
+      expect(store.get().uppercase).toEqual('AB');
 
-    expect(store.get().merged).toEqual('cd');
-    expect(store.get().uppercase).toEqual('CD');
+      store.update((state) => ({ ...state, v1: 'c' }));
+      store.update((state) => ({ ...state, v2: 'd' }));
+
+      expect(store.get().merged).toEqual('ab');
+      expect(store.get().uppercase).toEqual('AB');
+
+      await 0;
+
+      expect(store.get().merged).toEqual('cd');
+      expect(store.get().uppercase).toEqual('CD');
+    });
 
     expect(history).toEqual([
       { v1: 'a', v2: 'b' },
-      { v1: 'a', v2: 'b', merged: 'ab' },
       { v1: 'a', v2: 'b', merged: 'ab', uppercase: 'AB' },
-      { v1: 'c', v2: 'b', merged: 'ab', uppercase: 'AB' },
-      { v1: 'c', v2: 'b', merged: 'cb', uppercase: 'CB' },
-      { v1: 'c', v2: 'd', merged: 'cb', uppercase: 'CB' },
+      { v1: 'c', v2: 'd', merged: 'ab', uppercase: 'AB' },
       { v1: 'c', v2: 'd', merged: 'cd', uppercase: 'CD' },
     ]);
   });
 
-  it('should trigger a listener in case a state was changed', () => {
-    const { store, patch, history } = createTestStore<{
+  it('should trigger a listener in case a state was changed', async () => {
+    const store = createStore<{
       bar: number;
       foo: number;
-    }>({ bar: 0, foo: 0 }, OBJECT_COMPARATOR);
+    }>({ bar: 0, foo: 0 }, { comparator: OBJECT_COMPARATOR });
 
-    store.update(patch({ foo: 1 }));
-    store.update(patch({ foo: 2 }));
-    store.update(patch({ bar: 42 }));
-    store.update(patch({ foo: 2 }));
-    store.update(patch({ foo: 3 }));
+    const history = await collectChanges(store.value$, () => {
+      store.update((state) => ({ ...state, foo: 1 }));
+      store.update((state) => ({ ...state, foo: 2 }));
+      store.update((state) => ({ ...state, bar: 42 }));
+      store.update((state) => ({ ...state, foo: 2 }));
+      store.update((state) => ({ ...state, foo: 3 }));
+    });
 
     expect(history).toEqual([
       { bar: 0, foo: 0 },
-      { bar: 0, foo: 1 },
-      { bar: 0, foo: 2 },
-      { bar: 42, foo: 2 },
       { bar: 42, foo: 3 },
     ]);
   });
 
-  it('should preserve order of pending updates during applying the current update', () => {
-    const { store, patch, history } = createTestStore<{
+  it('should preserve order of pending updates during applying the current update', async () => {
+    const store = createStore<{
       x: number;
       y: number;
       z: number;
-    }>({ x: 0, y: 0, z: 0 }, OBJECT_COMPARATOR);
+    }>({ x: 0, y: 0, z: 0 }, { comparator: OBJECT_COMPARATOR });
 
-    store.value$.subscribe(({ x }) => store.update(patch({ y: x })));
-    store.value$.subscribe(({ y }) => store.update(patch({ z: y })));
-    store.update(patch({ x: 1 }));
-    store.update(patch({ x: 2 }));
-    store.update(patch({ x: 3 }));
+    store.value$.subscribe(({ x }) =>
+      store.update((state) => ({ ...state, y: x })),
+    );
+    store.value$.subscribe(({ y }) =>
+      store.update((state) => ({ ...state, z: y })),
+    );
+
+    const history = await collectChanges(store.value$, () => {
+      store.update((state) => ({ ...state, x: 1 }));
+      store.update((state) => ({ ...state, x: 2 }));
+      store.update((state) => ({ ...state, x: 3 }));
+    });
 
     expect(history).toEqual([
       { x: 0, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
-      { x: 1, y: 1, z: 0 },
-      { x: 1, y: 1, z: 1 },
-      { x: 2, y: 1, z: 1 },
-      { x: 2, y: 2, z: 1 },
-      { x: 2, y: 2, z: 2 },
-      { x: 3, y: 2, z: 2 },
-      { x: 3, y: 3, z: 2 },
+      { x: 3, y: 0, z: 0 },
+      { x: 3, y: 3, z: 0 },
       { x: 3, y: 3, z: 3 },
     ]);
   });
 
-  it('should reschedule continuous setting a state by subscribers', () => {
-    const { store, history } = createTestStore<number>(0);
+  it('should reschedule continuous setting a state by subscribers', async () => {
+    const store = createStore<number>(0);
 
     store.value$.subscribe((x) => {
       if (x < 100) {
         store.set(x * 10);
       }
     });
-    store.set(1);
-    store.set(2);
-    store.set(3);
 
-    expect(history).toEqual([0, 1, 10, 100, 2, 20, 200, 3, 30, 300]);
+    const changes = await collectChanges(store.value$, () => {
+      store.set(1);
+      store.set(2);
+      store.set(3);
+    });
+
+    expect(changes).toEqual([0, 3, 30, 300]);
   });
 });
 
@@ -431,36 +440,3 @@ describe('declareStateUpdates()', () => {
     expect(store.get()).toBe(12);
   });
 });
-
-function collectChanges<T>(
-  source$: Observable<T>,
-  action: () => void,
-): Promise<Array<T>> {
-  const bufferClose$ = new Subject<void>();
-
-  setImmediate(() => {
-    action();
-    bufferClose$.next();
-  });
-
-  return firstValueFrom(source$.pipe(bufferWhen(() => bufferClose$)));
-}
-
-function createTestStore<State>(
-  initialState: State,
-  comparator?: (prevState: State, nextState: State) => boolean,
-): {
-  store: Store<State>;
-  patch: (partial: Partial<State>) => StateMutation<State>;
-  history: State[];
-} {
-  const patch =
-    (partial: Partial<State>) =>
-    (state: State): State => ({ ...state, ...partial });
-  const store = createStore(initialState, { comparator: comparator });
-
-  const history: State[] = [];
-  store.value$.subscribe((state) => history.push(state));
-
-  return { store, patch, history };
-}

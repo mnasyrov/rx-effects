@@ -4,6 +4,7 @@ import {
   Observable,
   Observer,
   Subject,
+  timer,
 } from 'rxjs';
 import Mock = jest.Mock;
 
@@ -13,8 +14,11 @@ export function collectChanges<T>(
 ): Promise<Array<T>> {
   const bufferClose$ = new Subject<void>();
 
-  setImmediate(async () => {
+  setTimeout(async () => {
     await action();
+
+    await firstValueFrom(timer(0));
+
     bufferClose$.next();
   });
 

@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { Controller } from './controller';
 import { Query, QueryOptions } from './query';
 import { mapQuery } from './queryMappers';
@@ -158,6 +158,9 @@ export type Store<State> = Controller<
 
     /** Updates the store by provided mutations */
     update: StoreUpdateFunction<State>;
+
+    /** Immediately emits a current state to store's subscribers */
+    notify: () => void;
   }
 >;
 
@@ -186,6 +189,8 @@ export type InternalStoreOptions<State> = Readonly<
   StoreOptions<State> & { internal?: boolean }
 >;
 
+const NOTIFY_QUEUE: Set<Store<any>> = new Set();
+
 /**
  * Creates the state store.
  *
@@ -198,20 +203,22 @@ export function createStore<State>(
 ): Store<State> {
   const stateComparator = options?.comparator ?? DEFAULT_COMPARATOR;
 
-  const store$: BehaviorSubject<State> = new BehaviorSubject(initialState);
-  const state$ = store$.asObservable();
-
-  let isUpdating = false;
-  let pendingMutations: StateMutationQueue<State> | undefined;
+  let currentState = initialState;
+  const subscribers: Set<Subscriber<State>> = new Set();
 
   const store: Store<State> = {
     id: ++STORE_SEQ_NUMBER,
     name: options?.name,
 
-    value$: state$,
+    value$: new Observable<State>((subscriber) => {
+      subscribers.add(subscriber);
+      subscriber.next(currentState);
+
+      return () => subscribers.delete(subscriber);
+    }),
 
     get(): State {
-      return store$.value;
+      return currentState;
     },
 
     select<R, K = R>(
@@ -231,14 +238,22 @@ export function createStore<State>(
     asQuery: () => store,
 
     set(nextState: State) {
-      apply([() => nextState]);
+      update(() => nextState);
     },
 
     update,
 
+    notify() {
+      const pinnedState = currentState;
+      subscribers.forEach((subscriber) => subscriber.next(pinnedState));
+    },
+
     destroy() {
-      store$.complete();
+      subscribers.forEach((subscriber) => subscriber.complete());
+      subscribers.clear();
+
       STORE_EVENT_BUS.next({ type: 'destroyed', store });
+
       options?.onDestroy?.();
     },
   };
@@ -248,58 +263,55 @@ export function createStore<State>(
       | StateMutation<State>
       | ReadonlyArray<StateMutation<State> | undefined | null | false>,
   ) {
-    if (isReadonlyArray(mutation)) {
-      apply(mutation);
-    } else {
-      apply([mutation]);
-    }
-  }
+    const prevState = currentState;
 
-  function apply(mutations: StateMutationQueue<State>) {
-    if (isUpdating) {
-      pendingMutations = (pendingMutations ?? []).concat(mutations);
-      return;
-    }
-
-    const prevState = store$.value;
-
-    let nextState = prevState;
-
-    for (let i = 0; i < mutations.length; i++) {
-      const mutation = mutations[i];
-      if (mutation) {
-        const stateBeforeMutation = nextState;
-        nextState = mutation(nextState);
-
-        STORE_EVENT_BUS.next({
-          type: 'mutation',
-          store,
-          mutation,
-          nextState,
-          prevState: stateBeforeMutation,
-        });
-      }
-    }
+    const nextState = isReadonlyArray(mutation)
+      ? applyMutations(currentState, mutation)
+      : applyMutation(currentState, mutation);
 
     if (stateComparator(prevState, nextState)) {
       return;
     }
 
-    isUpdating = true;
-    store$.next(nextState);
+    currentState = nextState;
+    scheduleNotify(store);
+
     STORE_EVENT_BUS.next({
       type: 'updated',
       store,
       nextState,
       prevState,
     });
-    isUpdating = false;
+  }
 
-    if (pendingMutations?.length) {
-      const mutationsToApply = pendingMutations;
-      pendingMutations = [];
-      apply(mutationsToApply);
+  function applyMutations(
+    state: State,
+    mutations: StateMutationQueue<State>,
+  ): State {
+    let nextState = state;
+
+    for (let i = 0; i < mutations.length; i++) {
+      const mutation = mutations[i];
+      if (mutation) {
+        nextState = applyMutation(nextState, mutation);
+      }
     }
+
+    return nextState;
+  }
+
+  function applyMutation(state: State, mutation: StateMutation<State>): State {
+    const nextState = mutation(state);
+
+    STORE_EVENT_BUS.next({
+      type: 'mutation',
+      store,
+      mutation,
+      nextState,
+      prevState: state,
+    });
+
+    return nextState;
   }
 
   if ((options as InternalStoreOptions<State> | undefined)?.internal) {
@@ -309,6 +321,18 @@ export function createStore<State>(
   STORE_EVENT_BUS.next({ type: 'created', store });
 
   return store;
+}
+
+function scheduleNotify(store: Store<any>) {
+  if (NOTIFY_QUEUE.add(store).size === 1) {
+    Promise.resolve().then(executeNotifyQueue);
+  }
+}
+
+function executeNotifyQueue() {
+  const queue = [...NOTIFY_QUEUE];
+  NOTIFY_QUEUE.clear();
+  queue.forEach((store) => store.notify());
 }
 
 /** Creates StateUpdates for updating the store by provided state mutations */

@@ -1,10 +1,12 @@
 import {
+  asapScheduler,
   exhaustMap,
   firstValueFrom,
   from,
   mapTo,
   materialize,
   Observable,
+  observeOn,
   of,
   tap,
   throwError,
@@ -257,16 +259,15 @@ describe('Effect', () => {
       );
 
       const resultPromise = getFirstValues(effect.result$, 4);
-      const pendingCountPromise = getFirstValues(effect.pendingCount.value$, 5);
+      const pendingCountPromise = getFirstValues(effect.pendingCount.value$, 4);
       const errorPromise = firstValueFrom(effect.error$);
 
       effect.handle(from([1, 2]));
-      expect(effect.pendingCount.get()).toBe(2);
 
       expect(await resultPromise).toEqual([2, 3, 5, 4]);
       expect(effect.pendingCount.get()).toBe(0);
 
-      expect(await pendingCountPromise).toEqual([0, 1, 2, 1, 0]);
+      expect(await pendingCountPromise).toEqual([0, 2, 1, 0]);
 
       expect(await errorPromise).toEqual({
         origin: 'handler',

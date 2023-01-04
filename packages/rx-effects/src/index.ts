@@ -33,6 +33,7 @@ export * from './mvc';
 
 export type { Query, QueryOptions } from './query';
 export { mapQuery, mergeQueries } from './queryMappers';
+export { queryBehaviourSubject } from './queryUtils';
 
 export * from './store';
 export { pipeStore, declareStoreWithUpdates } from './storeUtils';
@@ -48,3 +49,10 @@ export { OBJECT_COMPARATOR } from './utils';
 
 export type { StoreDeclaration, DeclaredStoreFactory } from './declareStore';
 export { declareStore } from './declareStore';
+
+export type {
+  ComputationOptions,
+  Computation,
+  ComputationResolver,
+} from './compute';
+export { compute } from './compute';

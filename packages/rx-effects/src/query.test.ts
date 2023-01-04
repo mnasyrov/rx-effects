@@ -208,7 +208,10 @@ describe('mergeQueries()', () => {
     query.value$.subscribe(listener);
 
     store2.set({ k: 1, value: 0 });
+    store2.notify();
+
     store2.set({ k: 2, value: 1 });
+    store2.notify();
 
     expect(listener).toHaveBeenCalledTimes(3);
     expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });
@@ -225,7 +228,10 @@ describe('mergeQueries()', () => {
     query.value$.subscribe(listener);
 
     store2.set({ k: 1, value: 0 });
+    store2.notify();
+
     store2.set({ k: 2, value: 1 });
+    store2.notify();
 
     expect(listener).toHaveBeenCalledTimes(2);
     expect(listener).toHaveBeenNthCalledWith(1, 0);
@@ -245,8 +251,13 @@ describe('mergeQueries()', () => {
     query.value$.subscribe(listener);
 
     store2.set({ k: 1, value: 1 });
+    store2.notify();
+
     store2.set({ k: 2, value: 2 });
+    store2.notify();
+
     store1.set(1);
+    store1.notify();
 
     expect(listener).toHaveBeenCalledTimes(2);
     expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });
@@ -267,7 +278,10 @@ describe('mergeQueries()', () => {
 
     store2.set({ k: 1, value: 1 });
     store2.set({ k: 2, value: 2 });
+    store2.notify();
+
     store1.set(1);
+    store1.notify();
 
     expect(listener).toHaveBeenCalledTimes(2);
     expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });

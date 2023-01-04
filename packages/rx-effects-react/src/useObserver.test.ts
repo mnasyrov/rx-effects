@@ -1,6 +1,6 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import { BehaviorSubject, PartialObserver, Subject } from 'rxjs';
-import { isBrowser, useObserver } from './useObserver';
+import { useObserver } from './useObserver';
 
 describe('useObserver()', () => {
   it('should subscribe a listener for next values', () => {
@@ -100,24 +100,6 @@ describe('useObserver()', () => {
     expect(observer.error).toHaveBeenCalledTimes(1);
   });
 
-  it('should use useLayoutEffect when isBrowser is true', () => {
-    jest.resetModules();
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    global.window = {};
-
-    const useIsomorphicLayoutEffect =
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require('./useObserver').useIsomorphicLayoutEffect;
-
-    expect(typeof useIsomorphicLayoutEffect).toBe('function');
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete global.window;
-  });
-
   it('should unsubscribe on unmount', () => {
     const source$ = new BehaviorSubject(1);
     const listener = jest.fn();
@@ -179,23 +161,5 @@ describe('useObserver()', () => {
     expect(listener1).toHaveBeenCalledWith(1);
 
     expect(listener2).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('isBrowser()', () => {
-  it('should return true when the window exists', () => {
-    const isBrowserFalsy = isBrowser();
-    expect(isBrowserFalsy).toBeFalsy();
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    global.window = {};
-
-    const isBrowserTruthy = isBrowser();
-    expect(isBrowserTruthy).toBeTruthy();
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete global.window;
   });
 });

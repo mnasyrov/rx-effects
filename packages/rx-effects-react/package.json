@@ -49,16 +49,14 @@
   },
   "peerDependencies": {
     "ditox-react": ">=2.2.0",
-    "react": ">=17.0.0",
+    "react": ">=17 || >=18",
     "rxjs": ">=7.0.0"
   },
   "devDependencies": {
-    "@testing-library/react": "12.1.2",
-    "@testing-library/react-hooks": "7.0.2",
-    "@types/react": "17.0.38",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "react-test-renderer": "17.0.2"
+    "@testing-library/react": "13.4.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-test-renderer": "18.2.0"
   },
   "gitHead": "666d5b8672ebe6cb02174366a799d1da27d387a9"
 }

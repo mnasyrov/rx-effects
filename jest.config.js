@@ -5,10 +5,12 @@
 import fastGlob from 'fast-glob';
 
 export default {
+  testEnvironment: 'jsdom',
   roots: fastGlob.sync(['packages/*/src'], {
     onlyDirectories: true,
     ignore: ['packages/examples/*'],
   }),
   collectCoverageFrom: ['packages/*/src/**/{!(index|testUtils),}.{ts,tsx}'],
   preset: 'ts-jest',
+  setupFilesAfterEnv: ['jest-extended/all'],
 };
