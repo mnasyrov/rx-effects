@@ -1,6 +1,12 @@
 import { declareModule, Token } from 'ditox';
 import { DependencyModule, useDependencyContainer } from 'ditox-react';
-import React, { FC, useEffect, useMemo, useRef } from 'react';
+import React, {
+  FC,
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   Controller,
   ControllerFactory,
@@ -71,7 +77,7 @@ function createStoresForParams(params: any[]): Store<any>[] {
 export function createControllerContainer<T extends AnyObject>(
   token: Token<T>,
   factory: ControllerFactory<T>,
-): FC {
+): FC<PropsWithChildren> {
   const module = declareModule({ factory, token });
 
   return ({ children }) => (

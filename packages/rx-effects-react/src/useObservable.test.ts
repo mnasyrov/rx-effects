@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 import { Subject } from 'rxjs';
 import { monitorSubscriptionCount } from './test/testUtils';
 import { useObservable } from './useObservable';

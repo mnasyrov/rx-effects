@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Observable, Observer } from 'rxjs';
+import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect';
 
 /**
  * Subscribes the provided observer or `next` handler on `source$` observable.
@@ -41,17 +42,3 @@ export function useObserver<T>(
     return () => subscription.unsubscribe();
   }, [source$]);
 }
-
-export function isBrowser() {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return typeof window !== 'undefined';
-}
-
-/**
- * Prevent React warning when using useLayoutEffect on server.
- */
-export const useIsomorphicLayoutEffect = isBrowser()
-  ? useLayoutEffect
-  : /* istanbul ignore next: both are not called on server */
-    useEffect;

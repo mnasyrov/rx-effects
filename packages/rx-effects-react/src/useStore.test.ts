@@ -1,5 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
-import { act } from 'react-test-renderer';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { declareStateUpdates } from 'rx-effects';
 import { useStore } from './useStore';
 
@@ -40,10 +39,13 @@ describe('useStore()', () => {
     act(() => {
       updates1.increase();
     });
-    const [value2, updates2, store2] = result.current;
 
-    expect(value2).toBe(1);
-    expect(updates2).toBe(updates1);
-    expect(store2).toBe(store1);
+    waitFor(() => {
+      const [value2, updates2, store2] = result.current;
+
+      expect(value2).toBe(1);
+      expect(updates2).toBe(updates1);
+      expect(store2).toBe(store1);
+    });
   });
 });
