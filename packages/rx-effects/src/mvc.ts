@@ -73,7 +73,7 @@ export function declareViewController<
     deps: Dependencies,
     scope: Scope,
   ) => ((scope: Scope, ...params: Params) => Service) | Service,
-): ViewControllerFactory<Service, unknown[]>;
+): ViewControllerFactory<Service, Params>;
 
 export function declareViewController<
   Dependencies extends DependencyProps,
