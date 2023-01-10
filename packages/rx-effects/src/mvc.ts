@@ -72,23 +72,24 @@ export function declareViewController<
   factory: (
     deps: Dependencies,
     scope: Scope,
-  ) => Service | ((scope: Scope, ...params: Params) => Service),
-): ViewControllerFactory<Service, Params>;
+  ) => ((scope: Scope, ...params: Params) => Service) | Service,
+): ViewControllerFactory<Service, unknown[]>;
 
 export function declareViewController<
   Dependencies extends DependencyProps,
   Service extends AnyObject,
   Params extends unknown[],
-  Factory extends (
-    deps: Dependencies,
-    scope: Scope,
-  ) => Service | ((scope: Scope, ...params: Params) => Service),
+  Factory extends (scope: Scope, ...params: Params) => Service,
+  FactoryWithDependencies extends
+    | ((deps: Dependencies, scope: Scope) => Service)
+    | ((
+        deps: Dependencies,
+        scope: Scope,
+      ) => (scope: Scope, ...params: Params) => Service),
 >(
   tokensOrFactory: TokenProps<Dependencies> | Factory,
-  factory?: Factory,
+  factory?: FactoryWithDependencies,
 ): ViewControllerFactory<Service, Params> {
-  const factoryValue = (factory ?? tokensOrFactory) as Factory;
-
   const tokensValue = (
     factory ? tokensOrFactory : {}
   ) as TokenProps<Dependencies>;
@@ -96,13 +97,18 @@ export function declareViewController<
   return (container: Container, ...params: Params) => {
     return injectable((dependencies) => {
       return createController((scope) => {
+        if (typeof tokensOrFactory === 'function') {
+          return tokensOrFactory(scope, ...params);
+        }
+
+        const factoryValue = factory as FactoryWithDependencies;
+
         const result = factoryValue(dependencies as Dependencies, scope);
 
         if (typeof result === 'function') {
           return result(scope, ...params);
-        } else {
-          return result;
         }
+        return result;
       });
     }, tokensValue)(container);
   };
