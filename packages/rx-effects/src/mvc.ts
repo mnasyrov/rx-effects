@@ -90,17 +90,15 @@ export function declareViewController<
   tokensOrFactory: TokenProps<Dependencies> | Factory,
   factory?: FactoryWithDependencies,
 ): ViewControllerFactory<Service, Params> {
-  const tokensValue = (
-    factory ? tokensOrFactory : {}
-  ) as TokenProps<Dependencies>;
-
   return (container: Container, ...params: Params) => {
+    if (typeof tokensOrFactory === 'function') {
+      return createController((scope) => {
+        return tokensOrFactory(scope, ...params);
+      });
+    }
+
     return injectable((dependencies) => {
       return createController((scope) => {
-        if (typeof tokensOrFactory === 'function') {
-          return tokensOrFactory(scope, ...params);
-        }
-
         const factoryValue = factory as FactoryWithDependencies;
 
         const result = factoryValue(dependencies as Dependencies, scope);
@@ -110,6 +108,6 @@ export function declareViewController<
         }
         return result;
       });
-    }, tokensValue)(container);
+    }, tokensOrFactory)(container);
   };
 }

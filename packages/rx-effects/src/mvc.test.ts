@@ -127,9 +127,12 @@ describe('declareViewController()', () => {
     const controllerFactory = declareViewController(
       { value: VALUE_TOKEN },
       ({ value }) =>
-        (scope, arg: Query<number>) => ({
-          getValue: () => value * 10 + arg.get(),
-        }),
+        (scope, arg: Query<number>) => {
+          const $value = scope.createStore(10);
+          return {
+            getValue: () => value * $value.get() + arg.get(),
+          };
+        },
     );
 
     const container = createContainer();
