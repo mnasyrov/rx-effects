@@ -107,9 +107,13 @@ describe('declareViewController()', () => {
   });
 
   it('should create a factory without DI dependencies', () => {
-    const controllerFactory = declareViewController(() => ({
-      getValue: () => 10,
-    }));
+    const controllerFactory = declareViewController((scope) => {
+      const $value = scope.createStore(10);
+
+      return {
+        getValue: () => $value.get(),
+      };
+    });
 
     const container = createContainer();
 
@@ -123,9 +127,12 @@ describe('declareViewController()', () => {
     const controllerFactory = declareViewController(
       { value: VALUE_TOKEN },
       ({ value }) =>
-        (scope, arg: Query<number>) => ({
-          getValue: () => value * 10 + arg.get(),
-        }),
+        (scope, arg: Query<number>) => {
+          const $value = scope.createStore(10);
+          return {
+            getValue: () => value * $value.get() + arg.get(),
+          };
+        },
     );
 
     const container = createContainer();
