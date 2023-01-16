@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks';
 import { BehaviorSubject, PartialObserver, Subject } from 'rxjs';
-import { useObserver } from './useObserver';
+import { isBrowser, useObserver } from './useObserver';
 
 describe('useObserver()', () => {
   it('should subscribe a listener for next values', () => {
@@ -48,6 +48,31 @@ describe('useObserver()', () => {
     source2$.next(1);
     expect(listener2).toHaveBeenNthCalledWith(1, 1);
     expect(listener2).toHaveBeenCalledTimes(1);
+  });
+
+  it('should check window', async () => {
+    const isBrowserFalsy = isBrowser();
+    expect(isBrowserFalsy).toBeFalsy();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    global.window = {};
+
+    const isBrowserTruthy = isBrowser();
+    expect(isBrowserTruthy).toBeTruthy();
+  });
+
+  it('should subscribe to error', () => {
+    const source$ = new Subject();
+    const observer: PartialObserver<unknown> = {
+      error: jest.fn(),
+    };
+
+    renderHook(() => useObserver(source$, observer));
+
+    source$.error(new Error('some error'));
+
+    expect(observer.error).toHaveBeenCalledTimes(1);
   });
 
   it('should return a subscription', () => {

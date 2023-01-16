@@ -23,60 +23,57 @@ export function useObserver<T>(
 ): Subscription {
   const hookSubscriptions = useConst(() => new Subscription());
 
-  const argsRef = useRef<
-    [Observable<T>, PartialObserver<T> | ((value: T) => void)]
-  >([source$, observerOrNext]);
+  const argsRef = useRef<PartialObserver<T> | ((value: T) => void)>(
+    observerOrNext,
+  );
 
   // Update the latest observable and callbacks
   // synchronously after render being committed
   useIsomorphicLayoutEffect(() => {
-    argsRef.current = [source$, observerOrNext];
+    argsRef.current = observerOrNext;
   });
 
   useEffect(() => {
-    if (!hookSubscriptions.closed) {
-      const input$ = argsRef.current[0];
-
-      const subscription = input$.subscribe({
-        next: (value) => {
-          if (input$ !== argsRef.current[0]) {
-            // stale observable
-            return;
-          }
-          const nextObserver =
-            (argsRef.current[1] as PartialObserver<T>)?.next ||
-            (argsRef.current[1] as ((value: T) => void) | null | undefined);
-          if (nextObserver) {
-            return nextObserver(value);
-          }
-        },
-        error: (error) => {
-          if (input$ !== argsRef.current[0]) {
-            // stale observable
-            return;
-          }
-          const errorObserver = (argsRef.current[1] as PartialObserver<T>)
-            ?.error;
-          if (errorObserver) {
-            return errorObserver(error);
-          }
-        },
-        complete: () => {
-          if (input$ !== argsRef.current[0]) {
-            // stale observable
-            return;
-          }
-          const completeObserver = (argsRef.current[1] as PartialObserver<T>)
-            ?.complete;
-          if (completeObserver) {
-            return completeObserver();
-          }
-        },
-      });
-      hookSubscriptions.add(subscription);
-      return () => subscription.unsubscribe();
+    if (hookSubscriptions.closed) {
+      return;
     }
-    return undefined;
+
+    const subscription = source$.subscribe({
+      next: (value) => {
+        const nextObserver =
+          typeof argsRef.current === 'function'
+            ? argsRef.current
+            : argsRef.current.next;
+
+        if (nextObserver) {
+          return nextObserver(value);
+        }
+      },
+      error: (error) => {
+        if (typeof argsRef.current === 'function') {
+          return;
+        }
+
+        const errorObserver = argsRef.current.error;
+
+        if (errorObserver) {
+          return errorObserver(error);
+        }
+      },
+      complete: () => {
+        if (typeof argsRef.current === 'function') {
+          return;
+        }
+
+        const completeObserver = argsRef.current.complete;
+
+        if (completeObserver) {
+          return completeObserver();
+        }
+      },
+    });
+    hookSubscriptions.add(subscription);
+    return () => subscription.unsubscribe();
   }, [hookSubscriptions, source$]);
 
   useEffect(() => {
@@ -86,7 +83,7 @@ export function useObserver<T>(
   return hookSubscriptions;
 }
 
-function isBrowser() {
+export function isBrowser() {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return typeof window !== 'undefined';
