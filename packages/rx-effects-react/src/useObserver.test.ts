@@ -50,7 +50,7 @@ describe('useObserver()', () => {
     expect(listener2).toHaveBeenCalledTimes(1);
   });
 
-  it('should check window', async () => {
+  it('should check window', () => {
     const isBrowserFalsy = isBrowser();
     expect(isBrowserFalsy).toBeFalsy();
 
@@ -60,6 +60,10 @@ describe('useObserver()', () => {
 
     const isBrowserTruthy = isBrowser();
     expect(isBrowserTruthy).toBeTruthy();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    delete global.window;
   });
 
   it('should subscribe to error', () => {
@@ -75,6 +79,24 @@ describe('useObserver()', () => {
     expect(observer.error).toHaveBeenCalledTimes(1);
   });
 
+  it('should use useLayoutEffect when isBrowser is true', () => {
+    jest.resetModules();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    global.window = {};
+
+    const useIsomorphicLayoutEffect =
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require('./useObserver').useIsomorphicLayoutEffect;
+
+    expect(typeof useIsomorphicLayoutEffect).toBe('function');
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    delete global.window;
+  });
+
   it('should return a subscription', () => {
     const source$ = new BehaviorSubject(1);
     const listener = jest.fn();
@@ -83,6 +105,26 @@ describe('useObserver()', () => {
 
     result.current.unsubscribe();
     source$.next(2);
+
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(1);
+  });
+
+  it('should do nothing if is unsubscribe', () => {
+    const source1$ = new BehaviorSubject(1);
+    const source2$ = new BehaviorSubject(1);
+    const listener = jest.fn();
+
+    const { result, rerender } = renderHook(
+      ({ source$ }) => useObserver(source$, listener),
+      { initialProps: { source$: source1$ } },
+    );
+
+    result.current.unsubscribe();
+
+    rerender({ source$: source2$ });
+
+    source2$.next(2);
 
     expect(listener).toHaveBeenCalledTimes(1);
     expect(listener).toHaveBeenCalledWith(1);

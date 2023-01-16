@@ -50,22 +50,16 @@ export function useObserver<T>(
         }
       },
       error: (error) => {
-        if (typeof argsRef.current === 'function') {
-          return;
-        }
-
-        const errorObserver = argsRef.current.error;
+        const errorObserver =
+          typeof argsRef.current !== 'function' && argsRef.current.error;
 
         if (errorObserver) {
           return errorObserver(error);
         }
       },
       complete: () => {
-        if (typeof argsRef.current === 'function') {
-          return;
-        }
-
-        const completeObserver = argsRef.current.complete;
+        const completeObserver =
+          typeof argsRef.current !== 'function' && argsRef.current.complete;
 
         if (completeObserver) {
           return completeObserver();
@@ -92,7 +86,7 @@ export function isBrowser() {
 /**
  * Prevent React warning when using useLayoutEffect on server.
  */
-const useIsomorphicLayoutEffect = isBrowser()
+export const useIsomorphicLayoutEffect = isBrowser()
   ? useLayoutEffect
   : /* istanbul ignore next: both are not called on server */
     useEffect;
