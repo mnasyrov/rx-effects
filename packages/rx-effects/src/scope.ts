@@ -133,10 +133,7 @@ export function createScope(): Scope {
       source: Observable<T>,
       nextOrObserver?: Partial<Observer<T>> | ((value: T) => unknown),
     ): Subscription {
-      const subscription =
-        typeof nextOrObserver === 'function'
-          ? source.subscribe(nextOrObserver)
-          : source.subscribe(nextOrObserver);
+      const subscription = source.subscribe(nextOrObserver);
 
       registerTeardown(subscription);
 
