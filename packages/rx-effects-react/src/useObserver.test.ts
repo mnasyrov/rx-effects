@@ -50,22 +50,6 @@ describe('useObserver()', () => {
     expect(listener2).toHaveBeenCalledTimes(1);
   });
 
-  it('should check window', () => {
-    const isBrowserFalsy = isBrowser();
-    expect(isBrowserFalsy).toBeFalsy();
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    global.window = {};
-
-    const isBrowserTruthy = isBrowser();
-    expect(isBrowserTruthy).toBeTruthy();
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete global.window;
-  });
-
   it('should subscribe to error', () => {
     const source$ = new Subject();
     const observer: PartialObserver<unknown> = {
@@ -189,5 +173,23 @@ describe('useObserver()', () => {
     expect(listener1).toHaveBeenCalledWith(1);
 
     expect(listener2).toHaveBeenCalledTimes(0);
+  });
+});
+
+describe('isBrowser()', () => {
+  it('should return true when the window exists', () => {
+    const isBrowserFalsy = isBrowser();
+    expect(isBrowserFalsy).toBeFalsy();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    global.window = {};
+
+    const isBrowserTruthy = isBrowser();
+    expect(isBrowserTruthy).toBeTruthy();
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    delete global.window;
   });
 });
