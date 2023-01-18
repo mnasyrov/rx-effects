@@ -50,6 +50,39 @@ describe('useObserver()', () => {
     expect(listener2).toHaveBeenCalledTimes(1);
   });
 
+  it('should resubscribe if a only source is changed 2', () => {
+    const sourceNext$ = new BehaviorSubject(1);
+
+    expect(() => {
+      renderHook(() =>
+        useObserver(sourceNext$, {
+          next: undefined,
+        }),
+      );
+      sourceNext$.next(1);
+    }).not.toThrow();
+
+    const sourceError$ = new BehaviorSubject(1);
+    expect(() => {
+      renderHook(() =>
+        useObserver(sourceError$, {
+          error: undefined,
+        }),
+      );
+      sourceError$.error(new Error('some error'));
+    }).not.toThrow();
+
+    const sourceComplete$ = new BehaviorSubject(1);
+    expect(() => {
+      renderHook(() =>
+        useObserver(sourceComplete$, {
+          complete: undefined,
+        }),
+      );
+      sourceComplete$.complete();
+    }).not.toThrow();
+  });
+
   it('should subscribe to error', () => {
     const source$ = new Subject();
     const observer: PartialObserver<unknown> = {

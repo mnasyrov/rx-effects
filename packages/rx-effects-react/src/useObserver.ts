@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import { Observable, PartialObserver, Subscription } from 'rxjs';
+import { Observable, Observer, Subscription } from 'rxjs';
 import { useConst } from './useConst';
 
 /**
@@ -19,18 +19,19 @@ import { useConst } from './useConst';
  */
 export function useObserver<T>(
   source$: Observable<T>,
-  observerOrNext: PartialObserver<T> | ((value: T) => void),
+  observerOrNext: Partial<Observer<T>> | ((value: T) => void),
 ): Subscription {
   const hookSubscriptions = useConst(() => new Subscription());
 
-  const argsRef = useRef<PartialObserver<T> | ((value: T) => void)>(
-    observerOrNext,
-  );
+  const argsRef = useRef<Partial<Observer<T>>>({});
 
   // Update the latest observable and callbacks
   // synchronously after render being committed
   useIsomorphicLayoutEffect(() => {
-    argsRef.current = observerOrNext;
+    argsRef.current =
+      typeof observerOrNext === 'function'
+        ? { next: observerOrNext }
+        : observerOrNext;
   });
 
   useEffect(() => {
@@ -39,32 +40,9 @@ export function useObserver<T>(
     }
 
     const subscription = source$.subscribe({
-      next: (value) => {
-        const nextObserver =
-          typeof argsRef.current === 'function'
-            ? argsRef.current
-            : argsRef.current.next;
-
-        if (nextObserver) {
-          return nextObserver(value);
-        }
-      },
-      error: (error) => {
-        const errorObserver =
-          typeof argsRef.current !== 'function' && argsRef.current.error;
-
-        if (errorObserver) {
-          return errorObserver(error);
-        }
-      },
-      complete: () => {
-        const completeObserver =
-          typeof argsRef.current !== 'function' && argsRef.current.complete;
-
-        if (completeObserver) {
-          return completeObserver();
-        }
-      },
+      next: (value) => argsRef.current.next?.(value),
+      error: (error) => argsRef.current.error?.(error),
+      complete: () => argsRef.current.complete?.(),
     });
     hookSubscriptions.add(subscription);
     return () => subscription.unsubscribe();
