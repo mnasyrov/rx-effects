@@ -23,7 +23,7 @@ export function useObserver<T>(
 ): Subscription {
   const hookSubscriptions = useConst(() => new Subscription());
 
-  const argsRef = useRef<Partial<Observer<T>>>({});
+  const argsRef = useRef<Partial<Observer<T>>>();
 
   // Update the latest observable and callbacks
   // synchronously after render being committed
@@ -40,9 +40,9 @@ export function useObserver<T>(
     }
 
     const subscription = source$.subscribe({
-      next: (value) => argsRef.current.next?.(value),
-      error: (error) => argsRef.current.error?.(error),
-      complete: () => argsRef.current.complete?.(),
+      next: (value) => argsRef.current?.next?.(value),
+      error: (error) => argsRef.current?.error?.(error),
+      complete: () => argsRef.current?.complete?.(),
     });
     hookSubscriptions.add(subscription);
     return () => subscription.unsubscribe();

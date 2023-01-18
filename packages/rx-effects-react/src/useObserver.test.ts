@@ -50,7 +50,7 @@ describe('useObserver()', () => {
     expect(listener2).toHaveBeenCalledTimes(1);
   });
 
-  it('should resubscribe if a only source is changed 2', () => {
+  it('should handled it all variants of the listener', () => {
     const sourceNext$ = new BehaviorSubject(1);
 
     expect(() => {
@@ -59,6 +59,8 @@ describe('useObserver()', () => {
           next: undefined,
         }),
       );
+      renderHook(() => useObserver(sourceNext$, undefined as any));
+
       sourceNext$.next(1);
     }).not.toThrow();
 
@@ -69,6 +71,7 @@ describe('useObserver()', () => {
           error: undefined,
         }),
       );
+      renderHook(() => useObserver(sourceError$, undefined as any));
       sourceError$.error(new Error('some error'));
     }).not.toThrow();
 
@@ -79,6 +82,7 @@ describe('useObserver()', () => {
           complete: undefined,
         }),
       );
+      renderHook(() => useObserver(sourceComplete$, undefined as any));
       sourceComplete$.complete();
     }).not.toThrow();
   });
