@@ -42,7 +42,7 @@ rx-effects-react
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:43](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/mvc.tsx#L43)
+[rx-effects-react/src/mvc.tsx:43](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/mvc.tsx#L43)
 
 ---
 
@@ -72,7 +72,7 @@ If the factory is provided, it is called only once.
 
 #### Defined in
 
-[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useConst.ts#L12)
+[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useConst.ts#L12)
 
 ---
 
@@ -105,7 +105,7 @@ included explicitly when it is needed.
 
 #### Defined in
 
-[rx-effects-react/src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useController.ts#L18)
+[rx-effects-react/src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useController.ts#L18)
 
 ---
 
@@ -131,7 +131,7 @@ included explicitly when it is needed.
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:12](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/mvc.tsx#L12)
+[rx-effects-react/src/mvc.tsx:12](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/mvc.tsx#L12)
 
 ---
 
@@ -170,7 +170,7 @@ const value = useObservable<string>(source$, undefined);
 
 #### Defined in
 
-[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useObservable.ts#L19)
+[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useObservable.ts#L19)
 
 ---
 
@@ -185,10 +185,9 @@ This hook allows to do fine handling of the source observable.
 **`Example`**
 
 ```ts
-const observer = useCallback((nextValue) => {
+useObserver(source$, (nextValue) => {
   logger.log(nextValue);
-}, []);
-useObserver(source$, observer);
+});
 ```
 
 #### Type parameters
@@ -210,7 +209,7 @@ useObserver(source$, observer);
 
 #### Defined in
 
-[rx-effects-react/src/useObserver.ts:21](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useObserver.ts#L21)
+[rx-effects-react/src/useObserver.ts:20](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useObserver.ts#L20)
 
 ---
 
@@ -238,7 +237,7 @@ Returns a value which is provided by the query.
 
 #### Defined in
 
-[rx-effects-react/src/useQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useQuery.ts#L9)
+[rx-effects-react/src/useQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useQuery.ts#L9)
 
 ---
 
@@ -284,7 +283,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useSelector.ts#L27)
+[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useSelector.ts#L27)
 
 ---
 
@@ -313,7 +312,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/useStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/useStore.ts#L11)
+[rx-effects-react/src/useStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useStore.ts#L11)
 
 ---
 
@@ -341,4 +340,4 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:23](https://github.com/mnasyrov/rx-effects/blob/4cbeb8c/packages/rx-effects-react/src/mvc.tsx#L23)
+[rx-effects-react/src/mvc.tsx:23](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/mvc.tsx#L23)

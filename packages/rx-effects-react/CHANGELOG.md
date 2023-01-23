@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://github.com/mnasyrov/rx-effects/compare/v1.0.0...v1.0.1) (2023-01-23)
+
+### Bug Fixes
+
+- Fixed rerendering by `useObserver()` and reduced excess unsubscribe/subscribe on rerendering a parent component ([#13](https://github.com/mnasyrov/rx-effects/issues/13)) ([469b251](https://github.com/mnasyrov/rx-effects/commit/469b251797980b6280eb98d097e1b24747675879))
+
 # [1.0.0](https://github.com/mnasyrov/rx-effects/compare/v0.7.2...v1.0.0) (2022-12-20)
 
 ### Features
