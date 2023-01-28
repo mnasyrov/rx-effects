@@ -45,3 +45,5 @@ export { registerStoreExtension } from './storeExtensions';
 export { createStoreLoggerExtension } from './storeLoggerExtension';
 
 export { OBJECT_COMPARATOR } from './utils';
+
+export { declareStore } from './declareStore';
