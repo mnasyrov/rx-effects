@@ -118,53 +118,17 @@ describe('useObserver()', () => {
     delete global.window;
   });
 
-  it('should return a subscription', () => {
-    const source$ = new BehaviorSubject(1);
-    const listener = jest.fn();
-
-    const { result } = renderHook(() => useObserver(source$, listener));
-
-    result.current.unsubscribe();
-    source$.next(2);
-
-    expect(listener).toHaveBeenCalledTimes(1);
-    expect(listener).toHaveBeenCalledWith(1);
-  });
-
-  it('should do nothing if is unsubscribe', () => {
-    const source1$ = new BehaviorSubject(1);
-    const source2$ = new BehaviorSubject(1);
-    const listener = jest.fn();
-
-    const { result, rerender } = renderHook(
-      ({ source$ }) => useObserver(source$, listener),
-      { initialProps: { source$: source1$ } },
-    );
-
-    result.current.unsubscribe();
-
-    rerender({ source$: source2$ });
-
-    source2$.next(2);
-
-    expect(listener).toHaveBeenCalledTimes(1);
-    expect(listener).toHaveBeenCalledWith(1);
-  });
-
   it('should unsubscribe on unmount', () => {
     const source$ = new BehaviorSubject(1);
     const listener = jest.fn();
 
-    const { result, unmount } = renderHook(() =>
-      useObserver(source$, listener),
-    );
+    const { unmount } = renderHook(() => useObserver(source$, listener));
 
     unmount();
     source$.next(2);
 
     expect(listener).toHaveBeenCalledTimes(1);
     expect(listener).toHaveBeenCalledWith(1);
-    expect(result.current.closed).toBe(true);
   });
 
   it('should unsubscribe old Observable and subscribe to new one when it changes', () => {
@@ -192,24 +156,29 @@ describe('useObserver()', () => {
     expect(listener).toHaveBeenLastCalledWith(2);
   });
 
-  it("should not subscribe a new observer in case hook's subscription was unsubscribed", () => {
+  it('should not subscribe a new observer in case a listener is changed', () => {
     const source$ = new BehaviorSubject(1);
     const listener1 = jest.fn();
     const listener2 = jest.fn();
 
-    const { result, rerender } = renderHook(
+    const { rerender } = renderHook(
       ({ listener }) => useObserver(source$, listener),
       { initialProps: { listener: listener1 } },
     );
 
-    result.current.unsubscribe();
+    const observer = source$.observers[0];
+    expect(observer).toBeDefined();
+
     rerender({ listener: listener2 });
     source$.next(2);
+
+    expect(source$.observers.length).toBe(1);
+    expect(source$.observers[0]).toBe(observer);
 
     expect(listener1).toHaveBeenCalledTimes(1);
     expect(listener1).toHaveBeenCalledWith(1);
 
-    expect(listener2).toHaveBeenCalledTimes(0);
+    expect(listener2).toHaveBeenCalledTimes(1);
   });
 });
 
