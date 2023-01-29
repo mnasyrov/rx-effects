@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import { Observable, Observer, Subscription } from 'rxjs';
-import { useConst } from './useConst';
+import { Observable, Observer } from 'rxjs';
 
 /**
  * Subscribes the provided observer or `next` handler on `source$` observable.
@@ -20,9 +19,7 @@ import { useConst } from './useConst';
 export function useObserver<T>(
   source$: Observable<T>,
   observerOrNext: Partial<Observer<T>> | ((value: T) => void),
-): Subscription {
-  const hookSubscriptions = useConst(() => new Subscription());
-
+): void {
   const argsRef = useRef<Partial<Observer<T>>>();
 
   // Update the latest observable and callbacks
@@ -35,24 +32,14 @@ export function useObserver<T>(
   });
 
   useEffect(() => {
-    if (hookSubscriptions.closed) {
-      return;
-    }
-
     const subscription = source$.subscribe({
       next: (value) => argsRef.current?.next?.(value),
       error: (error) => argsRef.current?.error?.(error),
       complete: () => argsRef.current?.complete?.(),
     });
-    hookSubscriptions.add(subscription);
+
     return () => subscription.unsubscribe();
-  }, [hookSubscriptions, source$]);
-
-  useEffect(() => {
-    return () => hookSubscriptions.unsubscribe();
-  }, [hookSubscriptions]);
-
-  return hookSubscriptions;
+  }, [source$]);
 }
 
 export function isBrowser() {
