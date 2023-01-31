@@ -3,6 +3,7 @@ import {
   createController,
   declareController,
   declareViewController,
+  InferredService,
 } from './mvc';
 import { Query } from './query';
 import { createStore } from './store';
@@ -85,6 +86,11 @@ describe('declareController()', () => {
 
     const controller = controllerFactory(container);
     expect(controller.getValue()).toBe(10);
+
+    // Check inferring of a service type
+    type Service = InferredService<typeof controllerFactory>;
+    const service: Service = controller;
+    expect(service.getValue()).toBe(10);
   });
 });
 
@@ -104,6 +110,11 @@ describe('declareViewController()', () => {
 
     const controller = controllerFactory(container);
     expect(controller.getValue()).toBe(10);
+
+    // Check inferring of a service type
+    type Service = InferredService<typeof controllerFactory>;
+    const service: Service = controller;
+    expect(service.getValue()).toBe(10);
   });
 
   it('should create a factory without DI dependencies', () => {
@@ -119,6 +130,11 @@ describe('declareViewController()', () => {
 
     const controller = controllerFactory(container);
     expect(controller.getValue()).toBe(10);
+
+    // Check inferring of a service type
+    type Service = InferredService<typeof controllerFactory>;
+    const service: Service = controller;
+    expect(service.getValue()).toBe(10);
   });
 
   it('should create a factory which accepts resolved dependencies and parameters as Queries', () => {
@@ -140,5 +156,10 @@ describe('declareViewController()', () => {
 
     const controller = controllerFactory(container, createStore(2));
     expect(controller.getValue()).toBe(12);
+
+    // Check inferring of a service type
+    type Service = InferredService<typeof controllerFactory>;
+    const service: Service = controller;
+    expect(service.getValue()).toBe(12);
   });
 });
