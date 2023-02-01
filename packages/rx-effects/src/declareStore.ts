@@ -1,131 +1,15 @@
-import { Observable } from 'rxjs';
-import { Query } from './query';
-import { createStore, createStoreUpdates, StoreUpdateFunction } from './store';
-
-type DeepReadonly<T> = T extends (infer R)[]
-  ? DeepReadonlyArray<R>
-  : T extends (...any: any[]) => any
-  ? T
-  : T extends object
-  ? DeepReadonlyObject<T>
-  : T;
-
-type DeepReadonlyArray<T> = ReadonlyArray<DeepReadonly<T>>;
-
-type DeepReadonlyObject<T> = {
-  readonly [P in keyof T]: DeepReadonly<T[P]>;
-};
-
-type CaseUpdater<S = any, P = any> = (
-  ...payload: P[]
-) => (state: DeepReadonly<S>) => DeepReadonly<S>;
-
-type StoreCaseUpdates<State> = {
-  [K: string]: CaseUpdater<State, any>;
-};
-
-type ActionCreatorForCaseUpdater<CR> = CR extends (...payload: infer P) => any
-  ? ActionCreator<P>
-  : () => void;
-
-type ActionCreator<P extends any[] = any[]> = IsAny<
-  P,
-  (...payload: any[]) => void,
-  IsUnknownOrNonInferrable<
-    P,
-    () => void,
-    IfVoid<
-      P,
-      (...payload: void[]) => void,
-      IfMaybeUndefined<
-        P,
-        (...payload: undefined[]) => void,
-        (...payload: P) => void
-      >
-    >
-  >
->;
-
-type CaseUpdaterActions<CaseUpdaters extends StoreCaseUpdates<any>> = {
-  [Type in keyof CaseUpdaters]: ActionCreatorForCaseUpdater<CaseUpdaters[Type]>;
-};
-
-type IsAny<T, True, False = never> =
-  // test if we are going the left AND right path in the condition
-  true | false extends (T extends never ? true : false) ? True : False;
-
-type IsUnknown<T, True, False = never> = unknown extends T
-  ? IsAny<T, False, True>
-  : False;
-
-type AtLeastTS35<True, False> = [True, False][IsUnknown<
-  ReturnType<<T>() => T>,
-  0,
-  1
->];
-
-type IfMaybeUndefined<P, True, False> = [undefined] extends [P] ? True : False;
-
-type IfVoid<P, True, False> = [void] extends [P] ? True : False;
-
-type IsEmptyObj<T, True, False = never> = T extends any
-  ? keyof T extends never
-    ? IsUnknown<T, False, IfMaybeUndefined<T, False, IfVoid<T, False, True>>>
-    : False
-  : never;
-
-type IsUnknownOrNonInferrable<T, True, False> = AtLeastTS35<
-  IsUnknown<T, True, False>,
-  IsEmptyObj<T, True, IsUnknown<T, True, False>>
->;
-
-type QueryOptions<T, K> = Readonly<{
-  distinct?:
-    | boolean
-    | {
-        comparator?: (previous: K, current: K) => boolean;
-        keySelector?: (value: T) => K;
-      };
-}>;
-
-interface StoreResult<
-  State = any,
-  CaseUpdaters extends StoreCaseUpdates<State> = StoreCaseUpdates<State>,
-  Name extends string = string,
-> {
-  readonly name: Name | undefined;
-  readonly updates: CaseUpdaterActions<CaseUpdaters>;
-  readonly get: () => DeepReadonly<State>;
-
-  /**
-   * Cast the store to a narrowed `Query` type.
-   */
-  readonly asQuery: () => Query<DeepReadonly<State>>;
-  readonly value$: Observable<DeepReadonly<State>>;
-  readonly destroy: () => void;
-  readonly select: <R, K = R>(
-    selector: (state: DeepReadonly<State>) => R,
-    options?: QueryOptions<R, K>,
-  ) => Observable<R>;
-
-  readonly query: <R, K = R>(
-    selector: (state: DeepReadonly<State>) => R,
-    options?: QueryOptions<R, K>,
-  ) => Query<R>;
-
-  readonly update: StoreUpdateFunction<DeepReadonly<State>>;
-
-  readonly id: number;
-  readonly getInitialState: () => DeepReadonly<State>;
-  readonly reset: () => void;
-}
+import {
+  createStore,
+  createStoreUpdates,
+  StateMutation,
+  StateUpdates,
+  Store,
+  StoreWithUpdates,
+} from './store';
 
 interface StoreOptions<State> {
   /** A comparator for detecting changes between old and new states */
-  comparator?: (
-    prevState: DeepReadonly<State>,
-    nextState: DeepReadonly<State>,
-  ) => boolean;
+  comparator?: (prevState: State, nextState: State) => boolean;
 
   /** Callback is called when the store is destroyed */
   onDestroy?: () => void;
@@ -134,7 +18,7 @@ interface StoreOptions<State> {
 interface StoreProps<
   InitialState,
   State = InitialState extends () => infer S ? S : InitialState,
-  Updates extends StoreCaseUpdates<State> = StoreCaseUpdates<State>,
+  Updates extends StateUpdates<State> = StateUpdates<State>,
   Name extends string = string,
 > {
   name?: Name;
@@ -143,28 +27,18 @@ interface StoreProps<
 
   updates: Updates;
   /** A comparator for detecting changes between old and new states */
-  comparator?: (
-    prevState: DeepReadonly<State>,
-    nextState: DeepReadonly<State>,
-  ) => boolean;
+  comparator?: (prevState: State, nextState: State) => boolean;
 }
 
-type DeclareStoreResultFn<
-  State,
-  CaseUpdates extends StoreCaseUpdates<State>,
-> = (
-  initialState?: DeepReadonly<State> | StateMutation<State> | null,
-  options?: StoreOptions<State>,
-) => StoreResult<State, CaseUpdates>;
-
-interface DeclareStoreResult<
-  State,
-  CaseUpdates extends StoreCaseUpdates<State>,
-> {
+interface DeclareStoreResultFn<State, CaseUpdates extends StateUpdates<State>> {
   (
-    initialState?: DeepReadonly<State> | StateMutation<State> | null,
+    initialState?: State | StateMutation<State> | null,
     options?: StoreOptions<State>,
-  ): StoreResult<State, CaseUpdates>;
+  ): Store<State> & StoreWithUpdates<State, CaseUpdates>;
+}
+
+interface DeclareStoreResult<State, CaseUpdates extends StateUpdates<State>>
+  extends DeclareStoreResultFn<State, CaseUpdates> {
   updates: CaseUpdates;
 }
 
@@ -237,7 +111,7 @@ type UserStore = ReturnType<typeof createUserStore>;
 export function declareStore<
   InitialState,
   State = InitialState extends () => infer S ? S : InitialState,
-  CaseUpdates extends StoreCaseUpdates<State> = StoreCaseUpdates<State>,
+  CaseUpdates extends StateUpdates<State> = StateUpdates<State>,
 >(
   props: StoreProps<InitialState, State, CaseUpdates>,
 ): DeclareStoreResult<State, CaseUpdates> {
@@ -248,7 +122,7 @@ export function declareStore<
 
   const result: DeclareStoreResultFn<State, CaseUpdates> = function (
     initialState,
-    options = {},
+    options,
   ) {
     const _initialState = initialState
       ? typeof initialState === 'function'
@@ -256,32 +130,15 @@ export function declareStore<
         : initialState
       : _state;
 
-    const _store = createStore<DeepReadonly<State>>(_initialState, {
-      comparator: options.comparator ?? comparator,
+    const _store = createStore<State>(_initialState, {
+      comparator: options?.comparator ?? comparator,
       name,
-      onDestroy: options.onDestroy,
+      onDestroy: options?.onDestroy,
     });
 
     return {
-      name,
-      updates: createStoreUpdates(
-        _store.update,
-        updates,
-      ) as CaseUpdaterActions<CaseUpdates>,
-      value$: _store.value$,
-      get: _store.get,
-      asQuery: _store.asQuery,
-      destroy: _store.destroy,
-      select: _store.select,
-      query: _store.query,
-      update: _store.update,
-      id: _store.id,
-      reset: () => {
-        _store.update(() => _initialState);
-      },
-      getInitialState: () => {
-        return _initialState;
-      },
+      ..._store,
+      updates: createStoreUpdates(_store.update, updates),
     };
   };
 
@@ -289,5 +146,3 @@ export function declareStore<
 
   return result as DeclareStoreResult<State, CaseUpdates>;
 }
-
-type StateMutation<State> = (state: DeepReadonly<State>) => DeepReadonly<State>;

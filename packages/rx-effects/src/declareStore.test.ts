@@ -74,8 +74,6 @@ describe('createStore()', () => {
     localStore.updates.increment();
 
     expect(get().userId).toBe(102);
-
-    expect(localStore.getInitialState().userId).toBe(101);
   });
 
   it('should update initial state during initialization', () => {
@@ -89,6 +87,19 @@ describe('createStore()', () => {
     expect(get().count).toBe(12);
 
     expect(get().value).toBe('new initial text');
+  });
+
+  it('should initial state to be able to be a function', () => {
+    const simpleStore = createSimpleStore((state) => ({
+      ...state,
+      value: 'updated text',
+    }));
+
+    const { get } = simpleStore.asQuery();
+
+    expect(get().count).toBe(0);
+
+    expect(get().value).toBe('updated text');
   });
 
   it('should update the state', () => {
@@ -126,60 +137,6 @@ describe('createStore()', () => {
     simpleStore.updates.sum(1, 11);
 
     expect(get().count).toBe(12);
-  });
-
-  it('should get initial state without mutation after executing updates', () => {
-    const simpleStore = createSimpleStore();
-    const { get } = simpleStore.asQuery();
-
-    expect(get().count).toBe(0);
-
-    simpleStore.updates.increment();
-
-    expect(get().count).toBe(1);
-
-    expect(simpleStore.getInitialState().count).toBe(0);
-  });
-
-  it('should reset changed state to initial state', () => {
-    const simpleStore1 = createSimpleStore();
-    const simpleStore1Query = simpleStore1.asQuery();
-
-    const simpleStore2 = createSimpleStore({
-      count: 100,
-      value: 'new value',
-    });
-    const simpleStore2Query = simpleStore2.asQuery();
-
-    const simpleStore3 = createSimpleStore((state) => ({
-      ...state,
-      count: 12,
-    }));
-    const simpleStore3Query = simpleStore3.asQuery();
-
-    simpleStore1.updates.increment();
-
-    simpleStore2.updates.increment();
-
-    simpleStore3.updates.increment();
-
-    expect(simpleStore1Query.get().count).toBe(1);
-
-    expect(simpleStore2Query.get().count).toBe(101);
-
-    expect(simpleStore3Query.get().count).toBe(13);
-
-    simpleStore1.reset();
-
-    simpleStore2.reset();
-
-    simpleStore3.reset();
-
-    expect(simpleStore1Query.get().count).toBe(0);
-
-    expect(simpleStore2Query.get().count).toBe(100);
-
-    expect(simpleStore3Query.get().count).toBe(12);
   });
 
   it('should use custom comparator', () => {
