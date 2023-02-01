@@ -53,29 +53,6 @@ describe('createStore()', () => {
     expect(initialState.count).toBe(0);
   });
 
-  it('should initial state be function for declareStore', () => {
-    const createLocalStore = declareStore({
-      initialState: () => ({ userId: 101 }),
-      updates: {
-        increment: () => (state) => {
-          return {
-            ...state,
-            userId: state.userId + 1,
-          };
-        },
-      },
-    });
-
-    const localStore = createLocalStore();
-    const { get } = localStore.asQuery();
-
-    expect(get().userId).toBe(101);
-
-    localStore.updates.increment();
-
-    expect(get().userId).toBe(102);
-  });
-
   it('should update initial state during initialization', () => {
     const simpleStore = createSimpleStore({
       count: 12,
@@ -137,32 +114,5 @@ describe('createStore()', () => {
     simpleStore.updates.sum(1, 11);
 
     expect(get().count).toBe(12);
-  });
-
-  it('should use custom comparator', () => {
-    const createLocalStore = declareStore({
-      initialState: () => ({ userId: 101 }),
-      updates: {
-        increment: () => (state) => {
-          return {
-            ...state,
-            userId: state.userId + 1,
-          };
-        },
-      },
-      comparator: (prevState, nextState) => prevState === nextState,
-    });
-
-    const localStore = createLocalStore(
-      { userId: 1 },
-      { comparator: (prevState, nextState) => prevState === nextState },
-    );
-    const { get } = localStore.asQuery();
-
-    expect(get().userId).toBe(1);
-
-    localStore.updates.increment();
-
-    expect(get().userId).toBe(2);
   });
 });

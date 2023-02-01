@@ -1,40 +1,26 @@
 import {
   createStore,
-  createStoreUpdates,
   StateMutation,
   StateUpdates,
-  Store,
+  StoreOptions,
   StoreWithUpdates,
+  withStoreUpdates,
 } from './store';
 
-interface StoreOptions<State> {
-  /** A comparator for detecting changes between old and new states */
-  comparator?: (prevState: State, nextState: State) => boolean;
-
-  /** Callback is called when the store is destroyed */
-  onDestroy?: () => void;
-}
-
-interface StoreProps<
-  InitialState,
-  State = InitialState extends () => infer S ? S : InitialState,
+type DeclareStoreOptions<
+  State,
   Updates extends StateUpdates<State> = StateUpdates<State>,
-  Name extends string = string,
-> {
-  name?: Name;
-
-  initialState: InitialState;
-
+> = Readonly<{
+  initialState: State;
   updates: Updates;
-  /** A comparator for detecting changes between old and new states */
-  comparator?: (prevState: State, nextState: State) => boolean;
-}
+  options?: StoreOptions<State>;
+}>;
 
 interface DeclareStoreResultFn<State, CaseUpdates extends StateUpdates<State>> {
   (
     initialState?: State | StateMutation<State> | null,
     options?: StoreOptions<State>,
-  ): Store<State> & StoreWithUpdates<State, CaseUpdates>;
+  ): StoreWithUpdates<State, CaseUpdates>;
 }
 
 interface DeclareStoreResult<State, CaseUpdates extends StateUpdates<State>>
@@ -109,37 +95,29 @@ type UserStore = ReturnType<typeof createUserStore>;
 ```
  */
 export function declareStore<
-  InitialState,
-  State = InitialState extends () => infer S ? S : InitialState,
+  State,
   CaseUpdates extends StateUpdates<State> = StateUpdates<State>,
 >(
-  props: StoreProps<InitialState, State, CaseUpdates>,
+  props: DeclareStoreOptions<State, CaseUpdates>,
 ): DeclareStoreResult<State, CaseUpdates> {
-  const { initialState, updates, name, comparator } = props;
-
-  const _state =
-    typeof initialState === 'function' ? initialState() : initialState;
+  const { initialState: _state, updates, options: _options = {} } = props;
 
   const result: DeclareStoreResultFn<State, CaseUpdates> = function (
     initialState,
-    options,
+    options = {},
   ) {
     const _initialState = initialState
       ? typeof initialState === 'function'
-        ? (initialState as StateMutation<State>)({ ..._state })
+        ? (initialState as StateMutation<State>)(_state)
         : initialState
       : _state;
 
-    const _store = createStore<State>(_initialState, {
-      comparator: options?.comparator ?? comparator,
-      name,
-      onDestroy: options?.onDestroy,
+    const store = createStore<State>(_initialState, {
+      ..._options,
+      ...options,
     });
 
-    return {
-      ..._store,
-      updates: createStoreUpdates(_store.update, updates),
-    };
+    return withStoreUpdates(store, updates);
   };
 
   Object.assign(result, { updates });
