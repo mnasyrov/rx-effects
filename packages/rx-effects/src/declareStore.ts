@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import {
   createStore,
   StateMutation,
@@ -7,7 +8,7 @@ import {
   withStoreUpdates,
 } from './store';
 
-type DeclareStoreOptions<
+export type StoreDeclaration<
   State,
   Updates extends StateUpdates<State> = StateUpdates<State>,
 > = Readonly<{
@@ -16,21 +17,22 @@ type DeclareStoreOptions<
   options?: StoreOptions<State>;
 }>;
 
-interface DeclareStoreResultFn<State, CaseUpdates extends StateUpdates<State>> {
-  (
-    initialState?: State | StateMutation<State> | null,
-    options?: StoreOptions<State>,
-  ): StoreWithUpdates<State, CaseUpdates>;
-}
+type FactoryStateArg<State> =
+  | (State extends Function ? never : State)
+  | StateMutation<State>;
 
-interface DeclareStoreResult<State, CaseUpdates extends StateUpdates<State>>
-  extends DeclareStoreResultFn<State, CaseUpdates> {
-  updates: CaseUpdates;
-}
+export type DeclaredStoreFactory<State, Updates extends StateUpdates<State>> = {
+  (
+    initialState?: FactoryStateArg<State>,
+    options?: StoreOptions<State>,
+  ): StoreWithUpdates<State, Updates>;
+
+  updates: Updates;
+};
 
 /**
  * declare the base interface for create store
- * @example 
+ * @example
 ```ts
 type State = {
   id: string;
@@ -96,31 +98,34 @@ type UserStore = ReturnType<typeof createUserStore>;
  */
 export function declareStore<
   State,
-  CaseUpdates extends StateUpdates<State> = StateUpdates<State>,
+  Updates extends StateUpdates<State> = StateUpdates<State>,
 >(
-  props: DeclareStoreOptions<State, CaseUpdates>,
-): DeclareStoreResult<State, CaseUpdates> {
-  const { initialState: _state, updates, options: _options = {} } = props;
+  declaration: StoreDeclaration<State, Updates>,
+): DeclaredStoreFactory<State, Updates> {
+  const {
+    initialState: baseState,
+    updates,
+    options: baseOptions,
+  } = declaration;
 
-  const result: DeclareStoreResultFn<State, CaseUpdates> = function (
-    initialState,
-    options = {},
+  function factory(
+    initialState?: FactoryStateArg<State>,
+    options?: StoreOptions<State>,
   ) {
-    const _initialState = initialState
-      ? typeof initialState === 'function'
-        ? (initialState as StateMutation<State>)(_state)
-        : initialState
-      : _state;
+    const state =
+      initialState === undefined
+        ? baseState
+        : typeof initialState === 'function'
+        ? (initialState as StateMutation<State>)(baseState)
+        : initialState;
 
-    const store = createStore<State>(_initialState, {
-      ..._options,
+    const store = createStore<State>(state, {
+      ...baseOptions,
       ...options,
     });
 
     return withStoreUpdates(store, updates);
-  };
+  }
 
-  Object.assign(result, { updates });
-
-  return result as DeclareStoreResult<State, CaseUpdates>;
+  return Object.assign(factory, { updates });
 }

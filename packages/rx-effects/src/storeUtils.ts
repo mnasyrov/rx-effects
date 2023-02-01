@@ -41,6 +41,9 @@ export function pipeStore<T>(
   return clone;
 }
 
+/**
+ * @deprecated Use `declareStore()`
+ */
 export function declareStoreWithUpdates<
   State,
   Updates extends StateUpdates<State>,
