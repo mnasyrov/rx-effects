@@ -1,5 +1,6 @@
 import { Container, injectable, Token } from 'ditox';
 import { Controller } from './controller';
+import { Query } from './query';
 import { createScope, Scope } from './scope';
 import { AnyObject } from './utils';
 
@@ -24,12 +25,6 @@ export type ControllerFactory<Service extends AnyObject> = (
   container: Container,
 ) => Controller<Service>;
 
-export type InferredService<Factory> = Factory extends ControllerFactory<
-  infer Service
->
-  ? Service
-  : never;
-
 declare type DependencyProps = {
   [key: string]: unknown;
 };
@@ -53,12 +48,20 @@ export function declareController<
 
 export type ViewControllerFactory<
   Service extends AnyObject,
-  Params extends unknown[],
+  Params extends Query<unknown>[],
 > = (container: Container, ...params: Params) => Controller<Service>;
+
+export type InferredService<Factory> = Factory extends ViewControllerFactory<
+  infer Service,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  infer Params
+>
+  ? Service
+  : never;
 
 export function declareViewController<
   Service extends AnyObject,
-  Params extends unknown[],
+  Params extends Query<unknown>[],
 >(
   factory: (scope: Scope, ...params: Params) => Service,
 ): ViewControllerFactory<Service, Params>;
@@ -66,7 +69,7 @@ export function declareViewController<
 export function declareViewController<
   Dependencies extends DependencyProps,
   Service extends AnyObject,
-  Params extends unknown[],
+  Params extends Query<unknown>[],
 >(
   tokens: TokenProps<Dependencies>,
   factory: (
@@ -78,7 +81,7 @@ export function declareViewController<
 export function declareViewController<
   Dependencies extends DependencyProps,
   Service extends AnyObject,
-  Params extends unknown[],
+  Params extends Query<unknown>[],
   Factory extends (scope: Scope, ...params: Params) => Service,
   FactoryWithDependencies extends
     | ((deps: Dependencies, scope: Scope) => Service)

@@ -6,6 +6,7 @@ import {
   declareController,
   declareViewController,
   InferredService,
+  Query,
 } from 'rx-effects';
 import {
   createControllerContainer,
@@ -143,8 +144,8 @@ describe('useViewController()', () => {
     const viewController = declareViewController(
       { value: VALUE_TOKEN },
       ({ value }) =>
-        (scope, param: number) => ({
-          getValue: () => value * 10 + param,
+        (scope, param: Query<number>) => ({
+          getValue: () => value * 10 + param.get(),
           destroy: () => onDestroy(),
         }),
     );
@@ -166,10 +167,10 @@ describe('useViewController()', () => {
 
     rerender(4);
     expect(result.current.getValue()).toBe(14);
-    expect(onDestroy).toHaveBeenCalledTimes(1);
+    expect(onDestroy).toHaveBeenCalledTimes(0);
 
     unmount();
-    expect(onDestroy).toHaveBeenCalledTimes(2);
+    expect(onDestroy).toHaveBeenCalledTimes(1);
   });
 });
 
