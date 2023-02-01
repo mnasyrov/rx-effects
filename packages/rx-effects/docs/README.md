@@ -9,6 +9,7 @@ rx-effects
 - [Action](README.md#action)
 - [Controller](README.md#controller)
 - [ControllerFactory](README.md#controllerfactory)
+- [DeclaredStoreFactory](README.md#declaredstorefactory)
 - [Effect](README.md#effect)
 - [EffectController](README.md#effectcontroller)
 - [EffectError](README.md#effecterror)
@@ -30,6 +31,7 @@ rx-effects
 - [StateMutationMetadata](README.md#statemutationmetadata)
 - [StateUpdates](README.md#stateupdates)
 - [Store](README.md#store)
+- [StoreDeclaration](README.md#storedeclaration)
 - [StoreEvent](README.md#storeevent)
 - [StoreExtension](README.md#storeextension)
 - [StoreOptions](README.md#storeoptions)
@@ -57,6 +59,7 @@ rx-effects
 - [createStoreUpdates](README.md#createstoreupdates)
 - [declareController](README.md#declarecontroller)
 - [declareStateUpdates](README.md#declarestateupdates)
+- [declareStore](README.md#declarestore)
 - [declareStoreWithUpdates](README.md#declarestorewithupdates)
 - [declareViewController](README.md#declareviewcontroller)
 - [mapQuery](README.md#mapquery)
@@ -105,7 +108,7 @@ submitForm.even$.subscribe((formData) => {
 
 #### Defined in
 
-[packages/rx-effects/src/action.ts:24](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/action.ts#L24)
+[packages/rx-effects/src/action.ts:24](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/action.ts#L24)
 
 ---
 
@@ -134,7 +137,7 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[packages/rx-effects/src/controller.ts:18](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/controller.ts#L18)
+[packages/rx-effects/src/controller.ts:18](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/controller.ts#L18)
 
 ---
 
@@ -164,7 +167,45 @@ type LoggerController = Controller<{
 
 #### Defined in
 
-[packages/rx-effects/src/mvc.ts:23](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/mvc.ts#L23)
+[packages/rx-effects/src/mvc.ts:24](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/mvc.ts#L24)
+
+---
+
+### DeclaredStoreFactory
+
+Ƭ **DeclaredStoreFactory**<`State`, `Updates`\>: `Object`
+
+#### Type parameters
+
+| Name      | Type                                                       |
+| :-------- | :--------------------------------------------------------- |
+| `State`   | `State`                                                    |
+| `Updates` | extends [`StateUpdates`](README.md#stateupdates)<`State`\> |
+
+#### Call signature
+
+▸ (`initialState?`, `options?`): `Readonly`<`Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> & { `updates`: [`StoreUpdates`](README.md#storeupdates)<`State`, `Updates`\> }\>
+
+##### Parameters
+
+| Name            | Type                                                                                                                                       |
+| :-------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| `initialState?` | `FactoryStateArg`<`State`\>                                                                                                                |
+| `options?`      | `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\> |
+
+##### Returns
+
+`Readonly`<`Readonly`<`Readonly`<`Readonly`<{ `get`: () => `T` ; `value$`: `Observable`<`T`\> }\> & { `asQuery`: () => [`Query`](README.md#query)<`State`\> ; `query`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => [`Query`](README.md#query)<`R`\> ; `select`: <R, K\>(`selector`: (`state`: `State`) => `R`, `options?`: [`QueryOptions`](README.md#queryoptions)<`R`, `K`\>) => `Observable`<`R`\> }\> & { `id`: `number` ; `name?`: `string` ; `set`: (`state`: `State`) => `void` ; `update`: [`StoreUpdateFunction`](README.md#storeupdatefunction)<`State`\> } & { `destroy`: () => `void` }\> & { `updates`: [`StoreUpdates`](README.md#storeupdates)<`State`, `Updates`\> }\>
+
+#### Type declaration
+
+| Name      | Type      |
+| :-------- | :-------- |
+| `updates` | `Updates` |
+
+#### Defined in
+
+[packages/rx-effects/src/declareStore.ts:24](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/declareStore.ts#L24)
 
 ---
 
@@ -190,7 +231,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effect.ts#L56)
+[packages/rx-effects/src/effect.ts:56](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effect.ts#L56)
 
 ---
 
@@ -208,7 +249,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effectController.ts:28](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectController.ts#L28)
+[packages/rx-effects/src/effectController.ts:28](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectController.ts#L28)
 
 ---
 
@@ -225,7 +266,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effectState.ts:11](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectState.ts#L11)
+[packages/rx-effects/src/effectState.ts:11](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectState.ts#L11)
 
 ---
 
@@ -235,7 +276,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effectState.ts:9](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectState.ts#L9)
+[packages/rx-effects/src/effectState.ts:9](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectState.ts#L9)
 
 ---
 
@@ -266,7 +307,7 @@ unsubscribe from them and deactivate the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effect.ts#L27)
+[packages/rx-effects/src/effect.ts:27](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effect.ts#L27)
 
 ---
 
@@ -303,7 +344,7 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:23](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effect.ts#L23)
+[packages/rx-effects/src/effect.ts:23](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effect.ts#L23)
 
 ---
 
@@ -321,7 +362,7 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effectState.ts:24](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectState.ts#L24)
+[packages/rx-effects/src/effectState.ts:24](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectState.ts#L24)
 
 ---
 
@@ -338,7 +379,7 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effect.ts#L38)
+[packages/rx-effects/src/effect.ts:38](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effect.ts#L38)
 
 ---
 
@@ -369,7 +410,7 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:31](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effect.ts#L31)
+[packages/rx-effects/src/effect.ts:31](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effect.ts#L31)
 
 ---
 
@@ -386,7 +427,7 @@ a result, Promise or Observable
 
 #### Defined in
 
-[packages/rx-effects/src/effectState.ts:4](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectState.ts#L4)
+[packages/rx-effects/src/effectState.ts:4](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectState.ts#L4)
 
 ---
 
@@ -406,7 +447,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/effectState.ts:32](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectState.ts#L32)
+[packages/rx-effects/src/effectState.ts:32](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectState.ts#L32)
 
 ---
 
@@ -418,13 +459,13 @@ Details about performing the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:71](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/scope.ts#L71)
+[packages/rx-effects/src/scope.ts:71](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/scope.ts#L71)
 
 ---
 
 ### InferredService
 
-Ƭ **InferredService**<`Factory`\>: `Factory` extends [`ControllerFactory`](README.md#controllerfactory)<infer Service\> ? `Service` : `never`
+Ƭ **InferredService**<`Factory`\>: `Factory` extends [`ViewControllerFactory`](README.md#viewcontrollerfactory)<infer Service, infer Params\> ? `Service` : `never`
 
 #### Type parameters
 
@@ -434,7 +475,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/mvc.ts:27](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/mvc.ts#L27)
+[packages/rx-effects/src/mvc.ts:54](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/mvc.ts#L54)
 
 ---
 
@@ -450,7 +491,7 @@ Details about performing the effect.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:185](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L185)
+[packages/rx-effects/src/store.ts:185](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L185)
 
 ---
 
@@ -468,7 +509,7 @@ Provider for a value of a state.
 
 #### Defined in
 
-[packages/rx-effects/src/query.ts:6](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/query.ts#L6)
+[packages/rx-effects/src/query.ts:6](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/query.ts#L6)
 
 ---
 
@@ -499,7 +540,7 @@ Getter for keys of values to compare. Values itself are used for comparing by de
 
 #### Defined in
 
-[packages/rx-effects/src/query.ts:21](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/query.ts#L21)
+[packages/rx-effects/src/query.ts:21](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/query.ts#L21)
 
 ---
 
@@ -514,7 +555,7 @@ A controller-like boundary for effects and business logic.
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/scope.ts#L15)
+[packages/rx-effects/src/scope.ts:15](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/scope.ts#L15)
 
 ---
 
@@ -563,7 +604,7 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:29](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L29)
+[packages/rx-effects/src/store.ts:29](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L29)
 
 ---
 
@@ -573,7 +614,7 @@ a next state
 
 #### Defined in
 
-[packages/rx-effects/src/storeMetadata.ts:6](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/storeMetadata.ts#L6)
+[packages/rx-effects/src/storeMetadata.ts:6](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/storeMetadata.ts#L6)
 
 ---
 
@@ -591,7 +632,7 @@ A record of factories which create state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:34](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L34)
+[packages/rx-effects/src/store.ts:34](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L34)
 
 ---
 
@@ -609,7 +650,24 @@ Store of a state
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:151](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L151)
+[packages/rx-effects/src/store.ts:151](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L151)
+
+---
+
+### StoreDeclaration
+
+Ƭ **StoreDeclaration**<`State`, `Updates`\>: `Readonly`<{ `initialState`: `State` ; `options?`: [`StoreOptions`](README.md#storeoptions)<`State`\> ; `updates`: `Updates` }\>
+
+#### Type parameters
+
+| Name      | Type                                                                                                            |
+| :-------- | :-------------------------------------------------------------------------------------------------------------- |
+| `State`   | `State`                                                                                                         |
+| `Updates` | extends [`StateUpdates`](README.md#stateupdates)<`State`\> = [`StateUpdates`](README.md#stateupdates)<`State`\> |
+
+#### Defined in
+
+[packages/rx-effects/src/declareStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/declareStore.ts#L11)
 
 ---
 
@@ -625,7 +683,7 @@ Store of a state
 
 #### Defined in
 
-[packages/rx-effects/src/storeEvents.ts:4](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/storeEvents.ts#L4)
+[packages/rx-effects/src/storeEvents.ts:4](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/storeEvents.ts#L4)
 
 ---
 
@@ -659,7 +717,7 @@ Store of a state
 
 #### Defined in
 
-[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/storeExtensions.ts#L9)
+[packages/rx-effects/src/storeExtensions.ts:9](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/storeExtensions.ts#L9)
 
 ---
 
@@ -675,7 +733,7 @@ Store of a state
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:174](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L174)
+[packages/rx-effects/src/store.ts:174](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L174)
 
 ---
 
@@ -693,7 +751,7 @@ Read-only interface of a store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:88](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L88)
+[packages/rx-effects/src/store.ts:88](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L88)
 
 ---
 
@@ -725,7 +783,7 @@ Function which changes a state of the store
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:138](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L138)
+[packages/rx-effects/src/store.ts:138](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L138)
 
 ---
 
@@ -757,7 +815,7 @@ Updates the state by provided mutations
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:131](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L131)
+[packages/rx-effects/src/store.ts:131](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L131)
 
 ---
 
@@ -776,7 +834,7 @@ Record of store update functions
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:141](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L141)
+[packages/rx-effects/src/store.ts:141](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L141)
 
 ---
 
@@ -795,7 +853,7 @@ Store of a state with updating functions
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:165](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L165)
+[packages/rx-effects/src/store.ts:165](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L165)
 
 ---
 
@@ -805,10 +863,10 @@ Store of a state with updating functions
 
 #### Type parameters
 
-| Name      | Type                |
-| :-------- | :------------------ |
-| `Service` | extends `AnyObject` |
-| `Params`  | extends `unknown`[] |
+| Name      | Type                                             |
+| :-------- | :----------------------------------------------- |
+| `Service` | extends `AnyObject`                              |
+| `Params`  | extends [`Query`](README.md#query)<`unknown`\>[] |
 
 #### Type declaration
 
@@ -827,7 +885,7 @@ Store of a state with updating functions
 
 #### Defined in
 
-[packages/rx-effects/src/mvc.ts:54](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/mvc.ts#L54)
+[packages/rx-effects/src/mvc.ts:49](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/mvc.ts#L49)
 
 ## Variables
 
@@ -837,7 +895,7 @@ Store of a state with updating functions
 
 #### Defined in
 
-[packages/rx-effects/src/effectController.ts:15](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectController.ts#L15)
+[packages/rx-effects/src/effectController.ts:15](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectController.ts#L15)
 
 ## Functions
 
@@ -860,7 +918,7 @@ Makes shallow comparison of two objects.
 
 #### Defined in
 
-[packages/rx-effects/src/utils.ts:14](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/utils.ts#L14)
+[packages/rx-effects/src/utils.ts:14](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/utils.ts#L14)
 
 ---
 
@@ -886,7 +944,7 @@ Makes shallow comparison of two objects.
 
 #### Defined in
 
-[packages/rx-effects/src/action.ts:31](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/action.ts#L31)
+[packages/rx-effects/src/action.ts:31](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/action.ts#L31)
 
 ---
 
@@ -912,7 +970,7 @@ Makes shallow comparison of two objects.
 
 #### Defined in
 
-[packages/rx-effects/src/mvc.ts:6](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/mvc.ts#L6)
+[packages/rx-effects/src/mvc.ts:7](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/mvc.ts#L7)
 
 ---
 
@@ -951,7 +1009,7 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 #### Defined in
 
-[packages/rx-effects/src/effect.ts:74](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effect.ts#L74)
+[packages/rx-effects/src/effect.ts:74](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effect.ts#L74)
 
 ---
 
@@ -973,7 +1031,7 @@ const sumEffect = createEffect<{ a: number; b: number }, number>((event) => {
 
 #### Defined in
 
-[packages/rx-effects/src/effectController.ts:40](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/effectController.ts#L40)
+[packages/rx-effects/src/effectController.ts:40](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/effectController.ts#L40)
 
 ---
 
@@ -989,7 +1047,7 @@ Creates `Scope` instance.
 
 #### Defined in
 
-[packages/rx-effects/src/scope.ts:76](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/scope.ts#L76)
+[packages/rx-effects/src/scope.ts:76](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/scope.ts#L76)
 
 ---
 
@@ -1018,7 +1076,7 @@ Creates the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:195](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L195)
+[packages/rx-effects/src/store.ts:195](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L195)
 
 ---
 
@@ -1038,7 +1096,7 @@ Creates the state store.
 
 #### Defined in
 
-[packages/rx-effects/src/storeLoggerExtension.ts:3](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/storeLoggerExtension.ts#L3)
+[packages/rx-effects/src/storeLoggerExtension.ts:3](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/storeLoggerExtension.ts#L3)
 
 ---
 
@@ -1068,7 +1126,7 @@ Creates StateUpdates for updating the store by provided state mutations
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:315](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L315)
+[packages/rx-effects/src/store.ts:315](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L315)
 
 ---
 
@@ -1096,7 +1154,7 @@ Creates StateUpdates for updating the store by provided state mutations
 
 #### Defined in
 
-[packages/rx-effects/src/mvc.ts:41](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/mvc.ts#L41)
+[packages/rx-effects/src/mvc.ts:36](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/mvc.ts#L36)
 
 ---
 
@@ -1136,7 +1194,7 @@ Declare a record of factories for creating state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:41](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L41)
+[packages/rx-effects/src/store.ts:41](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L41)
 
 ▸ **declareStateUpdates**<`State`, `Updates`\>(`stateExample`, `updates`): `Updates`
 
@@ -1162,13 +1220,111 @@ Declare a record of factories for creating state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:50](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L50)
+[packages/rx-effects/src/store.ts:50](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L50)
+
+---
+
+### declareStore
+
+▸ **declareStore**<`State`, `Updates`\>(`declaration`): [`DeclaredStoreFactory`](README.md#declaredstorefactory)<`State`, `Updates`\>
+
+declare the base interface for create store
+
+**`Example`**
+
+```ts
+type State = {
+ id: string;
+ name: string;
+ isAdmin: boolean
+};
+const initialState: State = {
+ id: '',
+ name: '',
+ isAdmin: false
+};
+const createUserStore = declareStore({
+ initialState,
+ updates: {
+   setId: (id: string) => (state) => {
+     return {
+       ...state,
+       id: id,
+     };
+   },
+   setName: (name: string) => (state) => {
+     return {
+       ...state,
+       name: name,
+     };
+   },
+   update: (id: string name: string) => (state) => {
+     return {
+       ...state,
+       id: id,
+       name: name,
+     };
+   },
+   setIsAdmin: () => (state) => {
+     return {
+       ...state,
+       isAdmin: true,
+     };
+   },
+ },
+});
+
+const userStore1 = createUserStore({ id: '1', name: 'User 1', isAdmin: false });
+
+const userStore2 = createUserStore({ id: '2', name: 'User 2', isAdmin: true });
+
+// OR
+
+const users = [
+ createUserStore({id: 1, name: 'User 1'}),
+ createUserStore({id: 2, name: 'User 2'}),
+]
+
+userStore1.updates.setName('User from store 1');
+
+assets.isEqual(userStore1.get().name, 'User from store 1')
+
+assets.isEqual(userStore2.get().name, 'User 2')
+
+// type of createUserStore
+type UserStore = ReturnType<typeof createUserStore>;
+```
+
+#### Type parameters
+
+| Name      | Type                                                                                                                                                                                                                                    |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `State`   | `State`                                                                                                                                                                                                                                 |
+| `Updates` | extends `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> = `Readonly`<`Record`<`string`, (...`args`: `any`[]) => [`StateMutation`](README.md#statemutation)<`State`\>\>\> |
+
+#### Parameters
+
+| Name          | Type                                                                                                                                                                                                                     |
+| :------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `declaration` | `Readonly`<{ `initialState`: `State` ; `options?`: `Readonly`<{ `comparator?`: (`prevState`: `State`, `nextState`: `State`) => `boolean` ; `name?`: `string` ; `onDestroy?`: () => `void` }\> ; `updates`: `Updates` }\> |
+
+#### Returns
+
+[`DeclaredStoreFactory`](README.md#declaredstorefactory)<`State`, `Updates`\>
+
+#### Defined in
+
+[packages/rx-effects/src/declareStore.ts:99](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/declareStore.ts#L99)
 
 ---
 
 ### declareStoreWithUpdates
 
 ▸ **declareStoreWithUpdates**<`State`, `Updates`\>(`initialState`, `updates`, `baseOptions?`): (`state?`: `State`, `options?`: [`StoreOptions`](README.md#storeoptions)<`State`\>) => [`StoreWithUpdates`](README.md#storewithupdates)<`State`, `Updates`\>
+
+**`Deprecated`**
+
+Use `declareStore()`
 
 #### Type parameters
 
@@ -1204,7 +1360,7 @@ Declare a record of factories for creating state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/storeUtils.ts:44](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/storeUtils.ts#L44)
+[packages/rx-effects/src/storeUtils.ts:47](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/storeUtils.ts#L47)
 
 ---
 
@@ -1214,10 +1370,10 @@ Declare a record of factories for creating state mutations.
 
 #### Type parameters
 
-| Name      | Type                |
-| :-------- | :------------------ |
-| `Service` | extends `AnyObject` |
-| `Params`  | extends `unknown`[] |
+| Name      | Type                                                                                   |
+| :-------- | :------------------------------------------------------------------------------------- |
+| `Service` | extends `AnyObject`                                                                    |
+| `Params`  | extends `Readonly`<{ `get`: () => `unknown` ; `value$`: `Observable`<`unknown`\> }\>[] |
 
 #### Parameters
 
@@ -1231,17 +1387,17 @@ Declare a record of factories for creating state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/mvc.ts:59](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/mvc.ts#L59)
+[packages/rx-effects/src/mvc.ts:62](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/mvc.ts#L62)
 
 ▸ **declareViewController**<`Dependencies`, `Service`, `Params`\>(`tokens`, `factory`): [`ViewControllerFactory`](README.md#viewcontrollerfactory)<`Service`, `Params`\>
 
 #### Type parameters
 
-| Name           | Type                      |
-| :------------- | :------------------------ |
-| `Dependencies` | extends `DependencyProps` |
-| `Service`      | extends `AnyObject`       |
-| `Params`       | extends `unknown`[]       |
+| Name           | Type                                                                                   |
+| :------------- | :------------------------------------------------------------------------------------- |
+| `Dependencies` | extends `DependencyProps`                                                              |
+| `Service`      | extends `AnyObject`                                                                    |
+| `Params`       | extends `Readonly`<{ `get`: () => `unknown` ; `value$`: `Observable`<`unknown`\> }\>[] |
 
 #### Parameters
 
@@ -1256,7 +1412,7 @@ Declare a record of factories for creating state mutations.
 
 #### Defined in
 
-[packages/rx-effects/src/mvc.ts:66](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/mvc.ts#L66)
+[packages/rx-effects/src/mvc.ts:69](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/mvc.ts#L69)
 
 ---
 
@@ -1289,7 +1445,7 @@ function.
 
 #### Defined in
 
-[packages/rx-effects/src/queryMappers.ts:14](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/queryMappers.ts#L14)
+[packages/rx-effects/src/queryMappers.ts:14](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/queryMappers.ts#L14)
 
 ---
 
@@ -1322,7 +1478,7 @@ and merges them into a single value.
 
 #### Defined in
 
-[packages/rx-effects/src/queryMappers.ts:39](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/queryMappers.ts#L39)
+[packages/rx-effects/src/queryMappers.ts:39](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/queryMappers.ts#L39)
 
 ---
 
@@ -1352,7 +1508,7 @@ You can use this helper to apply multiple changes at the same time.
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:78](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L78)
+[packages/rx-effects/src/store.ts:78](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L78)
 
 ---
 
@@ -1381,7 +1537,7 @@ Creates a deferred or transformed view of the store.
 
 #### Defined in
 
-[packages/rx-effects/src/storeUtils.ts:16](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/storeUtils.ts#L16)
+[packages/rx-effects/src/storeUtils.ts:16](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/storeUtils.ts#L16)
 
 ---
 
@@ -1401,7 +1557,7 @@ Creates a deferred or transformed view of the store.
 
 #### Defined in
 
-[packages/rx-effects/src/storeExtensions.ts:13](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/storeExtensions.ts#L13)
+[packages/rx-effects/src/storeExtensions.ts:13](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/storeExtensions.ts#L13)
 
 ---
 
@@ -1431,4 +1587,4 @@ Creates a proxy for the store with "updates" to change a state by provided mutat
 
 #### Defined in
 
-[packages/rx-effects/src/store.ts:334](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects/src/store.ts#L334)
+[packages/rx-effects/src/store.ts:334](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects/src/store.ts#L334)

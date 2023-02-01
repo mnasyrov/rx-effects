@@ -42,7 +42,7 @@ rx-effects-react
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:43](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/mvc.tsx#L43)
+[rx-effects-react/src/mvc.tsx:71](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/mvc.tsx#L71)
 
 ---
 
@@ -72,7 +72,7 @@ If the factory is provided, it is called only once.
 
 #### Defined in
 
-[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useConst.ts#L12)
+[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useConst.ts#L12)
 
 ---
 
@@ -105,7 +105,7 @@ included explicitly when it is needed.
 
 #### Defined in
 
-[rx-effects-react/src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useController.ts#L18)
+[rx-effects-react/src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useController.ts#L18)
 
 ---
 
@@ -131,7 +131,7 @@ included explicitly when it is needed.
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:12](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/mvc.tsx#L12)
+[rx-effects-react/src/mvc.tsx:15](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/mvc.tsx#L15)
 
 ---
 
@@ -170,13 +170,13 @@ const value = useObservable<string>(source$, undefined);
 
 #### Defined in
 
-[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useObservable.ts#L19)
+[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useObservable.ts#L19)
 
 ---
 
 ### useObserver
 
-▸ **useObserver**<`T`\>(`source$`, `observerOrNext`): `Subscription`
+▸ **useObserver**<`T`\>(`source$`, `observerOrNext`): `void`
 
 Subscribes the provided observer or `next` handler on `source$` observable.
 
@@ -205,11 +205,11 @@ useObserver(source$, (nextValue) => {
 
 #### Returns
 
-`Subscription`
+`void`
 
 #### Defined in
 
-[rx-effects-react/src/useObserver.ts:20](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useObserver.ts#L20)
+[rx-effects-react/src/useObserver.ts:19](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useObserver.ts#L19)
 
 ---
 
@@ -237,7 +237,7 @@ Returns a value which is provided by the query.
 
 #### Defined in
 
-[rx-effects-react/src/useQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useQuery.ts#L9)
+[rx-effects-react/src/useQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useQuery.ts#L9)
 
 ---
 
@@ -283,7 +283,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useSelector.ts#L27)
+[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useSelector.ts#L27)
 
 ---
 
@@ -312,27 +312,28 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/useStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/useStore.ts#L11)
+[rx-effects-react/src/useStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useStore.ts#L11)
 
 ---
 
 ### useViewController
 
-▸ **useViewController**<`Result`, `Params`\>(`factory`, `...params`): `Controller`<`Result`\>
+▸ **useViewController**<`Result`, `Params`, `QueryParams`\>(`factory`, `...params`): `Controller`<`Result`\>
 
 #### Type parameters
 
-| Name     | Type                                   |
-| :------- | :------------------------------------- |
-| `Result` | extends `Record`<`string`, `unknown`\> |
-| `Params` | extends `unknown`[]                    |
+| Name          | Type                                                                                           |
+| :------------ | :--------------------------------------------------------------------------------------------- |
+| `Result`      | extends `Record`<`string`, `unknown`\>                                                         |
+| `Params`      | extends `unknown`[]                                                                            |
+| `QueryParams` | extends { [K in string \| number \| symbol]: Params[K] extends V ? Readonly<Object\> : never } |
 
 #### Parameters
 
-| Name        | Type                                         |
-| :---------- | :------------------------------------------- |
-| `factory`   | `ViewControllerFactory`<`Result`, `Params`\> |
-| `...params` | `Params`                                     |
+| Name        | Type                                              |
+| :---------- | :------------------------------------------------ |
+| `factory`   | `ViewControllerFactory`<`Result`, `QueryParams`\> |
+| `...params` | `Params`                                          |
 
 #### Returns
 
@@ -340,4 +341,4 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:23](https://github.com/mnasyrov/rx-effects/blob/469b251/packages/rx-effects-react/src/mvc.tsx#L23)
+[rx-effects-react/src/mvc.tsx:26](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/mvc.tsx#L26)

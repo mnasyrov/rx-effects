@@ -1,6 +1,6 @@
 {
   "name": "rx-effects-react",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Reactive state and effects management. Tooling for React.js",
   "license": "MIT",
   "author": "Mikhail Nasyrov (https://github.com/mnasyrov)",
@@ -45,7 +45,7 @@
     "build:esm": "tsc -p tsconfig.build.json --outDir dist/esm --module es2015"
   },
   "dependencies": {
-    "rx-effects": "1.0.1"
+    "rx-effects": "1.1.0"
   },
   "peerDependencies": {
     "ditox-react": ">=2.2.0",
