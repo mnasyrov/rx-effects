@@ -1,7 +1,7 @@
 import { firstValueFrom } from 'rxjs';
 import { toArray } from 'rxjs/operators';
 import { collectChanges } from '../test/testUtils';
-import { mapQuery, mergeQueries } from './queryMappers';
+import { compute } from './compute';
 import {
   createStore,
   createStoreUpdates,
@@ -127,37 +127,6 @@ describe('Store', () => {
     });
   });
 
-  describe('select()', () => {
-    it('should return an observable for the selected value and its further changes', async () => {
-      const store = createStore<State>({ value: 1 });
-      const value$ = store.select((state) => state.value);
-
-      const changes = await collectChanges(value$, () => {
-        store.set({ value: 2 });
-        store.set({ value: 3 });
-      });
-
-      expect(changes).toEqual([1, 3]);
-    });
-
-    it('should use the provided valueCompare', async () => {
-      const store = createStore<State>({ value: 1, data: 'a,1' });
-      const data$ = store.select((state) => state.data, {
-        distinct: {
-          comparator: (v1, v2) =>
-            (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],
-        },
-      });
-
-      const changes = await collectChanges(data$, () => {
-        store.set({ value: 1, data: 'a,2' });
-        store.set({ value: 1, data: 'b,3' });
-      });
-
-      expect(changes).toEqual(['a,1', 'b,3']);
-    });
-  });
-
   describe('query()', () => {
     it('should return a query for the selected value of the state', async () => {
       const store = createStore<State>({ value: 1 });
@@ -174,29 +143,9 @@ describe('Store', () => {
       expect(changes).toEqual([1, 3]);
     });
 
-    it('should use the provided valueCompare', async () => {
-      const store = createStore<State>({ value: 1, data: 'a,1' });
-      const query = store.query((state) => state.data, {
-        distinct: {
-          comparator: (v1, v2) =>
-            (v1 ?? '').split(',')[0] === (v2 ?? '').split(',')[0],
-        },
-      });
-
-      const changes = await collectChanges(query.value$, () => {
-        store.set({ value: 1, data: 'a,2' });
-        store.set({ value: 1, data: 'b,3' });
-      });
-
-      expect(query.get()).toEqual('b,3');
-      expect(changes).toEqual(['a,1', 'b,3']);
-    });
-  });
-
-  describe('asQuery()', () => {
-    it('should return the same store', () => {
+    it('should return the same store if the selector is not specified', () => {
       const store = createStore(1);
-      const query = store.asQuery();
+      const query = store.query();
 
       expect(query).toBe(store);
     });
@@ -247,9 +196,9 @@ describe('Concurrent Store updates', () => {
     const v1 = store.query((state) => state.v1);
     const v2 = store.query((state) => state.v2);
 
-    const merged = mergeQueries([v1, v2], (value1, value2) => value1 + value2);
+    const merged = compute((get) => get(v1) + get(v2));
 
-    const uppercase = mapQuery(merged, (value) => value.toUpperCase());
+    const uppercase = compute((get) => get(merged).toUpperCase());
 
     const history = await collectChanges(store.value$, async () => {
       merged.value$.subscribe((merged) =>

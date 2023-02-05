@@ -21,26 +21,6 @@ describe('mapQuery()', () => {
     expect(await firstValueFrom(query.value$)).toBe(11);
   });
 
-  it('should not produce values for each source emission if distinct is false', () => {
-    const sourceValue$ = new BehaviorSubject<number>(0);
-    const sourceQuery: Query<number> = {
-      get: () => sourceValue$.getValue(),
-      value$: sourceValue$,
-    };
-
-    const query = mapQuery(sourceQuery, (value) => value, { distinct: false });
-    const listener = jest.fn();
-    query.value$.subscribe(listener);
-
-    sourceValue$.next(1);
-    sourceValue$.next(1);
-
-    expect(listener).toHaveBeenCalledTimes(3);
-    expect(listener).toHaveBeenNthCalledWith(1, 0);
-    expect(listener).toHaveBeenNthCalledWith(2, 1);
-    expect(listener).toHaveBeenNthCalledWith(3, 1);
-  });
-
   it('should produce distinct values by default', () => {
     const sourceValue$ = new BehaviorSubject<number>(0);
     const sourceQuery: Query<number> = {
@@ -67,7 +47,7 @@ describe('mapQuery()', () => {
       value$: sourceValue$,
     };
 
-    const query = mapQuery(sourceQuery, (value) => value, { distinct: true });
+    const query = mapQuery(sourceQuery, (value) => value);
     const listener = jest.fn();
     query.value$.subscribe(listener);
 
@@ -77,54 +57,6 @@ describe('mapQuery()', () => {
     expect(listener).toHaveBeenCalledTimes(2);
     expect(listener).toHaveBeenNthCalledWith(1, 0);
     expect(listener).toHaveBeenNthCalledWith(2, 1);
-  });
-
-  it('should produce distinct values with the custom comparator', () => {
-    type Value = { v: number };
-    const sourceValue$ = new BehaviorSubject<Value>({ v: 0 });
-    const sourceQuery: Query<Value> = {
-      get: () => sourceValue$.getValue(),
-      value$: sourceValue$,
-    };
-
-    const query = mapQuery(sourceQuery, (value) => value, {
-      distinct: { comparator: (a, b) => a.v === b.v },
-    });
-    const listener = jest.fn();
-    query.value$.subscribe(listener);
-
-    sourceValue$.next({ v: 1 });
-    sourceValue$.next({ v: 1 });
-    sourceValue$.next({ v: 2 });
-
-    expect(listener).toHaveBeenCalledTimes(3);
-    expect(listener).toHaveBeenNthCalledWith(1, { v: 0 });
-    expect(listener).toHaveBeenNthCalledWith(2, { v: 1 });
-    expect(listener).toHaveBeenNthCalledWith(3, { v: 2 });
-  });
-
-  it('should produce distinct values with the custom keySelector', () => {
-    type Value = { v: number };
-    const sourceValue$ = new BehaviorSubject<Value>({ v: 0 });
-    const sourceQuery: Query<Value> = {
-      get: () => sourceValue$.getValue(),
-      value$: sourceValue$,
-    };
-
-    const query = mapQuery(sourceQuery, (value) => value, {
-      distinct: { keySelector: (a) => a.v },
-    });
-    const listener = jest.fn();
-    query.value$.subscribe(listener);
-
-    sourceValue$.next({ v: 1 });
-    sourceValue$.next({ v: 1 });
-    sourceValue$.next({ v: 2 });
-
-    expect(listener).toHaveBeenCalledTimes(3);
-    expect(listener).toHaveBeenNthCalledWith(1, { v: 0 });
-    expect(listener).toHaveBeenNthCalledWith(2, { v: 1 });
-    expect(listener).toHaveBeenNthCalledWith(3, { v: 2 });
   });
 
   it('should return the same calculated value if there is a subscription and the source was not changed', async () => {
@@ -199,11 +131,7 @@ describe('mergeQueries()', () => {
     const store1 = createStore(0);
     const store2 = createStore({ k: 0, value: 0 });
 
-    const query = mergeQueries(
-      [store1, store2],
-      (a, b) => ({ a, b: b.value }),
-      { distinct: false },
-    );
+    const query = mergeQueries([store1, store2], (a, b) => ({ a, b: b.value }));
     const listener = jest.fn();
     query.value$.subscribe(listener);
 
@@ -236,56 +164,6 @@ describe('mergeQueries()', () => {
     expect(listener).toHaveBeenCalledTimes(2);
     expect(listener).toHaveBeenNthCalledWith(1, 0);
     expect(listener).toHaveBeenNthCalledWith(2, 1);
-  });
-
-  it('should produce distinct values with the custom comparator', () => {
-    const store1 = createStore(0);
-    const store2 = createStore({ k: 0, value: 0 });
-
-    const query = mergeQueries(
-      [store1, store2],
-      (a, b) => ({ a, b: b.value }),
-      { distinct: { comparator: (a, b) => a.a === b.a } },
-    );
-    const listener = jest.fn();
-    query.value$.subscribe(listener);
-
-    store2.set({ k: 1, value: 1 });
-    store2.notify();
-
-    store2.set({ k: 2, value: 2 });
-    store2.notify();
-
-    store1.set(1);
-    store1.notify();
-
-    expect(listener).toHaveBeenCalledTimes(2);
-    expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });
-    expect(listener).toHaveBeenNthCalledWith(2, { a: 1, b: 2 });
-  });
-
-  it('should produce distinct values with the custom keySelector', () => {
-    const store1 = createStore(0);
-    const store2 = createStore({ k: 0, value: 0 });
-
-    const query = mergeQueries(
-      [store1, store2],
-      (a, b) => ({ a, b: b.value }),
-      { distinct: { keySelector: (a) => a.a } },
-    );
-    const listener = jest.fn();
-    query.value$.subscribe(listener);
-
-    store2.set({ k: 1, value: 1 });
-    store2.set({ k: 2, value: 2 });
-    store2.notify();
-
-    store1.set(1);
-    store1.notify();
-
-    expect(listener).toHaveBeenCalledTimes(2);
-    expect(listener).toHaveBeenNthCalledWith(1, { a: 0, b: 0 });
-    expect(listener).toHaveBeenNthCalledWith(2, { a: 1, b: 2 });
   });
 
   it('should return the same calculated value if there is a subscription and the source was not changed', async () => {

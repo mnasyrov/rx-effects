@@ -89,8 +89,13 @@ export function isComputationQuery<T>(
   return '_node' in value;
 }
 
-const FAST_QUERY_GETTER: ComputationResolver = (query: Query<unknown>) =>
-  query.get();
+const FAST_QUERY_GETTER: ComputationResolver = (
+  query: Query<unknown>,
+  selector?: (value: unknown) => unknown,
+) => {
+  const value = query.get();
+  return selector ? selector(value) : value;
+};
 
 type ValueRef<T> = { value: T; params?: Array<unknown> };
 
@@ -239,9 +244,7 @@ function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
           };
         }
 
-        const subscription = parent.value$
-          // .pipe(observeOn(asapScheduler))
-          .subscribe(depObserver);
+        const subscription = parent.value$.subscribe(depObserver);
 
         depsSubscriptions.push(() => subscription.unsubscribe());
       }

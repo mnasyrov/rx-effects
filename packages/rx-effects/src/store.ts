@@ -1,7 +1,7 @@
 import { Observable, Subscriber } from 'rxjs';
+import { compute } from './compute';
 import { Controller } from './controller';
-import { Query, QueryOptions } from './query';
-import { mapQuery } from './queryMappers';
+import { Query } from './query';
 import { STORE_EVENT_BUS } from './storeEvents';
 import { setInternalStoreFlag, setStateMutationName } from './storeMetadata';
 import { DEFAULT_COMPARATOR, isReadonlyArray } from './utils';
@@ -82,45 +82,31 @@ export function pipeStateMutations<State>(
     mutations.reduce((nextState, mutation) => mutation(nextState), state);
 }
 
+type StoreQueryFn<State> = {
+  (): Query<State>;
+  <T>(selector: (state: State) => T): Query<T>;
+};
+
 /**
  * Read-only interface of a store.
  */
 export type StoreQuery<State> = Readonly<
   Query<State> & {
     /**
-     * Returns a part of the state as `Observable`
-     * The result observable produces distinct values by default.
+     * Creates a query from the store.
      *
-     * @example
-     * ```ts
-     * const state: StateReader<{form: {login: 'foo'}}> = // ...
-     * const value$ = state.select((state) => state.form.login);
-     * ```
-     */
-    select: <R, K = R>(
-      selector: (state: State) => R,
-      options?: QueryOptions<R, K>,
-    ) => Observable<R>;
-
-    /**
-     * Returns a part of the state as `Query`.
-     * The result query produces distinct values by default.
+     * If selector is not specified, then the store is returned as is.
+     *
+     * If selector is specified then returns a part of the state as `Query`.
+     * The result query produces distinct values.
      *
      * @example
      * ```ts
      * const state: StateReader<{form: {login: 'foo'}}> = // ...
      * const query = state.query((state) => state.form.login);
      * ```
-     * */
-    query: <R, K = R>(
-      selector: (state: State) => R,
-      options?: QueryOptions<R, K>,
-    ) => Query<R>;
-
-    /**
-     * Cast the store to a narrowed `Query` type.
      */
-    asQuery: () => Query<State>;
+    query: StoreQueryFn<State>;
   }
 >;
 
@@ -221,21 +207,11 @@ export function createStore<State>(
       return currentState;
     },
 
-    select<R, K = R>(
-      selector: (state: State) => R,
-      options?: QueryOptions<R, K>,
-    ): Observable<R> {
-      return this.query(selector, options).value$;
+    query<T>(selector?: (state: State) => T): Query<T> | Query<State> {
+      return selector
+        ? compute<T>(() => selector(store.get()), [store])
+        : store;
     },
-
-    query<R, K = R>(
-      selector: (state: State) => R,
-      options?: QueryOptions<R, K>,
-    ): Query<R> {
-      return mapQuery(this, selector, options);
-    },
-
-    asQuery: () => store,
 
     set(nextState: State) {
       update(() => nextState);
