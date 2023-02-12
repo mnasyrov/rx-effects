@@ -1,4 +1,5 @@
-export const DEFAULT_COMPARATOR = (a: unknown, b: unknown): boolean => a === b;
+export const DEFAULT_COMPARATOR: (a: unknown, b: unknown) => boolean =
+  Object.is;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
