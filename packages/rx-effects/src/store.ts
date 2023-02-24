@@ -1,5 +1,5 @@
 import { Observable, Subscriber } from 'rxjs';
-import { compute } from './compute';
+import { compute, nextStoreVersion } from './compute';
 import { Controller } from './controller';
 import { Query } from './query';
 import { STORE_EVENT_BUS } from './storeEvents';
@@ -209,7 +209,7 @@ export function createStore<State>(
 
     query<T>(selector?: (state: State) => T): Query<T> | Query<State> {
       return selector
-        ? compute<T>(() => selector(store.get()), [store])
+        ? compute<T>((get) => selector(get(store)), [store])
         : store;
     },
 
@@ -249,6 +249,7 @@ export function createStore<State>(
       return;
     }
 
+    nextStoreVersion();
     currentState = nextState;
     scheduleNotify(store);
 

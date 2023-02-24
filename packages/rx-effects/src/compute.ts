@@ -97,7 +97,7 @@ const FAST_QUERY_GETTER: ComputationResolver = (
   return selector ? selector(value) : value;
 };
 
-type ValueRef<T> = { value: T; params?: Array<unknown> };
+type ValueRef<T> = { value: T; params?: Array<unknown>; version?: number };
 
 /** @internal */
 export type Node<T> = {
@@ -114,6 +114,7 @@ export type Node<T> = {
   children?: Set<Node<any>>;
 };
 
+/** @internal */
 export function createComputationNode<T>(
   computation: Computation<T>,
   options?: ComputationOptions<T>,
@@ -145,20 +146,30 @@ export function createComputationQuery<T>(node: Node<T>): ComputationQuery<T> {
 
 /// COMPUTATION ENGINE
 
-let GLOBAL_VERSION = 0;
+let NODE_VERSION = 0;
+let STORE_VERSION = 0;
 
 /** @internal */
-export function setGlobalVersion(value: number) {
-  GLOBAL_VERSION = value;
+export function nextVersion(currentValue: number): number {
+  return currentValue >= Number.MAX_SAFE_INTEGER ? 0 : currentValue + 1;
 }
 
 /** @internal */
-export function nextVersion(): number {
-  return (GLOBAL_VERSION =
-    GLOBAL_VERSION === Number.MAX_SAFE_INTEGER ? 0 : GLOBAL_VERSION + 1);
+export function nextNodeVersion() {
+  STORE_VERSION = nextVersion(STORE_VERSION);
+  NODE_VERSION = nextVersion(NODE_VERSION);
+}
+
+/** @internal */
+export function nextStoreVersion() {
+  STORE_VERSION = nextVersion(STORE_VERSION);
 }
 
 export function getQueryValue<T>(node: Node<T>): T {
+  if (node.valueRef?.version === STORE_VERSION) {
+    return node.valueRef.value;
+  }
+
   return node.computation(FAST_QUERY_GETTER);
 }
 
@@ -203,7 +214,8 @@ function updateTreeObserverCount(node: Node<any>) {
 
 function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
   let dependencies = node.dependencies;
-  let valueRef = node.valueRef;
+  let valueRef =
+    node.valueRef?.version === STORE_VERSION ? node.valueRef : undefined;
 
   if (dependencies) {
     if (observer && !valueRef) {
@@ -288,7 +300,7 @@ export function makeColdNode<T>(node: Node<T>) {
 }
 
 function onSourceChanged<T>(node: Node<T>) {
-  nextVersion();
+  nextNodeVersion();
   recompute(node);
 }
 
@@ -321,13 +333,15 @@ export function onSourceComplete<T>(node: Node<T>) {
 }
 
 export function recompute<T>(node: Node<T>) {
-  if (node.version === GLOBAL_VERSION) {
+  if (node.version === NODE_VERSION) {
     return;
   }
-  node.version = GLOBAL_VERSION;
+  node.version = NODE_VERSION;
 
   if (node.observers && node.observers.size > 0) {
     calculateValue(node);
+  } else {
+    node.valueRef = undefined;
   }
 
   if (node.treeObserverCount > 0 && node.children) {
@@ -355,6 +369,10 @@ export function calculateValue<T>(node: Node<T>) {
       }
     }
   }
+
+  if (!isChanged && node.valueRef) {
+    node.valueRef.version = STORE_VERSION;
+  }
 }
 
 function calculate<T>(
@@ -378,7 +396,7 @@ function calculate<T>(
     },
   );
 
-  return { value, params };
+  return { value, params, version: STORE_VERSION };
 }
 
 function isCalculationChanged<T>(
