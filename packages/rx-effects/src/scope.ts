@@ -20,6 +20,11 @@ export type Scope = Controller<{
   add: (teardown: TeardownLogic) => void;
 
   /**
+   * Register a teardown function to be called with `destroy()` method.
+   */
+  onDestroy: (teardown: () => void) => void;
+
+  /**
    * Creates a store which will be destroyed with the scope.
    *
    * @param initialState Initial state
@@ -95,6 +100,8 @@ export function createScope(): Scope {
 
   return {
     add: registerTeardown,
+    onDestroy: registerTeardown,
+
     destroy,
 
     createController,
