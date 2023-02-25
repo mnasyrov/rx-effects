@@ -13,23 +13,26 @@
     "url": "https://github.com/mnasyrov/rx-effects.git"
   },
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "postinstall": "lerna bootstrap",
-    "clean": "rm -rf dist && lerna run clean",
+    "prepare": "husky install",
+    "clean": "rm -rf build coverage dist node_modules/.cache && npm run --workspaces --if-present clean",
     "lint": "npm run lint:eslint && npm run lint:tsc",
     "lint:eslint": "eslint \"packages/*/{src,test*}/**\"",
     "lint:tsc": "tsc --noEmit --jsx react",
     "test": "jest",
-    "build": "lerna run build",
+    "build": "npm run --workspaces --if-present build",
     "docs": "node scripts/docs.js",
+    "pack": "npm run build && mkdir -p dist && npm pack --workspaces --pack-destination ./dist",
     "preversion": "npm run build && npm run lint && npm run test && npm run docs && git add --all",
-    "prepare": "husky install",
+    "version": "changeset version",
     "prepublishOnly": "npm run clean && npm run build",
-    "lerna-version": "lerna version",
-    "lerna-publish": "lerna publish from-git",
-    "pack": "npm run build && mkdir -p dist && npx lerna exec 'npm pack --pack-destination ../../dist'"
+    "publish": "changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "2.26.0",
     "@types/jest": "29.2.4",
     "@types/shelljs": "0.8.11",
     "@typescript-eslint/eslint-plugin": "5.46.0",
@@ -47,7 +50,6 @@
     "jest": "29.4.2",
     "jest-environment-jsdom": "29.4.2",
     "jest-extended": "3.2.3",
-    "lerna": "6.5.1",
     "lint-staged": "13.1.0",
     "markdown-toc": "1.2.0",
     "prettier": "2.8.1",
