@@ -24,6 +24,7 @@
     "lint:tsc": "tsc --noEmit --jsx react",
     "test": "jest",
     "build": "npm run --workspaces --if-present build",
+    "benchmarks": "npm run --workspaces --if-present benchmarks",
     "docs": "node scripts/docs.js",
     "pack": "npm run build && mkdir -p dist && npm pack --workspaces --pack-destination ./dist",
     "preversion": "npm run build && npm run lint && npm run test && npm run docs && git add --all",
@@ -55,7 +56,9 @@
     "prettier": "2.8.1",
     "rxjs": "7.8.0",
     "shelljs": "0.8.5",
+    "tinybench": "2.3.1",
     "ts-jest": "29.0.3",
+    "tsx": "3.12.3",
     "typedoc": "0.23.21",
     "typedoc-plugin-markdown": "3.14.0",
     "typescript": "4.9.4"

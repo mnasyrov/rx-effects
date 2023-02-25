@@ -437,6 +437,20 @@ describe('compute()', () => {
       { key: 2, val: 'c' },
     ]);
   });
+
+  it('should use a getter with selector', async () => {
+    const source = createStore({ key: 1, val: 'a' });
+
+    const query = compute((get) => get(source, ({ val }) => val));
+    expect(query.get()).toEqual('a');
+  });
+
+  it('should use a getter without selector', async () => {
+    const source = createStore({ key: 1, val: 'a' });
+
+    const query = compute((get) => get(source));
+    expect(query.get()).toEqual({ key: 1, val: 'a' });
+  });
 });
 
 describe('createComputationNode()', () => {
@@ -553,7 +567,7 @@ describe('addValueObserver()', () => {
     });
 
     expect(node.hot).toBe(true);
-    expect(node.observers?.size).toBe(1);
+    expect(node.observers?.length).toBe(1);
     expect(node.treeObserverCount).toBe(1);
     expect(changes).toEqual([1]);
   });
@@ -568,13 +582,13 @@ describe('addValueObserver()', () => {
     const node2 = getComputationNode(query2);
 
     expect(node1.observers).toBeUndefined();
-    expect(node1.children?.size).toBeUndefined();
-    expect(node1.parents?.size).toBeUndefined();
+    expect(node1.children?.length).toBeUndefined();
+    expect(node1.parents?.length).toBeUndefined();
     expect(node1.depsSubscriptions?.length).toBeUndefined();
 
     expect(node2.observers).toBeUndefined();
-    expect(node2.children?.size).toBeUndefined();
-    expect(node2.parents?.size).toBeUndefined();
+    expect(node2.children?.length).toBeUndefined();
+    expect(node2.parents?.length).toBeUndefined();
     expect(node1.depsSubscriptions?.length).toBeUndefined();
 
     const subject = new Subject();
@@ -584,16 +598,16 @@ describe('addValueObserver()', () => {
 
     expect(node1.hot).toBe(true);
     expect(node1.treeObserverCount).toBe(1);
-    expect(node1.observers?.size).toBeUndefined();
-    expect(node1.children?.size).toBe(1);
-    expect(node1.parents?.size).toBeUndefined();
+    expect(node1.observers?.length).toBeUndefined();
+    expect(node1.children?.length).toBe(1);
+    expect(node1.parents?.length).toBeUndefined();
     expect(node1.depsSubscriptions?.length).toBe(1);
 
     expect(node2.hot).toBe(true);
     expect(node2.treeObserverCount).toBe(1);
-    expect(node2.observers?.size).toBe(1);
-    expect(node2.parents?.size).toBe(1);
-    expect(node2.children?.size).toBeUndefined();
+    expect(node2.observers?.length).toBe(1);
+    expect(node2.parents?.length).toBe(1);
+    expect(node2.children?.length).toBeUndefined();
     expect(node2.depsSubscriptions?.length).toBe(0);
 
     expect(changes).toEqual([1]);
@@ -624,7 +638,7 @@ describe('removeValueObserver()', () => {
 
     removeValueObserver(node, subject);
     expect(node.hot).toBe(false);
-    expect(node.observers?.size).toBe(0);
+    expect(node.observers?.length).toBeUndefined();
     expect(node.treeObserverCount).toBe(0);
   });
 
@@ -649,17 +663,17 @@ describe('removeValueObserver()', () => {
     removeValueObserver(node2, subject2);
     expect(node1.hot).toBe(true);
     expect(node1.treeObserverCount).toBe(1);
-    expect(node1.observers?.size).toBe(1);
-    expect(node1.children?.size).toBe(0);
-    expect(node1.parents?.size).toBeUndefined();
+    expect(node1.observers?.length).toBe(1);
+    expect(node1.children?.length).toBe(0);
+    expect(node1.parents?.length).toBeUndefined();
     expect(node1.depsSubscriptions?.length).toBe(1);
 
     expect(node2.hot).toBe(false);
     expect(node2.treeObserverCount).toBe(0);
-    expect(node2.observers?.size).toBe(0);
-    expect(node2.parents?.size).toBe(0);
-    expect(node2.children?.size).toBeUndefined();
-    expect(node2.depsSubscriptions?.length).toBe(0);
+    expect(node2.observers?.length).toBeUndefined();
+    expect(node2.parents?.length).toBeUndefined();
+    expect(node2.children?.length).toBeUndefined();
+    expect(node2.depsSubscriptions?.length).toBeUndefined();
   });
 });
 
@@ -736,8 +750,8 @@ describe('makeColdNode()', () => {
     const parent = getComputationNode(query);
 
     const node = getComputationNode(query);
-    node.parents = new Set();
-    node.parents.add(parent);
+    node.parents = [];
+    node.parents.push(parent);
 
     expect(() => {
       makeColdNode(node);
@@ -896,7 +910,7 @@ describe('calculateValue()', () => {
       computation: () => ++value,
       hot: false,
       treeObserverCount: 1,
-      observers: new Set([observer]),
+      observers: [observer],
     });
 
     expect(value).toBe(2);
@@ -911,7 +925,7 @@ describe('calculateValue()', () => {
     const node = {
       ...createComputationNode(() => source, { comparator }),
       treeObserverCount: 1,
-      observers: new Set([observer]),
+      observers: [observer],
     };
 
     calculateValue(node);
@@ -927,7 +941,7 @@ describe('calculateValue()', () => {
     const node = {
       ...createComputationNode(() => source, { comparator }),
       treeObserverCount: 1,
-      observers: new Set([observer]),
+      observers: [observer],
     };
     node.valueRef = { value: 1, params: [] };
 
