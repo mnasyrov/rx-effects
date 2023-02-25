@@ -7,12 +7,15 @@ describe('Scope', () => {
   describe('destroy()', () => {
     it('should unsubscribe all collected subscriptions', () => {
       const scope = createScope();
-      const teardown = jest.fn();
+      const teardown1 = jest.fn();
+      const teardown2 = jest.fn();
 
-      scope.add(teardown);
+      scope.add(teardown1);
+      scope.add(teardown2);
       scope.destroy();
 
-      expect(teardown).toHaveBeenCalledTimes(1);
+      expect(teardown1).toHaveBeenCalledTimes(1);
+      expect(teardown2).toHaveBeenCalledTimes(1);
     });
   });
 

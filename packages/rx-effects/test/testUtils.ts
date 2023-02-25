@@ -4,6 +4,7 @@ import {
   Observable,
   Observer,
   Subject,
+  timeout,
   timer,
 } from 'rxjs';
 import Mock = jest.Mock;
@@ -11,6 +12,7 @@ import Mock = jest.Mock;
 export function collectChanges<T>(
   source$: Observable<T>,
   action: () => void | Promise<void>,
+  interval = 500,
 ): Promise<Array<T>> {
   const bufferClose$ = new Subject<void>();
 
@@ -22,7 +24,12 @@ export function collectChanges<T>(
     bufferClose$.next();
   });
 
-  return firstValueFrom(source$.pipe(bufferWhen(() => bufferClose$)));
+  return firstValueFrom(
+    source$.pipe(
+      timeout(interval),
+      bufferWhen(() => bufferClose$),
+    ),
+  );
 }
 
 export function mockObserver<T>(): Observer<T> & {

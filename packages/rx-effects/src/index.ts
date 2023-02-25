@@ -31,12 +31,12 @@ export type { Controller } from './controller';
 
 export * from './mvc';
 
-export type { Query, QueryOptions } from './query';
+export type { Query } from './query';
 export { mapQuery, mergeQueries } from './queryMappers';
 export { queryBehaviourSubject } from './queryUtils';
 
 export * from './store';
-export { pipeStore, declareStoreWithUpdates } from './storeUtils';
+export { pipeStore } from './pipeStore';
 export type { StoreEvent } from './storeEvents';
 
 export type { StateMutationMetadata } from './storeMetadata';

@@ -19,13 +19,13 @@ import {
   getQueryValue,
   isComputationQuery,
   makeColdNode,
+  nextNodeVersion,
   nextVersion,
   Node,
   onSourceComplete,
   onSourceError,
   recompute,
   removeValueObserver,
-  setGlobalVersion,
 } from './compute';
 import { Query } from './query';
 import { queryBehaviourSubject } from './queryUtils';
@@ -378,7 +378,11 @@ describe('compute()', () => {
         store.update((state) => ({ ...state, result }));
       });
 
+      expect($nextResult.get()).toEqual({ value: 0 });
+
       store.update((state) => ({ ...state, a: 1 }));
+
+      expect($nextResult.get()).toEqual({ value: 1 });
     });
 
     subscription?.unsubscribe();
@@ -485,17 +489,16 @@ describe('createComputationQuery()', () => {
   });
 });
 
-describe('nextGlobalVersion()', () => {
-  it('should increase GLOBAL_VERSION and return a new value', () => {
-    const start = nextVersion();
-    expect(nextVersion()).toBe(start + 1);
-    expect(nextVersion()).toBe(start + 2);
-    expect(nextVersion()).toBe(start + 3);
+describe('nextVersion()', () => {
+  it('should return an increased value', () => {
+    expect(nextVersion(0)).toBe(1);
+    expect(nextVersion(1)).toBe(2);
+    expect(nextVersion(2)).toBe(3);
   });
 
-  it('should reset GLOBAL_VERSION if it reached MAX_SAFE_INTEGER', () => {
-    setGlobalVersion(Number.MAX_SAFE_INTEGER);
-    expect(nextVersion()).toBe(0);
+  it('should return zero if a current value greater or equal MAX_SAFE_INTEGER', () => {
+    expect(nextVersion(Number.MAX_SAFE_INTEGER)).toBe(0);
+    expect(nextVersion(Number.MAX_SAFE_INTEGER + 1)).toBe(0);
   });
 });
 
@@ -814,7 +817,7 @@ describe('recompute()', () => {
     expect(calc).toHaveBeenCalledTimes(0);
 
     calc.mockClear();
-    nextVersion();
+    nextNodeVersion();
     recompute(node);
     expect(calc).toHaveBeenCalledTimes(1);
   });
@@ -824,13 +827,13 @@ describe('recompute()', () => {
     const node = createComputationNode(calc);
 
     calc.mockClear();
-    nextVersion();
+    nextNodeVersion();
     recompute(node);
     expect(calc).toHaveBeenCalledTimes(0);
 
     addValueObserver(node, new Subject());
     calc.mockClear();
-    nextVersion();
+    nextNodeVersion();
     recompute(node);
     expect(calc).toHaveBeenCalledTimes(1);
   });
@@ -848,7 +851,7 @@ describe('recompute()', () => {
 
     calc1.mockClear();
     calc2.mockClear();
-    nextVersion();
+    nextNodeVersion();
     recompute(node1);
     expect(calc1).toHaveBeenCalledTimes(0);
     expect(calc2).toHaveBeenCalledTimes(0);
@@ -856,7 +859,7 @@ describe('recompute()', () => {
     addValueObserver(node2, new Subject());
     calc1.mockClear();
     calc2.mockClear();
-    nextVersion();
+    nextNodeVersion();
     recompute(node1);
     expect(calc1).toHaveBeenCalledTimes(1);
     expect(calc2).toHaveBeenCalledTimes(1);
@@ -877,7 +880,7 @@ describe('recompute()', () => {
 
     calc1.mockClear();
     calc2.mockClear();
-    nextVersion();
+    nextNodeVersion();
     recompute(node1);
     expect(calc1).toHaveBeenCalledTimes(0);
     expect(calc2).toHaveBeenCalledTimes(0);
@@ -913,7 +916,7 @@ describe('calculateValue()', () => {
 
     calculateValue(node);
     expect(observer.next).toHaveBeenCalledOnceWith(1);
-    expect(node.valueRef).toEqual({ value: 1 });
+    expect(node.valueRef).toEqual(expect.objectContaining({ value: 1 }));
   });
 
   it('should not cache value in the node in case valueRef is undefined', () => {

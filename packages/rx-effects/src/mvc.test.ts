@@ -16,7 +16,7 @@ describe('createController()', () => {
       const store = scope.createStore(1);
 
       return {
-        counter: store.asQuery(),
+        counter: store.query(),
         increase: () => store.update((state) => state + 1),
         decrease: () => store.update((state) => state - 1),
         destroy: () => onDestroy(),
