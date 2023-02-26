@@ -41,7 +41,8 @@
     "clean": "rm -rf dist",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -p tsconfig.build.json --outDir dist/cjs --module commonjs",
-    "build:esm": "tsc -p tsconfig.build.json --outDir dist/esm --module es2015"
+    "build:esm": "tsc -p tsconfig.build.json --outDir dist/esm --module es2015",
+    "benchmarks": "tsx benchmarks"
   },
   "peerDependencies": {
     "ditox": ">=2.2.0",

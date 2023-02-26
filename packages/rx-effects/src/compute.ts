@@ -1,6 +1,6 @@
 import { Observable, Observer } from 'rxjs';
 import { Query } from './query';
-import { DEFAULT_COMPARATOR } from './utils';
+import { DEFAULT_COMPARATOR, removeFromArray } from './utils';
 
 type Comparator<T> = (a: T, b: T) => boolean;
 
@@ -89,14 +89,6 @@ export function isComputationQuery<T>(
   return '_node' in value;
 }
 
-const FAST_QUERY_GETTER: ComputationResolver = (
-  query: Query<unknown>,
-  selector?: (value: unknown) => unknown,
-) => {
-  const value = query.get();
-  return selector ? selector(value) : value;
-};
-
 type ValueRef<T> = { value: T; params?: Array<unknown>; version?: number };
 
 /** @internal */
@@ -106,12 +98,12 @@ export type Node<T> = {
   hot: boolean;
   version?: number;
   valueRef?: ValueRef<T>;
-  dependencies?: Set<Query<unknown>>;
+  dependencies?: Query<unknown>[];
   depsSubscriptions?: (() => void)[];
-  observers?: Set<Observer<T>>;
+  observers?: Observer<T>[];
   treeObserverCount: number;
-  parents?: Set<Node<any>>;
-  children?: Set<Node<any>>;
+  parents?: Node<any>[];
+  children?: Node<any>[];
 };
 
 /** @internal */
@@ -125,7 +117,7 @@ export function createComputationNode<T>(
     computation,
     comparator: options?.comparator,
     hot: false,
-    dependencies: dependencies ? new Set(dependencies) : undefined,
+    dependencies: dependencies ? [...new Set(dependencies)] : undefined,
     treeObserverCount: 0,
   };
 }
@@ -148,6 +140,14 @@ export function createComputationQuery<T>(node: Node<T>): ComputationQuery<T> {
 
 let NODE_VERSION = 0;
 let STORE_VERSION = 0;
+
+const FAST_QUERY_GETTER: ComputationResolver = (
+  query: Query<unknown>,
+  selector?: (value: unknown) => unknown,
+) => {
+  const value = query.get();
+  return selector ? selector(value) : value;
+};
 
 /** @internal */
 export function nextVersion(currentValue: number): number {
@@ -175,9 +175,9 @@ export function getQueryValue<T>(node: Node<T>): T {
 
 export function addValueObserver<T>(node: Node<T>, observer: Observer<T>) {
   if (!node.observers) {
-    node.observers = new Set();
+    node.observers = [];
   }
-  node.observers.add(observer);
+  node.observers.push(observer);
 
   makeHotNode(node, observer);
 
@@ -185,27 +185,36 @@ export function addValueObserver<T>(node: Node<T>, observer: Observer<T>) {
 }
 
 export function removeValueObserver<T>(node: Node<T>, observer: Observer<T>) {
-  node.observers?.delete(observer);
+  node.observers = removeFromArray(node.observers, observer);
 
   updateTreeObserverCount(node);
 }
 
 function getTreeObserverCount(node: Node<any>): number {
+  const { children, observers } = node;
+
   let subtreeCount = 0;
 
-  if (node.children) {
-    node.children.forEach((childNode) => {
+  if (children) {
+    for (let i = 0; i < children.length; i++) {
+      const childNode = children[i];
       subtreeCount += childNode.treeObserverCount;
-    });
+    }
   }
 
-  return subtreeCount + (node.observers?.size ?? 0);
+  return subtreeCount + (observers?.length ?? 0);
 }
 
 function updateTreeObserverCount(node: Node<any>) {
   node.treeObserverCount = getTreeObserverCount(node);
 
-  node.parents?.forEach(updateTreeObserverCount);
+  const parents = node.parents;
+  if (parents) {
+    for (let i = 0; i < parents.length; i++) {
+      const parentNode = parents[i];
+      updateTreeObserverCount(parentNode);
+    }
+  }
 
   if (node.treeObserverCount === 0) {
     makeColdNode(node);
@@ -226,21 +235,24 @@ function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
 
     const next = calculate(node.computation, (query) => visitedDeps.add(query));
 
-    dependencies = visitedDeps;
-    node.dependencies = dependencies;
+    dependencies = node.dependencies = [...visitedDeps];
 
     if (observer && !valueRef) {
       valueRef = node.valueRef = next;
     }
   }
 
-  if (dependencies.size > 0 && !node.hot) {
+  if (dependencies.length > 0 && !node.hot) {
     let depObserver;
 
-    const depsSubscriptions = (node.depsSubscriptions =
-      node.depsSubscriptions ?? []);
+    let depsSubscriptions = node.depsSubscriptions;
+    if (!depsSubscriptions) {
+      depsSubscriptions = node.depsSubscriptions = [];
+    }
 
-    for (const parent of dependencies.values()) {
+    for (let i = 0; i < dependencies.length; i++) {
+      const parent = dependencies[i];
+
       if (!parent) {
         throw new TypeError('Incorrect dependency');
       }
@@ -271,32 +283,39 @@ function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
 }
 
 export function addChildNode(parent: Node<any>, child: Node<any>) {
-  if (!parent.children) parent.children = new Set();
-  parent.children.add(child);
+  if (!parent.children) parent.children = [];
+  parent.children.push(child);
 
-  if (!child.parents) child.parents = new Set();
-  child.parents.add(parent);
+  if (!child.parents) child.parents = [];
+  child.parents.push(parent);
 
   makeHotNode(parent);
 }
 
 export function makeColdNode<T>(node: Node<T>) {
   node.hot = false;
-
   node.treeObserverCount = 0;
-  if (node.depsSubscriptions) {
-    for (const unsubscribe of node.depsSubscriptions) {
+
+  const { depsSubscriptions, parents } = node;
+  if (depsSubscriptions) {
+    for (let i = 0; i < depsSubscriptions.length; i++) {
+      const unsubscribe = depsSubscriptions[i];
       unsubscribe();
     }
-    node.depsSubscriptions.length = 0;
   }
 
-  node.parents?.forEach((parent) => parent.children?.delete(node));
+  if (parents) {
+    for (let i = 0; i < parents.length; i++) {
+      const parent = parents[i];
+      parent.children = removeFromArray(parent.children, node);
+    }
+  }
 
   node.valueRef = undefined;
-  node.observers?.clear();
-  node.parents?.clear();
-  node.children?.clear();
+  node.depsSubscriptions = undefined;
+  node.observers = undefined;
+  node.parents = undefined;
+  node.children = undefined;
 }
 
 function onSourceChanged<T>(node: Node<T>) {
@@ -305,28 +324,36 @@ function onSourceChanged<T>(node: Node<T>) {
 }
 
 export function onSourceError<T>(node: Node<T>, error: any) {
-  if (node.observers) {
-    for (const observer of node.observers) {
+  const { children, observers } = node;
+
+  if (observers) {
+    for (let i = 0; i < observers.length; i++) {
+      const observer = observers[i];
       observer.error(error);
     }
   }
 
-  if (node.children) {
-    for (const child of node.children) {
+  if (children) {
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
       onSourceError(child, error);
     }
   }
 }
 
 export function onSourceComplete<T>(node: Node<T>) {
-  if (node.observers) {
-    for (const observer of node.observers) {
+  const { children, observers } = node;
+
+  if (observers) {
+    for (let i = 0; i < observers.length; i++) {
+      const observer = observers[i];
       observer.complete();
     }
   }
 
-  if (node.children) {
-    for (const child of node.children) {
+  if (children) {
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
       onSourceComplete(child);
     }
   }
@@ -338,14 +365,16 @@ export function recompute<T>(node: Node<T>) {
   }
   node.version = NODE_VERSION;
 
-  if (node.observers && node.observers.size > 0) {
+  if (node.observers && node.observers.length > 0) {
     calculateValue(node);
   } else {
     node.valueRef = undefined;
   }
 
   if (node.treeObserverCount > 0 && node.children) {
-    for (const child of node.children) {
+    const children = node.children;
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
       recompute(child);
     }
   }
@@ -364,7 +393,9 @@ export function calculateValue<T>(node: Node<T>) {
     node.valueRef = next;
 
     if (node.observers) {
-      for (const observer of node.observers) {
+      const observers = node.observers;
+      for (let i = 0; i < observers.length; i++) {
+        const observer = observers[i];
         observer.next(next.value);
       }
     }
