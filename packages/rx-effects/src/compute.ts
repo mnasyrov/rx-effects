@@ -245,7 +245,7 @@ function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
       depsSubscriptions = node.depsSubscriptions = [];
     }
 
-    for (const parent of dependencies.values()) {
+    for (const parent of dependencies) {
       if (!parent) {
         throw new TypeError('Incorrect dependency');
       }
