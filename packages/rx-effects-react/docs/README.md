@@ -21,7 +21,7 @@ rx-effects-react
 
 ### createControllerContainer
 
-▸ **createControllerContainer**<`T`\>(`token`, `factory`): `FC`
+▸ **createControllerContainer**<`T`\>(`token`, `factory`): `FC`<`PropsWithChildren`\>
 
 #### Type parameters
 
@@ -38,11 +38,11 @@ rx-effects-react
 
 #### Returns
 
-`FC`
+`FC`<`PropsWithChildren`\>
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:71](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/mvc.tsx#L71)
+[src/mvc.tsx:77](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/mvc.tsx#L77)
 
 ---
 
@@ -72,7 +72,7 @@ If the factory is provided, it is called only once.
 
 #### Defined in
 
-[rx-effects-react/src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useConst.ts#L12)
+[src/useConst.ts:12](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/useConst.ts#L12)
 
 ---
 
@@ -105,7 +105,7 @@ included explicitly when it is needed.
 
 #### Defined in
 
-[rx-effects-react/src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useController.ts#L18)
+[src/useController.ts:18](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/useController.ts#L18)
 
 ---
 
@@ -131,7 +131,7 @@ included explicitly when it is needed.
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:15](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/mvc.tsx#L15)
+[src/mvc.tsx:21](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/mvc.tsx#L21)
 
 ---
 
@@ -170,7 +170,7 @@ const value = useObservable<string>(source$, undefined);
 
 #### Defined in
 
-[rx-effects-react/src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useObservable.ts#L19)
+[src/useObservable.ts:19](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/useObservable.ts#L19)
 
 ---
 
@@ -209,7 +209,7 @@ useObserver(source$, (nextValue) => {
 
 #### Defined in
 
-[rx-effects-react/src/useObserver.ts:19](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useObserver.ts#L19)
+[src/useObserver.ts:20](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/useObserver.ts#L20)
 
 ---
 
@@ -237,7 +237,7 @@ Returns a value which is provided by the query.
 
 #### Defined in
 
-[rx-effects-react/src/useQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useQuery.ts#L9)
+[src/useQuery.ts:9](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/useQuery.ts#L9)
 
 ---
 
@@ -283,7 +283,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useSelector.ts#L27)
+[src/useSelector.ts:27](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/useSelector.ts#L27)
 
 ---
 
@@ -312,7 +312,7 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/useStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/useStore.ts#L11)
+[src/useStore.ts:11](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/useStore.ts#L11)
 
 ---
 
@@ -341,4 +341,4 @@ const value = useSelector<{ data: Record<string, string> }>(
 
 #### Defined in
 
-[rx-effects-react/src/mvc.tsx:26](https://github.com/mnasyrov/rx-effects/blob/75d07ba/packages/rx-effects-react/src/mvc.tsx#L26)
+[src/mvc.tsx:32](https://github.com/mnasyrov/rx-effects/blob/e362c63/packages/rx-effects-react/src/mvc.tsx#L32)
