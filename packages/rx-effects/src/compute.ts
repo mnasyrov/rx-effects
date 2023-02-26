@@ -81,14 +81,6 @@ export const compute: {
 
 /// INTERNAL
 
-type ComputationQuery<T> = Query<T> & Readonly<{ _node: Node<T> }>;
-
-export function isComputationQuery<T>(
-  value: Query<T>,
-): value is ComputationQuery<T> {
-  return '_node' in value;
-}
-
 type ValueRef<T> = { value: T; params?: Array<unknown>; version?: number };
 
 /** @internal */
@@ -106,6 +98,8 @@ export type Node<T> = {
   children?: Node<any>[];
 };
 
+const NODES = new WeakMap<Query<any>, Node<any>>();
+
 /** @internal */
 export function createComputationNode<T>(
   computation: Computation<T>,
@@ -122,10 +116,9 @@ export function createComputationNode<T>(
   };
 }
 
-export function createComputationQuery<T>(node: Node<T>): ComputationQuery<T> {
-  return {
-    _node: node,
-
+/** @internal */
+export function createComputationQuery<T>(node: Node<T>): Query<T> {
+  const query = {
     get: () => getQueryValue(node),
 
     value$: new Observable<T>((observer) => {
@@ -134,6 +127,15 @@ export function createComputationQuery<T>(node: Node<T>): ComputationQuery<T> {
       return () => removeValueObserver(node, observer);
     }),
   };
+
+  NODES.set(query, node);
+
+  return query;
+}
+
+/** @internal */
+export function getComputationNode<T>(query: Query<T>): Node<T> | undefined {
+  return NODES.get(query);
 }
 
 /// COMPUTATION ENGINE
@@ -251,14 +253,15 @@ function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
     }
 
     for (let i = 0; i < dependencies.length; i++) {
-      const parent = dependencies[i];
+      const parentQuery = dependencies[i];
 
-      if (!parent) {
+      if (!parentQuery) {
         throw new TypeError('Incorrect dependency');
       }
 
-      if (isComputationQuery(parent)) {
-        addChildNode(parent._node, node);
+      const parentNode = NODES.get(parentQuery);
+      if (parentNode) {
+        addChildNode(parentNode, node);
       } else {
         if (!depObserver) {
           depObserver = {
@@ -268,7 +271,7 @@ function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
           };
         }
 
-        const subscription = parent.value$.subscribe(depObserver);
+        const subscription = parentQuery.value$.subscribe(depObserver);
 
         depsSubscriptions.push(() => subscription.unsubscribe());
       }
