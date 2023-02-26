@@ -16,8 +16,8 @@ import {
   compute,
   createComputationNode,
   createComputationQuery,
+  getComputationNode,
   getQueryValue,
-  isComputationQuery,
   makeColdNode,
   nextNodeVersion,
   nextVersion,
@@ -225,8 +225,8 @@ describe('compute()', () => {
 
     const query1 = compute(() => source.get() + 1, [source]);
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node1 = getComputationNode(query1);
-    const node2 = getComputationNode(query2);
+    const node1 = getNode(query1);
+    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -272,8 +272,8 @@ describe('compute()', () => {
 
     const query1 = compute(() => source.get() + 1, [source]);
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node1 = getComputationNode(query1);
-    const node2 = getComputationNode(query2);
+    const node1 = getNode(query1);
+    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -477,27 +477,12 @@ describe('createComputationNode()', () => {
   });
 });
 
-describe('isComputationQuery()', () => {
-  it('should return "true" if value is ComputationQuery', () => {
-    const node = createComputationNode(() => 1);
-    const query = createComputationQuery(node);
-
-    expect(isComputationQuery(query)).toBe(true);
-  });
-
-  it('should return "false" if value is not ComputationQuery', () => {
-    const query = createStore(1);
-
-    expect(isComputationQuery(query)).toBe(false);
-  });
-});
-
 describe('createComputationQuery()', () => {
   it('should return ComputationQuery', async () => {
     const node = createComputationNode(() => 1);
     const query = createComputationQuery(node);
 
-    expect(isComputationQuery(query)).toBe(true);
+    expect(getComputationNode(query)).toBe(node);
     expect(query.get()).toBe(1);
     expect(await firstValueFrom(query.value$)).toBe(1);
   });
@@ -576,10 +561,10 @@ describe('addValueObserver()', () => {
     const source = createStore(1);
 
     const query1 = compute(() => 1, [source]);
-    const node1 = getComputationNode(query1);
+    const node1 = getNode(query1);
 
     const query2 = compute(() => 1, [query1]);
-    const node2 = getComputationNode(query2);
+    const node2 = getNode(query2);
 
     expect(node1.observers).toBeUndefined();
     expect(node1.children?.length).toBeUndefined();
@@ -646,10 +631,10 @@ describe('removeValueObserver()', () => {
     const source = createStore(1);
 
     const query1 = compute(() => 1, [source]);
-    const node1 = getComputationNode(query1);
+    const node1 = getNode(query1);
 
     const query2 = compute(() => 1, [query1]);
-    const node2 = getComputationNode(query2);
+    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -682,10 +667,10 @@ describe('onSourceError()', () => {
     const source = createStore(1);
 
     const query1 = compute(() => source.get() + 1, [source]);
-    const node1 = getComputationNode(query1);
+    const node1 = getNode(query1);
 
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node2 = getComputationNode(query2);
+    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -737,7 +722,7 @@ describe('onSourceError()', () => {
 describe('makeColdNode()', () => {
   it('should not fail if a node has initial state', () => {
     const query = compute(() => 1);
-    const node = getComputationNode(query);
+    const node = getNode(query);
 
     expect(() => {
       makeColdNode(node);
@@ -747,9 +732,9 @@ describe('makeColdNode()', () => {
   it('should not fail if a parent node has incorrect state', () => {
     const query = compute(() => 1);
 
-    const parent = getComputationNode(query);
+    const parent = getNode(query);
 
-    const node = getComputationNode(query);
+    const node = getNode(query);
     node.parents = [];
     node.parents.push(parent);
 
@@ -764,10 +749,10 @@ describe('onSourceComplete()', () => {
     const source = createStore(1);
 
     const query1 = compute(() => source.get() + 1, [source]);
-    const node1 = getComputationNode(query1);
+    const node1 = getNode(query1);
 
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node2 = getComputationNode(query2);
+    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -855,11 +840,11 @@ describe('recompute()', () => {
   it('should compute if only a subtree has an indirect observer', () => {
     const calc1 = jest.fn(() => 1);
     const query1 = compute(calc1);
-    const node1 = getComputationNode(query1);
+    const node1 = getNode(query1);
 
     const calc2 = jest.fn((get) => get(query1) + 1);
     const query2 = compute(calc2);
-    const node2 = getComputationNode(query2);
+    const node2 = getNode(query2);
 
     addChildNode(node1, node2);
 
@@ -950,8 +935,10 @@ describe('calculateValue()', () => {
   });
 });
 
-function getComputationNode<T>(query: Query<T>): Node<T> {
-  if (isComputationQuery(query)) return query._node;
+function getNode<T>(query: Query<T>): Node<T> {
+  const node = getComputationNode(query);
+
+  if (node) return node;
 
   throw new Error('Not ComputationQuery');
 }
