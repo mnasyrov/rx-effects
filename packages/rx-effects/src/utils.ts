@@ -44,15 +44,17 @@ export function isReadonlyArray<T>(
 }
 
 export function removeFromArray<T>(
-  array: T[] | undefined,
+  source: T[] | undefined,
   item: T,
 ): T[] | undefined {
-  if (!array) return undefined;
+  if (!source) return undefined;
 
-  const index = array.indexOf(item);
+  const clone = Array.from(source);
+
+  const index = clone.indexOf(item);
   if (index >= 0) {
-    array.splice(index, 1);
+    clone.splice(index, 1);
   }
 
-  return array;
+  return clone;
 }
