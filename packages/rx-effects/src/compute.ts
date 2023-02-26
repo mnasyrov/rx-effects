@@ -1,6 +1,6 @@
 import { Observable, Observer } from 'rxjs';
 import { Query } from './query';
-import { DEFAULT_COMPARATOR } from './utils';
+import { DEFAULT_COMPARATOR, removeFromArray } from './utils';
 
 type Comparator<T> = (a: T, b: T) => boolean;
 
@@ -98,7 +98,7 @@ export type Node<T> = {
   hot: boolean;
   version?: number;
   valueRef?: ValueRef<T>;
-  dependencies?: Set<Query<unknown>>;
+  dependencies?: Query<unknown>[];
   depsSubscriptions?: (() => void)[];
   observers?: Observer<T>[];
   treeObserverCount: number;
@@ -117,7 +117,7 @@ export function createComputationNode<T>(
     computation,
     comparator: options?.comparator,
     hot: false,
-    dependencies: dependencies ? new Set(dependencies) : undefined,
+    dependencies: dependencies ? [...new Set(dependencies)] : undefined,
     treeObserverCount: 0,
   };
 }
@@ -140,18 +140,11 @@ export function createComputationQuery<T>(node: Node<T>): ComputationQuery<T> {
 
 let NODE_VERSION = 0;
 let STORE_VERSION = 0;
-const DEPS_RESOLVE_QUEUE: Node<any>[] = [];
 
 const FAST_QUERY_GETTER: ComputationResolver = (
   query: Query<unknown>,
   selector?: (value: unknown) => unknown,
 ) => {
-  if (DEPS_RESOLVE_QUEUE.length > 0 && isComputationQuery(query)) {
-    const node = DEPS_RESOLVE_QUEUE[DEPS_RESOLVE_QUEUE.length - 1];
-    if (!node.dependencies) node.dependencies = new Set();
-    node.dependencies.add(query);
-  }
-
   const value = query.get();
   return selector ? selector(value) : value;
 };
@@ -176,16 +169,8 @@ export function getQueryValue<T>(node: Node<T>): T {
   if (node.valueRef?.version === STORE_VERSION) {
     return node.valueRef.value;
   }
-  if (DEPS_RESOLVE_QUEUE.length > 0) {
-    DEPS_RESOLVE_QUEUE.push(node);
-    try {
-      return node.computation(FAST_QUERY_GETTER);
-    } finally {
-      DEPS_RESOLVE_QUEUE.pop();
-    }
-  } else {
-    return node.computation(FAST_QUERY_GETTER);
-  }
+
+  return node.computation(FAST_QUERY_GETTER);
 }
 
 export function addValueObserver<T>(node: Node<T>, observer: Observer<T>) {
@@ -241,22 +226,18 @@ function makeHotNode<T>(node: Node<T>, observer?: Observer<T>) {
       valueRef = node.valueRef = calculate(node.computation);
     }
   } else {
-    DEPS_RESOLVE_QUEUE.push(node);
-
     const visitedDeps: Set<Query<unknown>> = new Set();
 
     const next = calculate(node.computation, (query) => visitedDeps.add(query));
 
-    dependencies = node.dependencies = visitedDeps;
+    dependencies = node.dependencies = [...visitedDeps];
 
     if (observer && !valueRef) {
       valueRef = node.valueRef = next;
     }
-
-    DEPS_RESOLVE_QUEUE.pop();
   }
 
-  if (dependencies.size > 0 && !node.hot) {
+  if (dependencies.length > 0 && !node.hot) {
     let depObserver;
 
     let depsSubscriptions = node.depsSubscriptions;
@@ -444,15 +425,4 @@ function isArrayEqual(
   b: ReadonlyArray<unknown>,
 ): boolean {
   return a.length === b.length && a.every((value, index) => b[index] === value);
-}
-
-function removeFromArray<T>(array: T[] | undefined, item: T): T[] | undefined {
-  if (!array) return undefined;
-
-  const index = array.indexOf(item);
-  if (index >= 0) {
-    array.splice(index, 1);
-  }
-
-  return array;
 }

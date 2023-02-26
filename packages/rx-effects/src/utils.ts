@@ -42,3 +42,17 @@ export function isReadonlyArray<T>(
 ): value is ReadonlyArray<T> {
   return Array.isArray(value);
 }
+
+export function removeFromArray<T>(
+  array: T[] | undefined,
+  item: T,
+): T[] | undefined {
+  if (!array) return undefined;
+
+  const index = array.indexOf(item);
+  if (index >= 0) {
+    array.splice(index, 1);
+  }
+
+  return array;
+}

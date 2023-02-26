@@ -472,7 +472,7 @@ describe('createComputationNode()', () => {
     });
 
     expect(node.comparator).toBe(comparator);
-    expect(node.dependencies).toEqual(new Set([s1, s2]));
+    expect(node.dependencies).toEqual([s1, s2]);
     expect(node.treeObserverCount).toBe(0);
   });
 });
