@@ -1,3 +1,12 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [2.0.0-beta.1](https://github.com/mnasyrov/rx-effects/compare/v2.0.0-beta.0...v2.0.0-beta.1) (2023-02-27)
+
+**Note:** Version bump only for package rx-effects-root
+
 # [2.0.0-beta.0](https://github.com/mnasyrov/rx-effects/compare/v1.1.0...v2.0.0-beta.0) (2023-02-26)
 
 ### Bug Fixes
@@ -9,11 +18,6 @@
 - Async store and `compute()` function ([5041b5c](https://github.com/mnasyrov/rx-effects/commit/5041b5cd9fe5fdda58af9e704ed64b419bffcdc4))
 - Changed default comparator to Object.is() ([2530afe](https://github.com/mnasyrov/rx-effects/commit/2530afefbf48ab32cd81469bebc5f199d157c200))
 - Refactored and removed deprecated API ([#19](https://github.com/mnasyrov/rx-effects/issues/19)) ([9fda459](https://github.com/mnasyrov/rx-effects/commit/9fda4592198262e345e19e7c9b0908b3d8d47962))
-
-# Change Log
-
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 # [1.1.0](https://github.com/mnasyrov/rx-effects/compare/v1.0.1...v1.1.0) (2023-02-01)
 
