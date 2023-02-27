@@ -25,10 +25,9 @@
   "engines": {
     "node": ">=12"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
-  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "docs",
@@ -39,9 +38,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -p tsconfig.build.json --outDir dist/cjs --module commonjs",
-    "build:esm": "tsc -p tsconfig.build.json --outDir dist/esm --module es2015",
+    "build": "tsup --clean --dts --format cjs,esm  src/index.ts",
     "benchmarks": "tsx benchmarks"
   },
   "peerDependencies": {

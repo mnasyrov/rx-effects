@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0-beta.0",
+  "hoist": "**",
+  "forceLocal": true,
+  "command": {
+    "bootstrap": {
+      "npmClientArgs": ["--save-exact"]
+    },
+    "run": {
+      "stream": true
+    },
+    "version": {
+      "conventionalCommits": true,
+      "exact": true
+    }
+  }
+}

@@ -1,8 +1,6 @@
 /* eslint-disable no-undef */
 
 import fastGlob from 'fast-glob';
-import * as fs from 'fs';
-import path from 'path';
 import shell from 'shelljs';
 
 function exec(command, workDir) {
@@ -28,17 +26,6 @@ function processPackages() {
   packagePaths.forEach((packagePath) => {
     console.log(`- ${packagePath}`);
     shell.cp('LICENSE', packagePath);
-  });
-
-  console.log('\nRun markdown-toc...');
-  ['.', ...packagePaths].forEach((packagePath) => {
-    const readmePath = path.join(packagePath, 'README.md');
-    if (!fs.existsSync(readmePath)) {
-      return;
-    }
-
-    console.log(`- ${readmePath}`);
-    exec(`markdown-toc -i ${readmePath}`);
   });
 
   console.log('\nRun typedoc...');

@@ -4,6 +4,7 @@
 /dist
 /packages/*/dist
 .DS_Store
+.turbo
 node_modules
 npm-debug.log
 Thumbs.db
