@@ -26,16 +26,9 @@
   "engines": {
     "node": ">=12"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
-    }
-  },
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "docs",
@@ -46,7 +39,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsup --clean --dts --format cjs,esm src/index.ts"
+    "build": "tsup --clean --dts --format cjs,esm src/index.ts --legacy-output"
   },
   "dependencies": {
     "rx-effects": "2.0.0-beta.2"
