@@ -11,7 +11,8 @@
     },
     "version": {
       "conventionalCommits": true,
-      "exact": true
+      "exact": true,
+      "no-push": true
     }
   }
 }
