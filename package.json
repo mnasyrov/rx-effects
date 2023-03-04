@@ -27,16 +27,18 @@
     "benchmarks": "npm run -ws --if-present benchmarks",
     "docs": "node scripts/docs.js",
     "pack": "npm run build && mkdir -p dist && npm pack -ws --pack-destination ./dist",
-    "preversion": "npm run build && npm run lint && npm run test && npm run docs && git add --all",
-    "prepublishOnly": "npm run clean && npm run build",
-    "package-version": "lerna version",
-    "package-publish": "lerna publish from-git"
+    "preversion": "npm run lint && npm run test && npm run build && npm run docs && git add --all",
+    "fix-deps": "npm run -ws --if-present fix-deps && npm install --save-exact --package-lock-only --ignore-scripts",
+    "changelog": "npm -ws --include-workspace-root exec -- conventional-changelog -p angular -i CHANGELOG.md -s",
+    "version": "npm -ws version $npm_package_version --no-git-tag-version --yes && npm run fix-deps && npm run changelog && git add .",
+    "publish": "npm run clean && npm run build && npm publish -w rx-effects -w rx-effects-react"
   },
   "devDependencies": {
     "@types/jest": "29.2.4",
     "@types/shelljs": "0.8.11",
     "@typescript-eslint/eslint-plugin": "5.46.0",
     "@typescript-eslint/parser": "5.46.0",
+    "conventional-changelog-cli": "2.2.2",
     "ditox": "2.3.0",
     "ditox-react": "2.3.0",
     "eslint": "8.29.0",
@@ -59,7 +61,6 @@
     "ts-jest": "29.0.3",
     "tsup": "6.6.3",
     "tsx": "3.12.3",
-    "turbo": "1.8.2",
     "typedoc": "0.23.21",
     "typedoc-plugin-markdown": "3.14.0",
     "typescript": "4.9.4"

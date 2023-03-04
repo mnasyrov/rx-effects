@@ -3,6 +3,9 @@
   "name": "rx-effects-examples",
   "version": "2.0.0-beta.3",
   "type": "module",
+  "scripts": {
+    "fix-deps": "npm pkg set dependencies.rx-effects=$npm_package_version dependencies.rx-effects-react=$npm_package_version"
+  },
   "dependencies": {
     "rx-effects": "2.0.0-beta.3",
     "rx-effects-react": "2.0.0-beta.3"
