@@ -49,12 +49,10 @@ export function removeFromArray<T>(
 ): T[] | undefined {
   if (!source) return undefined;
 
-  const clone = Array.from(source);
+  const index = source.indexOf(item);
+  if (index < 0) return source;
 
-  const index = clone.indexOf(item);
-  if (index >= 0) {
-    clone.splice(index, 1);
-  }
-
+  const clone = [...source];
+  clone.splice(index, 1);
   return clone;
 }
