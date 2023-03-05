@@ -4,7 +4,7 @@ import { Controller } from './controller';
 import { Query } from './query';
 import { STORE_EVENT_BUS } from './storeEvents';
 import { setInternalStoreFlag, setStateMutationName } from './storeMetadata';
-import { DEFAULT_COMPARATOR, isReadonlyArray } from './utils';
+import { DEFAULT_COMPARATOR, isReadonlyArray, removeFromArray } from './utils';
 
 let STORE_SEQ_NUMBER = 0;
 
@@ -175,7 +175,8 @@ export type InternalStoreOptions<State> = Readonly<
   StoreOptions<State> & { internal?: boolean }
 >;
 
-const NOTIFY_QUEUE: Set<Store<any>> = new Set();
+let STORE_NOTIFY_QUEUE: Store<any>[] = [];
+const STORE_NOTIFY_PRESENCE: Set<number> = new Set();
 
 /**
  * Creates the state store.
@@ -190,17 +191,21 @@ export function createStore<State>(
   const stateComparator = options?.comparator ?? DEFAULT_COMPARATOR;
 
   let currentState = initialState;
-  const subscribers: Set<Subscriber<State>> = new Set();
+  let subscribers: Subscriber<State>[] | undefined;
 
   const store: Store<State> = {
     id: ++STORE_SEQ_NUMBER,
     name: options?.name,
 
     value$: new Observable<State>((subscriber) => {
-      subscribers.add(subscriber);
+      if (!subscribers) subscribers = [];
+      subscribers.push(subscriber);
+
       subscriber.next(currentState);
 
-      return () => subscribers.delete(subscriber);
+      return () => {
+        subscribers = removeFromArray(subscribers, subscriber);
+      };
     }),
 
     get(): State {
@@ -221,12 +226,12 @@ export function createStore<State>(
 
     notify() {
       const pinnedState = currentState;
-      subscribers.forEach((subscriber) => subscriber.next(pinnedState));
+      subscribers?.forEach((subscriber) => subscriber.next(pinnedState));
     },
 
     destroy() {
-      subscribers.forEach((subscriber) => subscriber.complete());
-      subscribers.clear();
+      subscribers?.forEach((subscriber) => subscriber.complete());
+      subscribers = [];
 
       STORE_EVENT_BUS.next({ type: 'destroyed', store });
 
@@ -301,14 +306,23 @@ export function createStore<State>(
 }
 
 function scheduleNotify(store: Store<any>) {
-  if (NOTIFY_QUEUE.add(store).size === 1) {
+  const prevSize = STORE_NOTIFY_PRESENCE.size;
+  STORE_NOTIFY_PRESENCE.add(store.id);
+
+  if (STORE_NOTIFY_PRESENCE.size === prevSize) {
+    return;
+  }
+
+  if (STORE_NOTIFY_QUEUE.push(store) === 1) {
     Promise.resolve().then(executeNotifyQueue);
   }
 }
 
 function executeNotifyQueue() {
-  const queue = [...NOTIFY_QUEUE];
-  NOTIFY_QUEUE.clear();
+  const queue = STORE_NOTIFY_QUEUE;
+  STORE_NOTIFY_QUEUE = [];
+  STORE_NOTIFY_PRESENCE.clear();
+
   queue.forEach((store) => store.notify());
 }
 
