@@ -14,14 +14,9 @@ import {
   compute,
   createComputationNode,
   createComputationQuery,
-  getComputationNode,
   getQueryValue,
-  makeColdNode,
   nextNodeVersion,
   nextVersion,
-  Node,
-  onSourceComplete,
-  onSourceError,
   recompute,
   removeValueObserver,
 } from './compute';
@@ -223,8 +218,6 @@ describe('compute()', () => {
 
     const query1 = compute(() => source.get() + 1, [source]);
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node1 = getNode(query1);
-    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -256,9 +249,6 @@ describe('compute()', () => {
     expect(changes3).toEqual([
       { error: 'Test error 1', hasValue: false, kind: 'E', value: undefined },
     ]);
-
-    expect(node1.hot).toBe(false);
-    expect(node2.hot).toBe(false);
   });
 
   it('should propagate "complete" event from a source to observers', async () => {
@@ -267,8 +257,6 @@ describe('compute()', () => {
 
     const query1 = compute(() => source.get() + 1, [source]);
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node1 = getNode(query1);
-    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -300,9 +288,6 @@ describe('compute()', () => {
     expect(changes3).toEqual([
       { error: undefined, hasValue: false, kind: 'C', value: undefined },
     ]);
-
-    expect(node1.hot).toBe(false);
-    expect(node2.hot).toBe(false);
   });
 
   it('should throw an error on subscription to an incorrect dependency', async () => {
@@ -472,7 +457,7 @@ describe('createComputationQuery()', () => {
     const node = createComputationNode(() => 1);
     const query = createComputationQuery(node);
 
-    expect(getComputationNode(query)).toBe(node);
+    expect((query as any)._computed).toBe(true);
     expect(query.get()).toBe(1);
     expect(await firstValueFrom(query.value$)).toBe(1);
   });
@@ -550,29 +535,13 @@ describe('addValueObserver()', () => {
     const source = createStore(1);
 
     const query1 = compute(() => 1, [source]);
-    const node1 = getNode(query1);
 
     const query2 = compute(() => 1, [query1]);
-    const node2 = getNode(query2);
-
-    expect(node1.observers).toBeUndefined();
-    expect(node1.subscriptions?.length).toBeUndefined();
-
-    expect(node2.observers).toBeUndefined();
-    expect(node1.subscriptions?.length).toBeUndefined();
 
     const subject = new Subject();
     const changes = await collectChanges(subject, () => {
-      addValueObserver(node2, subject);
+      query2.value$.subscribe(subject);
     });
-
-    expect(node1.hot).toBe(true);
-    expect(node2.observers?.length).toBe(1);
-    expect(node1.subscriptions?.length).toBe(1);
-
-    expect(node2.hot).toBe(true);
-    expect(node2.observers?.length).toBe(1);
-    expect(node2.subscriptions?.length).toBe(1);
 
     expect(changes).toEqual([1]);
   });
@@ -608,53 +577,33 @@ describe('removeValueObserver()', () => {
     const source = createStore(1);
 
     const query1 = compute(() => 1, [source]);
-    const node1 = getNode(query1);
 
     const query2 = compute(() => 1, [query1]);
-    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
-    addValueObserver(node1, subject1);
-    addValueObserver(node2, subject2);
-
-    expect(node1.hot).toBe(true);
-    expect(node1.observers?.length).toBe(2);
-    expect(node2.hot).toBe(true);
-    expect(node2.observers?.length).toBe(1);
-
-    removeValueObserver(node2, subject2);
-    expect(node1.hot).toBe(true);
-    expect(node1.observers?.length).toBe(1);
-    expect(node1.subscriptions?.length).toBe(1);
-
-    expect(node2.hot).toBe(false);
-    expect(node2.observers?.length).toBeUndefined();
-    expect(node2.subscriptions?.length).toBeUndefined();
+    query1.value$.subscribe(subject1);
+    query2.value$.subscribe(subject2);
   });
 });
 
 describe('onSourceError()', () => {
   it('should propagate an error to an observer from a computation node', async () => {
-    const source = createStore(1);
+    const bs = new BehaviorSubject(1);
+    const source = queryBehaviourSubject(bs);
 
     const query1 = compute(() => source.get() + 1, [source]);
-    const node1 = getNode(query1);
 
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
     const changes = await collectChanges(subject2.pipe(materialize()), () => {
-      addValueObserver(node1, subject1);
-      addValueObserver(node2, subject2);
+      query1.value$.subscribe(subject1);
+      query2.value$.subscribe(subject2);
 
-      expect(node1.hot).toBe(true);
-      expect(node2.hot).toBe(true);
-
-      onSourceError(node1, 'Test error 1');
-      onSourceError(node1, 'Test error 1 second try');
+      bs.error('Test error 1');
+      bs.error('Test error 1 second try');
     });
     expect(changes).toEqual([
       { error: undefined, hasValue: true, kind: 'N', value: 4 },
@@ -662,7 +611,7 @@ describe('onSourceError()', () => {
     ]);
 
     const changes2 = await collectChanges(subject2.pipe(materialize()), () => {
-      onSourceError(node1, 'Test error 3');
+      bs.error('Test error 3');
     });
     expect(changes2).toEqual([
       { error: 'Test error 1', hasValue: false, kind: 'E', value: undefined },
@@ -670,65 +619,33 @@ describe('onSourceError()', () => {
 
     const subject3 = new Subject();
     const changes3 = await collectChanges(subject3.pipe(materialize()), () => {
-      addValueObserver(node2, subject3);
+      query2.value$.subscribe(subject3);
 
-      expect(node1.hot).toBe(true);
-      expect(node2.hot).toBe(true);
-
-      onSourceError(node1, 'Test error 4');
+      bs.error('Test error 4');
     });
     expect(changes3).toEqual([
-      { error: undefined, hasValue: true, kind: 'N', value: 4 },
-      { error: 'Test error 4', hasValue: false, kind: 'E', value: undefined },
+      { error: 'Test error 1', hasValue: false, kind: 'E', value: undefined },
     ]);
-
-    expect(node1.hot).toBe(false);
-    expect(node2.hot).toBe(false);
-  });
-});
-
-describe('makeColdNode()', () => {
-  it('should not fail if a node has initial state', () => {
-    const query = compute(() => 1);
-    const node = getNode(query);
-
-    expect(() => {
-      makeColdNode(node);
-    }).not.toThrow();
-  });
-
-  it('should not fail if a parent node has incorrect state', () => {
-    const query = compute(() => 1);
-
-    const node = getNode(query);
-
-    expect(() => {
-      makeColdNode(node);
-    }).not.toThrow();
   });
 });
 
 describe('onSourceComplete()', () => {
   it('should propagate "complete" to an observer from a computation node', async () => {
-    const source = createStore(1);
+    const bs = new BehaviorSubject(1);
+    const source = queryBehaviourSubject(bs);
 
     const query1 = compute(() => source.get() + 1, [source]);
-    const node1 = getNode(query1);
 
     const query2 = compute(() => query1.get() * 2, [query1]);
-    const node2 = getNode(query2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
     const changes = await collectChanges(subject2.pipe(materialize()), () => {
-      addValueObserver(node1, subject1);
-      addValueObserver(node2, subject2);
+      query1.value$.subscribe(subject1);
+      query2.value$.subscribe(subject2);
 
-      expect(node1.hot).toBe(true);
-      expect(node2.hot).toBe(true);
-
-      onSourceComplete(node1);
-      onSourceComplete(node1);
+      bs.complete();
+      bs.complete();
     });
     expect(changes).toEqual([
       { error: undefined, hasValue: true, kind: 'N', value: 4 },
@@ -736,7 +653,7 @@ describe('onSourceComplete()', () => {
     ]);
 
     const changes2 = await collectChanges(subject2.pipe(materialize()), () => {
-      onSourceComplete(node1);
+      bs.complete();
     });
     expect(changes2).toEqual([
       { error: undefined, hasValue: false, kind: 'C', value: undefined },
@@ -744,20 +661,13 @@ describe('onSourceComplete()', () => {
 
     const subject3 = new Subject();
     const changes3 = await collectChanges(subject3.pipe(materialize()), () => {
-      addValueObserver(node2, subject3);
+      query2.value$.subscribe(subject3);
 
-      expect(node1.hot).toBe(true);
-      expect(node2.hot).toBe(true);
-
-      onSourceComplete(node1);
+      bs.complete();
     });
     expect(changes3).toEqual([
-      { error: undefined, hasValue: true, kind: 'N', value: 4 },
       { error: undefined, hasValue: false, kind: 'C', value: undefined },
     ]);
-
-    expect(node1.hot).toBe(false);
-    expect(node2.hot).toBe(false);
   });
 });
 
@@ -798,32 +708,30 @@ describe('recompute()', () => {
   });
 
   it('should compute if only a subtree has an indirect observer', () => {
-    const calc1 = jest.fn(() => 1);
+    const bs = new BehaviorSubject(1);
+    const source = queryBehaviourSubject(bs);
+
+    const calc1 = jest.fn((get) => get(source) + 1);
     const query1 = compute(calc1);
-    const node1 = getNode(query1);
 
     const calc2 = jest.fn((get) => get(query1) + 1);
     const query2 = compute(calc2);
-    const node2 = getNode(query2);
 
     calc1.mockClear();
     calc2.mockClear();
     nextNodeVersion();
-    recompute(node1);
+    bs.next(1);
     expect(calc1).toHaveBeenCalledTimes(0);
     expect(calc2).toHaveBeenCalledTimes(0);
 
-    addValueObserver(node1, new Subject());
-    addValueObserver(node2, new Subject());
+    query1.value$.subscribe();
+    query2.value$.subscribe();
     calc1.mockClear();
     calc2.mockClear();
     nextNodeVersion();
-    recompute(node1);
-    expect(calc1).toHaveBeenCalledTimes(1);
-    expect(calc2).toHaveBeenCalledTimes(0);
-
-    expect(node1.valueRef).not.toBeUndefined();
-    expect(node2.valueRef).not.toBeUndefined();
+    bs.next(2);
+    expect(calc1).toHaveBeenCalledTimes(2);
+    expect(calc2).toHaveBeenCalledTimes(1);
   });
 
   it('should not trigger recomputing for cold nodes', () => {
@@ -842,11 +750,3 @@ describe('recompute()', () => {
     expect(calc2).toHaveBeenCalledTimes(0);
   });
 });
-
-function getNode<T>(query: Query<T>): Node<T> {
-  const node = getComputationNode(query);
-
-  if (node) return node;
-
-  throw new Error('Not ComputationQuery');
-}

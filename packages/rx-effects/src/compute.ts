@@ -92,13 +92,11 @@ export type Node<T> = {
   version?: number;
   valueRef?: ValueRef<T>;
   customDeps?: ReadonlyArray<Query<unknown>>;
-  resolvedDeps?: ReadonlyArray<Query<unknown>>;
+  resolvedDeps?: ReadonlySet<Query<unknown>>;
   subscriptions?: (() => void)[];
   observers?: Observer<T>[];
   depObserver?: Observer<T>;
 };
-
-const NODES = new WeakMap<Query<any>, Node<any>>();
 
 /** @internal */
 export function createComputationNode<T>(
@@ -116,6 +114,8 @@ export function createComputationNode<T>(
 /** @internal */
 export function createComputationQuery<T>(node: Node<T>): Query<T> {
   const query = {
+    _computed: true,
+
     get: () => getQueryValue(node),
 
     value$: new Observable<T>((observer) => {
@@ -125,14 +125,7 @@ export function createComputationQuery<T>(node: Node<T>): Query<T> {
     }),
   };
 
-  NODES.set(query, node);
-
   return query;
-}
-
-/** @internal */
-export function getComputationNode<T>(query: Query<T>): Node<T> | undefined {
-  return NODES.get(query);
 }
 
 /// COMPUTATION ENGINE
@@ -171,19 +164,9 @@ export function getQueryValue<T>(node: Node<T>): T {
     if (node.version === NODE_VERSION && node.valueRef) {
       return node.valueRef.value;
     }
+
     node.version = NODE_VERSION;
-
-    const valueRef = calculate<T>(node.computation);
-
-    // if (isNodeValueChanged(node, valueRef)) {
-    node.valueRef = valueRef;
-    // }
-
-    // return (node.valueRef ?? valueRef).value;
-    return node.valueRef.value;
-  }
-
-  if (node.valueRef?.version === STORE_VERSION) {
+    node.valueRef = calculate(node.computation);
     return node.valueRef.value;
   }
 
@@ -194,6 +177,10 @@ export function getQueryValue<T>(node: Node<T>): T {
 
     node.version = NODE_VERSION;
     node.valueRef = calculate(node.computation);
+    return node.valueRef.value;
+  }
+
+  if (node.valueRef?.version === STORE_VERSION) {
     return node.valueRef.value;
   }
 
@@ -231,7 +218,7 @@ function makeHotNode<T>(node: Node<T>, observer: Observer<T>) {
     const visitedDeps: Set<Query<unknown>> = new Set(node.customDeps);
 
     DEPS_COLLECTOR = (query) => {
-      if (!NODES.has(query)) visitedDeps.add(query);
+      if (!(query as any)._computed) visitedDeps.add(query);
     };
     const next = calculate(node.computation);
     DEPS_COLLECTOR = undefined;
@@ -240,10 +227,10 @@ function makeHotNode<T>(node: Node<T>, observer: Observer<T>) {
       valueRef = node.valueRef = next;
     }
 
-    node.resolvedDeps = [...visitedDeps];
+    node.resolvedDeps = visitedDeps;
   }
 
-  if (node.resolvedDeps && node.resolvedDeps.length > 0) {
+  if (node.resolvedDeps.size > 0) {
     node.resolvedDeps.forEach((parentQuery) => {
       if (!parentQuery) {
         throw new TypeError('Incorrect dependency');
@@ -321,13 +308,8 @@ export function onSourceComplete<T>(node: Node<T>) {
 }
 
 export function recompute<T>(node: Node<T>) {
-  if (!node.hot || node.version === NODE_VERSION) return;
+  if (!node.hot || !node.observers || node.version === NODE_VERSION) return;
   node.version = NODE_VERSION;
-
-  if (!node.observers || node.observers.length === 0) {
-    node.valueRef = undefined;
-    return;
-  }
 
   RECOMPUTE = true;
   let next;
