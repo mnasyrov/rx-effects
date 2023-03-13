@@ -5,7 +5,7 @@ const ITERATION_COUNT = 100;
 
 const bench = new Bench();
 
-bench.add('reactive-computed-bench (implicit)', () => {
+bench.add('reactive-computed-bench', () => {
   const entry = createStore(0);
 
   const a = compute((get) => get(entry));
@@ -16,26 +16,6 @@ bench.add('reactive-computed-bench (implicit)', () => {
   const f = compute((get) => get(d) + get(e));
   const g = compute((get) => get(d) + get(e));
   const h = compute((get) => get(f) + get(g));
-
-  h.value$.subscribe();
-
-  for (let i = 0; i < ITERATION_COUNT; i++) {
-    entry.set(i);
-    entry.notify();
-  }
-});
-
-bench.add('reactive-computed-bench (explicit)', () => {
-  const entry = createStore(0);
-
-  const a = compute(() => entry.get(), [entry]);
-  const b = compute(() => a.get() + 1, [a]);
-  const c = compute(() => a.get() + 1, [a]);
-  const d = compute(() => b.get() + c.get(), [b, c]);
-  const e = compute(() => d.get() + 1, [d]);
-  const f = compute(() => d.get() + e.get(), [d, e]);
-  const g = compute(() => d.get() + e.get(), [d, e]);
-  const h = compute(() => f.get() + g.get(), [f, g]);
 
   h.value$.subscribe();
 

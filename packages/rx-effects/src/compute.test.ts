@@ -25,7 +25,7 @@ import { queryBehaviourSubject } from './queryUtils';
 import { createStore } from './store';
 
 describe('compute()', () => {
-  it('should work #1', async () => {
+  it('should calculate the benchmark', async () => {
     const entry = createStore(0);
 
     const a = compute((get) => get(entry));
@@ -54,36 +54,9 @@ describe('compute()', () => {
     expect(changes).toEqual([10, 18, 26]);
   });
 
-  it('should work #2', async () => {
-    const entry = createStore(0);
-
-    const a = compute(() => entry.get(), [entry]);
-    const b = compute(() => a.get() + 1, [a]);
-    const c = compute(() => a.get() + 1, [a]);
-    const d = compute(() => b.get() + c.get(), [b, c]);
-    const e = compute(() => d.get() + 1, [d]);
-    const f = compute(() => d.get() + e.get(), [d, e]);
-    const g = compute(() => d.get() + e.get(), [d, e]);
-    const h = compute(() => f.get() + g.get(), [f, g]);
-
-    expect(h.get()).toEqual(10);
-
-    const changes = await collectChanges(h.value$, async () => {
-      entry.set(1);
-      expect(h.get()).toEqual(18);
-
-      await 0;
-
-      entry.set(2);
-      expect(h.get()).toEqual(26);
-    });
-
-    expect(changes).toEqual([10, 18, 26]);
-  });
-
   it('should have typings to return another type', () => {
     const source = createStore<number>(1);
-    const query: Query<string> = compute(() => source.get() + '!', [source]);
+    const query: Query<string> = compute((get) => get(source) + '!');
     expect(query.get()).toBe('1!');
   });
 
@@ -133,9 +106,10 @@ describe('compute()', () => {
     const s2 = createStore(0);
 
     const a = compute((get) => get(s1) + 1);
-    const b = compute((get) => ({ a: get(a), b: get(s2) }), {
-      comparator: (a, b) => a.b === b.b,
-    });
+    const b = compute(
+      (get) => ({ a: get(a), b: get(s2) }),
+      (a, b) => a.b === b.b,
+    );
 
     expect(b.get()).toEqual({ a: 1, b: 0 });
 
@@ -216,8 +190,8 @@ describe('compute()', () => {
     const bs = new BehaviorSubject<number>(1);
     const source = queryBehaviourSubject(bs);
 
-    const query1 = compute(() => source.get() + 1, [source]);
-    const query2 = compute(() => query1.get() * 2, [query1]);
+    const query1 = compute((get) => get(source) + 1);
+    const query2 = compute((get) => get(query1) * 2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -255,8 +229,8 @@ describe('compute()', () => {
     const bs = new BehaviorSubject<number>(1);
     const source = queryBehaviourSubject(bs);
 
-    const query1 = compute(() => source.get() + 1, [source]);
-    const query2 = compute(() => query1.get() * 2, [query1]);
+    const query1 = compute((get) => get(source) + 1);
+    const query2 = compute((get) => get(query1) * 2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -291,12 +265,7 @@ describe('compute()', () => {
   });
 
   it('should throw an error on subscription to an incorrect dependency', async () => {
-    const source = createStore(1);
-
-    const query1 = compute(
-      () => 1,
-      [source, undefined as unknown as Query<number>],
-    );
+    const query1 = compute((get) => get(undefined as any));
 
     const subject = new Subject();
     const changes = await collectChanges(subject.pipe(materialize()), () => {
@@ -304,7 +273,9 @@ describe('compute()', () => {
     });
     expect(changes).toEqual([
       {
-        error: new TypeError('Incorrect dependency'),
+        error: new TypeError(
+          "Cannot read properties of undefined (reading 'get')",
+        ),
         hasValue: false,
         kind: 'E',
         value: undefined,
@@ -399,9 +370,10 @@ describe('compute()', () => {
   it('should use a custom comparator', async () => {
     const source = createStore({ key: 1, val: 'a' });
 
-    const query = compute((get) => get(source), {
-      comparator: (a, b) => a.key === b.key,
-    });
+    const query = compute(
+      (get) => get(source),
+      (a, b) => a.key === b.key,
+    );
 
     const changes = await collectChanges(query.value$, () => {
       source.set({ key: 1, val: 'a' });
@@ -427,28 +399,6 @@ describe('compute()', () => {
 
     const query = compute((get) => get(source));
     expect(query.get()).toEqual({ key: 1, val: 'a' });
-  });
-});
-
-describe('createComputationNode()', () => {
-  it('should create a default node', () => {
-    const node = createComputationNode(() => 1);
-
-    expect(node.customDeps).toBe(undefined);
-  });
-
-  it('should create a node by options', () => {
-    const s1 = createStore(1);
-    const s2 = createStore(2);
-
-    const comparator = jest.fn();
-    const node = createComputationNode(() => 1, {
-      comparator,
-      dependencies: [s1, s2, s1],
-    });
-
-    expect(node.comparator).toBe(comparator);
-    expect(node.customDeps).toEqual([s1, s2, s1]);
   });
 });
 
@@ -534,16 +484,16 @@ describe('addValueObserver()', () => {
   it('should add an observer and push a current value into it and make the node be hot', async () => {
     const source = createStore(1);
 
-    const query1 = compute(() => 1, [source]);
+    const query1 = compute((get) => get(source) + 1);
 
-    const query2 = compute(() => 1, [query1]);
+    const query2 = compute((get) => get(query1) + 1);
 
     const subject = new Subject();
     const changes = await collectChanges(subject, () => {
       query2.value$.subscribe(subject);
     });
 
-    expect(changes).toEqual([1]);
+    expect(changes).toEqual([3]);
   });
 });
 
@@ -576,9 +526,9 @@ describe('removeValueObserver()', () => {
   it('should remove an observer, make a node be cold if treeObserverCount = 0 and update parents', async () => {
     const source = createStore(1);
 
-    const query1 = compute(() => 1, [source]);
+    const query1 = compute((get) => get(source) + 1);
 
-    const query2 = compute(() => 1, [query1]);
+    const query2 = compute((get) => get(query1) + 1);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -592,9 +542,9 @@ describe('onSourceError()', () => {
     const bs = new BehaviorSubject(1);
     const source = queryBehaviourSubject(bs);
 
-    const query1 = compute(() => source.get() + 1, [source]);
+    const query1 = compute((get) => get(source) + 1);
 
-    const query2 = compute(() => query1.get() * 2, [query1]);
+    const query2 = compute((get) => get(query1) * 2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();
@@ -634,9 +584,9 @@ describe('onSourceComplete()', () => {
     const bs = new BehaviorSubject(1);
     const source = queryBehaviourSubject(bs);
 
-    const query1 = compute(() => source.get() + 1, [source]);
+    const query1 = compute((get) => get(source) + 1);
 
-    const query2 = compute(() => query1.get() * 2, [query1]);
+    const query2 = compute((get) => get(query1) * 2);
 
     const subject1 = new Subject();
     const subject2 = new Subject();

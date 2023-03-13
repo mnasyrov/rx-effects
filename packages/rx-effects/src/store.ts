@@ -213,9 +213,7 @@ export function createStore<State>(
     },
 
     query<T>(selector?: (state: State) => T): Query<T> | Query<State> {
-      return selector
-        ? compute<T>((get) => selector(get(store)), [store])
-        : store;
+      return selector ? compute<T>((get) => selector(get(store))) : store;
     },
 
     set(nextState: State) {
