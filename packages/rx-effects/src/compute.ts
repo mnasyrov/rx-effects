@@ -201,10 +201,7 @@ function makeHotNode<T>(node: Node<T>, observer: Observer<T>) {
     const next = calculate(node.computation);
     DEPS_COLLECTOR = undefined;
 
-    if (!valueRef || isNodeValueChanged(node, next)) {
-      valueRef = node.valueRef = next;
-    }
-
+    valueRef = node.valueRef = next;
     node.resolvedDeps = visitedDeps;
   }
 
@@ -293,7 +290,14 @@ export function recompute<T>(node: Node<T>) {
     RECOMPUTE = false;
   }
 
-  const isChanged = isNodeValueChanged(node, next);
+  const isChanged =
+    !node.valueRef ||
+    isCalculationChanged(
+      node.comparator ?? DEFAULT_COMPARATOR,
+      node.valueRef,
+      next,
+    );
+
   if (isChanged) {
     node.valueRef = next;
     const value = next.value;
@@ -327,16 +331,6 @@ function calculate<T>(computation: Computation<T>): ValueRef<T> {
   );
 
   return { value, params, version: STORE_VERSION };
-}
-
-function isNodeValueChanged<T>(node: Node<T>, next: ValueRef<T>): boolean {
-  return node.valueRef
-    ? isCalculationChanged(
-        node.comparator ?? DEFAULT_COMPARATOR,
-        node.valueRef,
-        next,
-      )
-    : true;
 }
 
 function isCalculationChanged<T>(
