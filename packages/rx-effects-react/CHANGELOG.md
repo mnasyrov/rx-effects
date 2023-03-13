@@ -1,3 +1,5 @@
+# [2.0.0-beta.5](https://github.com/mnasyrov/rx-effects/compare/v2.0.0-beta.4...v2.0.0-beta.5) (2023-03-13)
+
 # [2.0.0-beta.4](https://github.com/mnasyrov/rx-effects/compare/v2.0.0-beta.3...v2.0.0-beta.4) (2023-03-04)
 
 # Change Log
