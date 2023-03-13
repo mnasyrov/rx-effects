@@ -12,7 +12,7 @@ export function mapQuery<T, R>(
   query: Query<T>,
   mapper: (value: T) => R,
 ): Query<R> {
-  return compute((get) => mapper(get(query)), [query]);
+  return compute((get) => mapper(get(query)));
 }
 
 /**
@@ -33,5 +33,5 @@ export function mergeQueries<Values extends unknown[], Result>(
   return compute((get) => {
     const values = queries.map((query) => get(query));
     return merger(...(values as Values));
-  }, queries);
+  });
 }

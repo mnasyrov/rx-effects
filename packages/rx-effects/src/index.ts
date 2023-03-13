@@ -50,9 +50,5 @@ export { OBJECT_COMPARATOR } from './utils';
 export type { StoreDeclaration, DeclaredStoreFactory } from './declareStore';
 export { declareStore } from './declareStore';
 
-export type {
-  ComputationOptions,
-  Computation,
-  ComputationResolver,
-} from './compute';
+export type { Computation, ComputationResolver } from './compute';
 export { compute } from './compute';

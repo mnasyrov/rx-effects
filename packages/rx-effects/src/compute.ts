@@ -21,17 +21,6 @@ export type ComputationResolver = {
 export type Computation<T> = (resolver: ComputationResolver) => T;
 
 /**
- * Options for "compute()" function
- */
-export type ComputationOptions<T> = {
-  /** A custom comparator to differ complex values */
-  comparator?: Comparator<T>;
-
-  /** Explicitly dependencies for refreshing calculations */
-  dependencies?: Query<unknown>[];
-};
-
-/**
  * Creates a computable query which calculates its values by provided "computation" function and dependencies.
  *
  * Rules of "Computation" function:
@@ -63,22 +52,13 @@ export type ComputationOptions<T> = {
  * expect(messageUppercase.get()).toBe('HELLO WORLD!');
  * ```
  */
-export const compute: {
-  <T>(computation: Computation<T>, dependencies?: Query<unknown>[]): Query<T>;
-  <T>(computation: Computation<T>, options?: ComputationOptions<T>): Query<T>;
-} = <T>(
+export function compute<T>(
   computation: Computation<T>,
-  dependenciesOrOptions?: Query<unknown>[] | ComputationOptions<T>,
-) => {
-  const options: ComputationOptions<T> | undefined = dependenciesOrOptions
-    ? Array.isArray(dependenciesOrOptions)
-      ? { dependencies: dependenciesOrOptions }
-      : dependenciesOrOptions
-    : undefined;
-
-  const node = createComputationNode(computation, options);
+  comparator?: Comparator<T>,
+): Query<T> {
+  const node = createComputationNode(computation, comparator);
   return createComputationQuery(node);
-};
+}
 
 /// INTERNAL
 
@@ -91,7 +71,6 @@ export type Node<T> = {
   hot: boolean;
   version?: number;
   valueRef?: ValueRef<T>;
-  customDeps?: ReadonlyArray<Query<unknown>>;
   resolvedDeps?: ReadonlySet<Query<unknown>>;
   subscriptions?: (() => void)[];
   observers?: Observer<T>[];
@@ -101,13 +80,12 @@ export type Node<T> = {
 /** @internal */
 export function createComputationNode<T>(
   computation: Computation<T>,
-  options?: ComputationOptions<T>,
+  comparator?: Comparator<T>,
 ): Node<T> {
   return {
     hot: false,
     computation,
-    comparator: options?.comparator,
-    customDeps: options?.dependencies,
+    comparator,
   };
 }
 
@@ -215,7 +193,7 @@ function makeHotNode<T>(node: Node<T>, observer: Observer<T>) {
       valueRef = node.valueRef = calculate(node.computation);
     }
   } else {
-    const visitedDeps: Set<Query<unknown>> = new Set(node.customDeps);
+    const visitedDeps: Set<Query<unknown>> = new Set();
 
     DEPS_COLLECTOR = (query) => {
       if (!(query as any)._computed) visitedDeps.add(query);
@@ -232,10 +210,6 @@ function makeHotNode<T>(node: Node<T>, observer: Observer<T>) {
 
   if (node.resolvedDeps.size > 0) {
     node.resolvedDeps.forEach((parentQuery) => {
-      if (!parentQuery) {
-        throw new TypeError('Incorrect dependency');
-      }
-
       if (!node.depObserver) {
         node.depObserver = {
           next: () => onSourceChanged(node),
