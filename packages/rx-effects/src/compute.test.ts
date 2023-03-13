@@ -8,11 +8,9 @@ import {
   Subject,
   Subscription,
 } from 'rxjs';
-import { collectChanges, mockObserver } from '../test/testUtils';
+import { collectChanges } from '../test/testUtils';
 import {
-  addChildNode,
   addValueObserver,
-  calculateValue,
   compute,
   createComputationNode,
   createComputationQuery,
@@ -261,9 +259,6 @@ describe('compute()', () => {
 
     expect(node1.hot).toBe(false);
     expect(node2.hot).toBe(false);
-
-    expect(node1.treeObserverCount).toBe(0);
-    expect(node2.treeObserverCount).toBe(0);
   });
 
   it('should propagate "complete" event from a source to observers', async () => {
@@ -308,9 +303,6 @@ describe('compute()', () => {
 
     expect(node1.hot).toBe(false);
     expect(node2.hot).toBe(false);
-
-    expect(node1.treeObserverCount).toBe(0);
-    expect(node2.treeObserverCount).toBe(0);
   });
 
   it('should throw an error on subscription to an incorrect dependency', async () => {
@@ -457,8 +449,7 @@ describe('createComputationNode()', () => {
   it('should create a default node', () => {
     const node = createComputationNode(() => 1);
 
-    expect(node.dependencies).toBe(undefined);
-    expect(node.treeObserverCount).toBe(0);
+    expect(node.customDeps).toBe(undefined);
   });
 
   it('should create a node by options', () => {
@@ -472,8 +463,7 @@ describe('createComputationNode()', () => {
     });
 
     expect(node.comparator).toBe(comparator);
-    expect(node.dependencies).toEqual([s1, s2]);
-    expect(node.treeObserverCount).toBe(0);
+    expect(node.customDeps).toEqual([s1, s2, s1]);
   });
 });
 
@@ -553,7 +543,6 @@ describe('addValueObserver()', () => {
 
     expect(node.hot).toBe(true);
     expect(node.observers?.length).toBe(1);
-    expect(node.treeObserverCount).toBe(1);
     expect(changes).toEqual([1]);
   });
 
@@ -567,14 +556,10 @@ describe('addValueObserver()', () => {
     const node2 = getNode(query2);
 
     expect(node1.observers).toBeUndefined();
-    expect(node1.children?.length).toBeUndefined();
-    expect(node1.parents?.length).toBeUndefined();
-    expect(node1.depsSubscriptions?.length).toBeUndefined();
+    expect(node1.subscriptions?.length).toBeUndefined();
 
     expect(node2.observers).toBeUndefined();
-    expect(node2.children?.length).toBeUndefined();
-    expect(node2.parents?.length).toBeUndefined();
-    expect(node1.depsSubscriptions?.length).toBeUndefined();
+    expect(node1.subscriptions?.length).toBeUndefined();
 
     const subject = new Subject();
     const changes = await collectChanges(subject, () => {
@@ -582,18 +567,12 @@ describe('addValueObserver()', () => {
     });
 
     expect(node1.hot).toBe(true);
-    expect(node1.treeObserverCount).toBe(1);
-    expect(node1.observers?.length).toBeUndefined();
-    expect(node1.children?.length).toBe(1);
-    expect(node1.parents?.length).toBeUndefined();
-    expect(node1.depsSubscriptions?.length).toBe(1);
+    expect(node2.observers?.length).toBe(1);
+    expect(node1.subscriptions?.length).toBe(1);
 
     expect(node2.hot).toBe(true);
-    expect(node2.treeObserverCount).toBe(1);
     expect(node2.observers?.length).toBe(1);
-    expect(node2.parents?.length).toBe(1);
-    expect(node2.children?.length).toBeUndefined();
-    expect(node2.depsSubscriptions?.length).toBe(0);
+    expect(node2.subscriptions?.length).toBe(1);
 
     expect(changes).toEqual([1]);
   });
@@ -610,7 +589,6 @@ describe('removeValueObserver()', () => {
       removeValueObserver(node, subject);
     }).not.toThrow();
     expect(node.hot).toBe(false);
-    expect(node.treeObserverCount).toBe(0);
   });
 
   it('should remove an observer and make a node be cold', async () => {
@@ -624,7 +602,6 @@ describe('removeValueObserver()', () => {
     removeValueObserver(node, subject);
     expect(node.hot).toBe(false);
     expect(node.observers?.length).toBeUndefined();
-    expect(node.treeObserverCount).toBe(0);
   });
 
   it('should remove an observer, make a node be cold if treeObserverCount = 0 and update parents', async () => {
@@ -640,25 +617,20 @@ describe('removeValueObserver()', () => {
     const subject2 = new Subject();
     addValueObserver(node1, subject1);
     addValueObserver(node2, subject2);
+
     expect(node1.hot).toBe(true);
-    expect(node1.treeObserverCount).toBe(2);
+    expect(node1.observers?.length).toBe(2);
     expect(node2.hot).toBe(true);
-    expect(node2.treeObserverCount).toBe(1);
+    expect(node2.observers?.length).toBe(1);
 
     removeValueObserver(node2, subject2);
     expect(node1.hot).toBe(true);
-    expect(node1.treeObserverCount).toBe(1);
     expect(node1.observers?.length).toBe(1);
-    expect(node1.children?.length).toBe(0);
-    expect(node1.parents?.length).toBeUndefined();
-    expect(node1.depsSubscriptions?.length).toBe(1);
+    expect(node1.subscriptions?.length).toBe(1);
 
     expect(node2.hot).toBe(false);
-    expect(node2.treeObserverCount).toBe(0);
     expect(node2.observers?.length).toBeUndefined();
-    expect(node2.parents?.length).toBeUndefined();
-    expect(node2.children?.length).toBeUndefined();
-    expect(node2.depsSubscriptions?.length).toBeUndefined();
+    expect(node2.subscriptions?.length).toBeUndefined();
   });
 });
 
@@ -710,12 +682,8 @@ describe('onSourceError()', () => {
       { error: 'Test error 4', hasValue: false, kind: 'E', value: undefined },
     ]);
 
-    // Nodes will be made cold by unsubscribing an observable by a subscriber
-    expect(node1.hot).toBe(true);
-    expect(node2.hot).toBe(true);
-
-    expect(node1.treeObserverCount).toBe(3);
-    expect(node2.treeObserverCount).toBe(2);
+    expect(node1.hot).toBe(false);
+    expect(node2.hot).toBe(false);
   });
 });
 
@@ -732,11 +700,7 @@ describe('makeColdNode()', () => {
   it('should not fail if a parent node has incorrect state', () => {
     const query = compute(() => 1);
 
-    const parent = getNode(query);
-
     const node = getNode(query);
-    node.parents = [];
-    node.parents.push(parent);
 
     expect(() => {
       makeColdNode(node);
@@ -792,12 +756,8 @@ describe('onSourceComplete()', () => {
       { error: undefined, hasValue: false, kind: 'C', value: undefined },
     ]);
 
-    // Nodes will be made cold by unsubscribing an observable by a subscriber
-    expect(node1.hot).toBe(true);
-    expect(node2.hot).toBe(true);
-
-    expect(node1.treeObserverCount).toBe(3);
-    expect(node2.treeObserverCount).toBe(2);
+    expect(node1.hot).toBe(false);
+    expect(node2.hot).toBe(false);
   });
 });
 
@@ -846,8 +806,6 @@ describe('recompute()', () => {
     const query2 = compute(calc2);
     const node2 = getNode(query2);
 
-    addChildNode(node1, node2);
-
     calc1.mockClear();
     calc2.mockClear();
     nextNodeVersion();
@@ -855,15 +813,16 @@ describe('recompute()', () => {
     expect(calc1).toHaveBeenCalledTimes(0);
     expect(calc2).toHaveBeenCalledTimes(0);
 
+    addValueObserver(node1, new Subject());
     addValueObserver(node2, new Subject());
     calc1.mockClear();
     calc2.mockClear();
     nextNodeVersion();
     recompute(node1);
     expect(calc1).toHaveBeenCalledTimes(1);
-    expect(calc2).toHaveBeenCalledTimes(1);
+    expect(calc2).toHaveBeenCalledTimes(0);
 
-    expect(node1.valueRef).toBeUndefined();
+    expect(node1.valueRef).not.toBeUndefined();
     expect(node2.valueRef).not.toBeUndefined();
   });
 
@@ -875,63 +834,12 @@ describe('recompute()', () => {
     const node2 = createComputationNode(calc2);
     addValueObserver(node2, new Subject());
 
-    addChildNode(node1, node2);
-
     calc1.mockClear();
     calc2.mockClear();
     nextNodeVersion();
     recompute(node1);
     expect(calc1).toHaveBeenCalledTimes(0);
     expect(calc2).toHaveBeenCalledTimes(0);
-  });
-});
-
-describe('calculateValue()', () => {
-  it('should notify subscribers with a new value', () => {
-    const observer = mockObserver<number>();
-    let value = 1;
-
-    calculateValue({
-      computation: () => ++value,
-      hot: false,
-      treeObserverCount: 1,
-      observers: [observer],
-    });
-
-    expect(value).toBe(2);
-    expect(observer.next).toHaveBeenCalledOnceWith(2);
-  });
-
-  it('should cache value in the node in case valueRef is undefined', () => {
-    const observer = mockObserver<number>();
-    const source = 1;
-
-    const comparator = () => true;
-    const node = {
-      ...createComputationNode(() => source, { comparator }),
-      treeObserverCount: 1,
-      observers: [observer],
-    };
-
-    calculateValue(node);
-    expect(observer.next).toHaveBeenCalledOnceWith(1);
-    expect(node.valueRef).toEqual(expect.objectContaining({ value: 1 }));
-  });
-
-  it('should not cache value in the node in case valueRef is undefined', () => {
-    const observer = mockObserver<number>();
-    const source = 2;
-
-    const comparator = () => true;
-    const node = {
-      ...createComputationNode(() => source, { comparator }),
-      treeObserverCount: 1,
-      observers: [observer],
-    };
-    node.valueRef = { value: 1, params: [] };
-
-    calculateValue(node);
-    expect(observer.next).toHaveBeenCalledTimes(0);
   });
 });
 
