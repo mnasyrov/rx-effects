@@ -9,6 +9,10 @@ import {
 } from 'rxjs';
 import Mock = jest.Mock;
 
+export function waitForMicrotask(): Promise<void> {
+  return firstValueFrom(timer(0)).then(() => undefined);
+}
+
 export function collectChanges<T>(
   source$: Observable<T>,
   action: () => void | Promise<void>,
