@@ -1,5 +1,6 @@
-export const DEFAULT_COMPARATOR: (a: unknown, b: unknown) => boolean =
-  Object.is;
+export type Comparator<T> = (prev: T, next: T) => boolean;
+
+export const DEFAULT_COMPARATOR: Comparator<unknown> = Object.is;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -12,10 +13,9 @@ export type PartialProp<T, K extends keyof T> = Omit<T, K> &
 /**
  * Makes shallow comparison of two objects.
  */
-export const OBJECT_COMPARATOR = (
-  objA: Record<string, unknown>,
-  objB: Record<string, unknown>,
-): boolean => {
+export const OBJECT_COMPARATOR: Comparator<
+  Readonly<Record<string, unknown>>
+> = (objA, objB): boolean => {
   if (objA === objB) {
     return true;
   }
@@ -52,7 +52,15 @@ export function removeFromArray<T>(
   const index = source.indexOf(item);
   if (index < 0) return source;
 
+  if (source.length === 1) {
+    return undefined;
+  }
+
   const clone = [...source];
   clone.splice(index, 1);
   return clone;
+}
+
+export function nextSafeInteger(currentValue: number): number {
+  return currentValue >= Number.MAX_SAFE_INTEGER ? 0 : currentValue + 1;
 }

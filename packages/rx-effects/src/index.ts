@@ -45,7 +45,8 @@ export type { StoreExtension } from './storeExtensions';
 export { registerStoreExtension } from './storeExtensions';
 export { createStoreLoggerExtension } from './storeLoggerExtension';
 
-export { OBJECT_COMPARATOR } from './utils';
+export type { Comparator } from './utils';
+export { DEFAULT_COMPARATOR, OBJECT_COMPARATOR } from './utils';
 
 export type { StoreDeclaration, DeclaredStoreFactory } from './declareStore';
 export { declareStore } from './declareStore';
