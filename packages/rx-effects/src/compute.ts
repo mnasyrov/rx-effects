@@ -1,18 +1,21 @@
 /* eslint-disable no-var */
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, TeardownLogic } from 'rxjs';
 import { Query } from './query';
-import { DEFAULT_COMPARATOR, removeFromArray } from './utils';
+import {
+  Comparator,
+  DEFAULT_COMPARATOR,
+  nextSafeInteger,
+  removeFromArray,
+} from './utils';
 
-type Comparator<T> = (a: T, b: T) => boolean;
-
-/// PUBLIC API
+//region PUBLIC API
 
 /**
  * This function returns a current value of a provided Query and registers it as a dependency for computation.
  */
 export type ComputationResolver = {
   <T>(query: Query<T>): T;
-  <T, R>(query: Query<T>, selector: (value: T) => R): R;
+  <T, R>(query: Query<T>, selector?: (value: T) => R): R;
 };
 
 /**
@@ -56,63 +59,19 @@ export function compute<T>(
   computation: Computation<T>,
   comparator?: Comparator<T>,
 ): Query<T> {
-  const node = createComputationNode(computation, comparator);
-  return createComputationQuery(node);
+  const node = new ComputationNode<T>(computation, comparator);
+  return node.createQuery();
 }
 
-/// INTERNAL
+//endregion PUBLIC API
 
-type ValueRef<T> = { value: T; params?: Array<unknown>; version?: number };
+//region INTERNAL IMPLEMENTATION
 
-/** @internal */
-export type Node<T> = {
-  computation: Computation<T>;
-  comparator?: (a: T, b: T) => boolean;
-  hot: boolean;
-  version?: number;
-  valueRef?: ValueRef<T>;
-  resolvedDeps?: ReadonlySet<Query<unknown>>;
-  subscriptions?: (() => void)[];
-  observers?: Observer<T>[];
-  depObserver?: Observer<T>;
-};
+let NODE_VERSION = 0;
+let STORE_VERSION = 0;
 
-/** @internal */
-export function createComputationNode<T>(
-  computation: Computation<T>,
-  comparator?: Comparator<T>,
-): Node<T> {
-  return {
-    hot: false,
-    computation,
-    comparator,
-  };
-}
-
-/** @internal */
-export function createComputationQuery<T>(node: Node<T>): Query<T> {
-  const query = {
-    _computed: true,
-
-    get: () => getQueryValue(node),
-
-    value$: new Observable<T>((observer) => {
-      addValueObserver(node, observer);
-
-      return () => removeValueObserver(node, observer);
-    }),
-  };
-
-  return query;
-}
-
-/// COMPUTATION ENGINE
-
-var NODE_VERSION = 0;
-var STORE_VERSION = 0;
-
-var DEPS_COLLECTOR: undefined | ((query: Query<unknown>) => void);
-var RECOMPUTE = false;
+let DEPS_COLLECTOR: undefined | ((query: Query<unknown>) => void);
+let RECOMPUTE = false;
 
 const FAST_QUERY_GETTER: ComputationResolver = (
   query: Query<unknown>,
@@ -123,192 +82,237 @@ const FAST_QUERY_GETTER: ComputationResolver = (
 };
 
 /** @internal */
-export function nextVersion(currentValue: number): number {
-  return currentValue >= Number.MAX_SAFE_INTEGER ? 0 : currentValue + 1;
-}
-
-/** @internal */
 export function nextNodeVersion() {
-  NODE_VERSION = nextVersion(NODE_VERSION);
+  NODE_VERSION = nextSafeInteger(NODE_VERSION);
 }
 
 /** @internal */
 export function nextStoreVersion() {
-  STORE_VERSION = nextVersion(STORE_VERSION);
+  STORE_VERSION = nextSafeInteger(STORE_VERSION);
 }
 
-export function getQueryValue<T>(node: Node<T>): T {
-  if (DEPS_COLLECTOR) {
-    if (node.version === NODE_VERSION && node.valueRef) {
-      return node.valueRef.value;
-    }
+type ValueRef<T> = { value: T; params?: Array<unknown>; version?: number };
 
-    node.version = NODE_VERSION;
-    node.valueRef = calculate(node.computation);
-    return node.valueRef.value;
-  }
+type ComputationQuery<T> = Query<T> &
+  Readonly<{
+    // _node: () => ComputationNode<T>;
+    _computed: true;
+  }>;
 
-  if (RECOMPUTE) {
-    if (node.version === NODE_VERSION && node.valueRef) {
-      return node.valueRef.value;
-    }
-
-    node.version = NODE_VERSION;
-    node.valueRef = calculate(node.computation);
-    return node.valueRef.value;
-  }
-
-  if (node.valueRef?.version === STORE_VERSION) {
-    return node.valueRef.value;
-  }
-
-  return node.computation(FAST_QUERY_GETTER);
+function isComputationQuery<T>(query: Query<T>): query is ComputationQuery<T> {
+  // return !!(query as ComputationQuery<T>)._node;
+  return (query as ComputationQuery<T>)._computed;
 }
 
-export function addValueObserver<T>(node: Node<T>, observer: Observer<T>) {
-  if (!node.observers) node.observers = [];
-  node.observers.push(observer);
+// function getComputationNode<T>(
+//   query: Query<T>,
+// ): ComputationNode<T> | undefined {
+//   return (query as ComputationQuery<T>)._node?.();
+// }
 
-  nextNodeVersion();
-  makeHotNode(node, observer);
-}
+class ComputationNode<T> {
+  computation: Computation<T>;
+  comparator: (a: T, b: T) => boolean;
+  hot = false;
+  version?: number;
+  valueRef?: ValueRef<T>;
+  resolvedDeps?: ReadonlySet<Query<unknown>>;
+  subscriptions?: (() => void)[];
+  observers?: Observer<T>[];
+  depObserver?: Observer<T>;
 
-export function removeValueObserver<T>(node: Node<T>, observer: Observer<T>) {
-  node.observers = removeFromArray(node.observers, observer);
-
-  if (!node.observers || node.observers.length === 0) {
-    makeColdNode(node);
+  constructor(
+    computation: Computation<any>,
+    comparator: Comparator<any> | undefined,
+  ) {
+    this.computation = computation;
+    this.comparator = comparator ?? DEFAULT_COMPARATOR;
   }
-}
 
-function makeHotNode<T>(node: Node<T>, observer: Observer<T>) {
-  if (node.hot && node.valueRef) {
-    observer.next(node.valueRef.value);
-    return;
-  }
-
-  let valueRef = node.valueRef;
-  if (node.resolvedDeps) {
-    if (!valueRef) {
-      valueRef = node.valueRef = calculate(node.computation);
-    }
-  } else {
-    const visitedDeps: Set<Query<unknown>> = new Set();
-
-    DEPS_COLLECTOR = (query) => {
-      if (!(query as any)._computed) visitedDeps.add(query);
+  createQuery(): ComputationQuery<T> {
+    return {
+      // _node: () => this,
+      _computed: true,
+      get: () => this.getQueryValue(),
+      value$: new Observable<any>((observer) => this.onSubscribe(observer)),
     };
-    const next = calculate(node.computation);
-    DEPS_COLLECTOR = undefined;
-
-    valueRef = node.valueRef = next;
-    node.resolvedDeps = visitedDeps;
   }
 
-  if (node.resolvedDeps.size > 0) {
-    node.resolvedDeps.forEach((parentQuery) => {
-      if (!node.depObserver) {
-        node.depObserver = {
-          next: () => onSourceChanged(node),
-          error: (error: any) => onSourceError(node, error),
-          complete: () => onSourceComplete(node),
-        };
+  onSubscribe(observer: Observer<T>): TeardownLogic {
+    this.addValueObserver(observer);
+
+    return () => this.removeValueObserver(observer);
+  }
+
+  getQueryValue(): T {
+    if (DEPS_COLLECTOR) {
+      if (this.version === NODE_VERSION && this.valueRef) {
+        return this.valueRef.value;
       }
-      const subscription = parentQuery.value$.subscribe(
-        node.depObserver as any,
-      );
 
-      if (!node.subscriptions) node.subscriptions = [];
-      node.subscriptions.push(() => subscription.unsubscribe());
-    });
+      this.version = NODE_VERSION;
+      this.valueRef = calculate(this.computation);
+      return this.valueRef.value;
+    }
+
+    if (RECOMPUTE) {
+      if (this.version === NODE_VERSION && this.valueRef) {
+        return this.valueRef.value;
+      }
+
+      this.version = NODE_VERSION;
+      this.valueRef = calculate(this.computation);
+      return this.valueRef.value;
+    }
+
+    if (this.valueRef?.version === STORE_VERSION) {
+      return this.valueRef.value;
+    }
+
+    return this.computation(FAST_QUERY_GETTER);
   }
 
-  node.hot = true;
+  addValueObserver(observer: Observer<T>) {
+    if (!this.observers) this.observers = [];
+    this.observers.push(observer);
 
-  observer.next(valueRef.value);
-}
+    nextNodeVersion();
+    this.makeHotNode(observer);
+  }
 
-export function makeColdNode<T>(node: Node<T>) {
-  node.hot = false;
+  removeValueObserver(observer: Observer<T>) {
+    this.observers = removeFromArray(this.observers, observer);
 
-  const { subscriptions } = node;
-  if (subscriptions) {
-    for (let i = 0; i < subscriptions.length; i++) {
-      const unsubscribe = subscriptions[i];
-      unsubscribe();
+    if (!this.observers || this.observers.length === 0) {
+      this.makeColdNode();
     }
   }
 
-  node.version = undefined;
-  node.valueRef = undefined;
-  node.subscriptions = undefined;
-  node.observers = undefined;
-}
-
-function onSourceChanged<T>(node: Node<T>) {
-  nextNodeVersion();
-  recompute(node);
-}
-
-export function onSourceError<T>(node: Node<T>, error: any) {
-  const { observers } = node;
-
-  if (observers) {
-    for (let i = 0; i < observers.length; i++) {
-      const observer = observers[i];
-      observer.error(error);
+  makeHotNode(observer: Observer<T>) {
+    if (this.hot && this.valueRef) {
+      observer.next(this.valueRef.value);
+      return;
     }
+
+    let valueRef = this.valueRef;
+    if (this.resolvedDeps) {
+      if (!valueRef) {
+        valueRef = this.valueRef = calculate(this.computation);
+      }
+    } else {
+      const visitedDeps: Set<Query<unknown>> = new Set();
+
+      DEPS_COLLECTOR = (query) => {
+        if (!isComputationQuery(query)) visitedDeps.add(query);
+      };
+      const next = calculate(this.computation);
+      DEPS_COLLECTOR = undefined;
+
+      valueRef = this.valueRef = next;
+      this.resolvedDeps = visitedDeps;
+    }
+
+    if (this.resolvedDeps.size > 0) {
+      this.resolvedDeps.forEach((parentQuery) => {
+        if (!this.depObserver) {
+          this.depObserver = {
+            next: () => this.onSourceChanged(),
+            error: (error: any) => this.onSourceError(error),
+            complete: () => this.onSourceComplete(),
+          };
+        }
+        const subscription = parentQuery.value$.subscribe(
+          this.depObserver as any,
+        );
+
+        if (!this.subscriptions) this.subscriptions = [];
+        this.subscriptions.push(() => subscription.unsubscribe());
+      });
+    }
+
+    this.hot = true;
+
+    observer.next(valueRef.value);
   }
 
-  node.observers = undefined;
-  makeColdNode(node);
-}
+  makeColdNode() {
+    this.hot = false;
 
-export function onSourceComplete<T>(node: Node<T>) {
-  const { observers } = node;
-
-  if (observers) {
-    for (let i = 0; i < observers.length; i++) {
-      const observer = observers[i];
-      observer.complete();
+    const { subscriptions } = this;
+    if (subscriptions) {
+      for (let i = 0; i < subscriptions.length; i++) {
+        const unsubscribe = subscriptions[i];
+        unsubscribe();
+      }
     }
+
+    this.version = undefined;
+    this.valueRef = undefined;
+    this.subscriptions = undefined;
+    this.observers = undefined;
   }
 
-  node.observers = undefined;
-  makeColdNode(node);
-}
-
-export function recompute<T>(node: Node<T>) {
-  if (!node.hot || !node.observers || node.version === NODE_VERSION) return;
-  node.version = NODE_VERSION;
-
-  RECOMPUTE = true;
-  let next;
-  try {
-    next = calculate(node.computation);
-  } finally {
-    RECOMPUTE = false;
+  onSourceChanged() {
+    nextNodeVersion();
+    this.recompute();
   }
 
-  const isChanged =
-    !node.valueRef ||
-    isCalculationChanged(
-      node.comparator ?? DEFAULT_COMPARATOR,
-      node.valueRef,
-      next,
-    );
+  onSourceError(error: any) {
+    const { observers } = this;
 
-  if (isChanged) {
-    node.valueRef = next;
-    const value = next.value;
-    const observers = node.observers;
-
-    for (let i = 0; i < observers.length; i++) {
-      const observer = observers[i];
-      observer.next(value);
+    if (observers) {
+      for (let i = 0; i < observers.length; i++) {
+        const observer = observers[i];
+        observer.error(error);
+      }
     }
-  } else if (node.valueRef) {
-    node.valueRef.version = STORE_VERSION;
+
+    this.observers = undefined;
+    this.makeColdNode();
+  }
+
+  onSourceComplete() {
+    const { observers } = this;
+
+    if (observers) {
+      for (let i = 0; i < observers.length; i++) {
+        const observer = observers[i];
+        observer.complete();
+      }
+    }
+
+    this.observers = undefined;
+    this.makeColdNode();
+  }
+
+  recompute() {
+    if (!this.hot || !this.observers || this.version === NODE_VERSION) return;
+    this.version = NODE_VERSION;
+
+    RECOMPUTE = true;
+    let next;
+    try {
+      next = calculate(this.computation);
+    } finally {
+      RECOMPUTE = false;
+    }
+
+    const isChanged =
+      !this.valueRef ||
+      isCalculationChanged(this.comparator, this.valueRef, next);
+
+    if (isChanged) {
+      this.valueRef = next;
+      const value = next.value;
+      const observers = this.observers;
+
+      for (let i = 0; i < observers.length; i++) {
+        const observer = observers[i];
+        observer.next(value);
+      }
+    } else if (this.valueRef) {
+      this.valueRef.version = STORE_VERSION;
+    }
   }
 }
 
@@ -351,3 +355,5 @@ function isArrayEqual(
 ): boolean {
   return a.length === b.length && a.every((value, index) => b[index] === value);
 }
+
+//endregion INTERNAL IMPLEMENTATION

@@ -115,13 +115,13 @@ describe('compute()', () => {
 
     const changes = await collectChanges(b.value$, () => {
       s1.set(1);
-      expect(b.get()).toEqual({ a: 1, b: 0 });
+      expect(b.get()).toEqual({ a: 2, b: 0 });
 
       s1.set(2);
-      expect(b.get()).toEqual({ a: 1, b: 0 });
+      expect(b.get()).toEqual({ a: 3, b: 0 });
 
       s1.set(3);
-      expect(b.get()).toEqual({ a: 1, b: 0 });
+      expect(b.get()).toEqual({ a: 4, b: 0 });
 
       s2.set(2);
       expect(b.get()).toEqual({ a: 4, b: 2 });
@@ -402,7 +402,7 @@ describe('compute()', () => {
   it('should return internal ComputationQuery', async () => {
     const query = compute(() => 1);
 
-    expect((query as any)._computed).toBe(true);
+    expect((query as any)._computed).toEqual(true);
     expect(query.get()).toBe(1);
     expect(await firstValueFrom(query.value$)).toBe(1);
   });
