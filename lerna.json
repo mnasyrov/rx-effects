@@ -10,7 +10,7 @@
       "stream": true
     },
     "version": {
-      "allowBranch": "main",
+      "allowBranch": ["main", "1.x"],
       "conventionalCommits": true,
       "exact": true
     }
