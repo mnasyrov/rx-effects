@@ -3,7 +3,7 @@
     "noEmit": true,
     "target": "ES2019",
     "module": "ES2015",
-    "lib": ["ES2019"],
+    "lib": ["ES2019", "ES2021.WeakRef"],
     "jsx": "react-jsx",
     "declaration": true,
     "sourceMap": true,
