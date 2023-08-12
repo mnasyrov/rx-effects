@@ -169,7 +169,15 @@ class ComputationNode<T> {
       return this.valueRef.value;
     }
 
-    return this.computation(FAST_QUERY_GETTER);
+    const nextValue = this.computation(FAST_QUERY_GETTER);
+
+    if (this.valueRef) {
+      if (this.comparator(this.valueRef.value, nextValue)) {
+        return this.valueRef.value;
+      }
+    }
+
+    return nextValue;
   }
 
   addValueObserver(observer: Observer<T>) {
