@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { MicrotaskScheduler } from '../../utils';
 import { Watch } from '../src/watch';
 
 /**
@@ -131,7 +132,9 @@ export function getEffectManager(): MyEffectManager {
 }
 
 export class MyEffectManager {
-  private queue = new Set<Watch>();
+  private readonly scheduler = new MicrotaskScheduler<Watch>((entry) => {
+    entry.run();
+  });
 
   create(
     effectFn: (onCleanup: (cleanupFn: EffectCleanupFn) => void) => void,
@@ -148,12 +151,8 @@ export class MyEffectManager {
           watch.run();
           return;
         }
-        const prevSize = this.queue.size;
-        this.queue.add(watch);
 
-        if (prevSize === 0) {
-          Promise.resolve().then(() => this.executeQueue());
-        }
+        this.scheduler.schedule(watch);
       },
 
       allowSignalWrites,
@@ -164,7 +163,7 @@ export class MyEffectManager {
 
     const destroy = () => {
       watch.cleanup();
-      this.queue.delete(watch);
+      this.scheduler.remove(watch);
     };
 
     return {
@@ -172,24 +171,11 @@ export class MyEffectManager {
     };
   }
 
-  executeQueue(): void {
-    if (this.queue.size === 0) {
-      return;
-    }
-
-    const list = [...this.queue];
-    this.queue.clear();
-
-    for (const watch of list) {
-      watch.run();
-    }
-  }
-
   flush(): void {
-    this.executeQueue();
+    this.scheduler.execute();
   }
 
   get isQueueEmpty(): boolean {
-    return this.queue.size === 0;
+    return this.scheduler.isEmpty();
   }
 }

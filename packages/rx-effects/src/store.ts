@@ -4,7 +4,12 @@ import { Controller } from './controller';
 import { Query } from './query';
 import { STORE_EVENT_BUS } from './storeEvents';
 import { setInternalStoreFlag, setStateMutationName } from './storeMetadata';
-import { DEFAULT_COMPARATOR, isReadonlyArray, removeFromArray } from './utils';
+import {
+  DEFAULT_COMPARATOR,
+  isReadonlyArray,
+  MicrotaskScheduler,
+  removeFromArray,
+} from './utils';
 
 let STORE_SEQ_NUMBER = 0;
 
@@ -175,8 +180,9 @@ export type InternalStoreOptions<State> = Readonly<
   StoreOptions<State> & { internal?: boolean }
 >;
 
-let STORE_NOTIFY_QUEUE: Store<any>[] = [];
-const STORE_NOTIFY_PRESENCE: Set<number> = new Set();
+const NOTIFICATION_SCHEDULER = new MicrotaskScheduler<Store<any>>((store) =>
+  store.notify(),
+);
 
 /**
  * Creates the state store.
@@ -254,7 +260,8 @@ export function createStore<State>(
 
     nextStoreVersion();
     currentState = nextState;
-    scheduleNotify(store);
+
+    NOTIFICATION_SCHEDULER.schedule(store);
 
     STORE_EVENT_BUS.next({
       type: 'updated',
@@ -301,27 +308,6 @@ export function createStore<State>(
   STORE_EVENT_BUS.next({ type: 'created', store });
 
   return store;
-}
-
-function scheduleNotify(store: Store<any>) {
-  const prevSize = STORE_NOTIFY_PRESENCE.size;
-  STORE_NOTIFY_PRESENCE.add(store.id);
-
-  if (STORE_NOTIFY_PRESENCE.size === prevSize) {
-    return;
-  }
-
-  if (STORE_NOTIFY_QUEUE.push(store) === 1) {
-    Promise.resolve().then(executeNotifyQueue);
-  }
-}
-
-function executeNotifyQueue() {
-  const queue = STORE_NOTIFY_QUEUE;
-  STORE_NOTIFY_QUEUE = [];
-  STORE_NOTIFY_PRESENCE.clear();
-
-  queue.forEach((store) => store.notify());
 }
 
 /** Creates StateUpdates for updating the store by provided state mutations */

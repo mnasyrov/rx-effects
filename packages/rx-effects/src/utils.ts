@@ -64,3 +64,39 @@ export function removeFromArray<T>(
 export function nextSafeInteger(currentValue: number): number {
   return currentValue >= Number.MAX_SAFE_INTEGER ? 0 : currentValue + 1;
 }
+
+export class MicrotaskScheduler<T> {
+  private readonly queue = new Set<T>();
+
+  constructor(private readonly action: (entry: T) => void) {}
+
+  isEmpty(): boolean {
+    return this.queue.size === 0;
+  }
+
+  schedule(entry: T): void {
+    const prevSize = this.queue.size;
+    this.queue.add(entry);
+
+    if (prevSize === 0) {
+      Promise.resolve().then(() => this.execute());
+    }
+  }
+
+  remove(entry: T): void {
+    this.queue.delete(entry);
+  }
+
+  execute(): void {
+    if (this.queue.size === 0) {
+      return;
+    }
+
+    const list = [...this.queue];
+    this.queue.clear();
+
+    for (const entry of list) {
+      this.action(entry);
+    }
+  }
+}
