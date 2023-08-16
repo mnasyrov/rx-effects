@@ -72,7 +72,11 @@ export class Watch extends ReactiveNode {
     }
   }
 
-  cleanup() {
-    this.cleanupFn();
+  override destroy(): void {
+    try {
+      this.cleanupFn();
+    } finally {
+      super.destroy();
+    }
   }
 }

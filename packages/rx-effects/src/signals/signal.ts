@@ -1,10 +1,10 @@
-import { nextStoreVersion } from '../compute';
 import {
   createSignalFromFunction,
   defaultEquals,
   Signal,
   ValueEqualityFn,
 } from './common';
+import { nextGlobalValueVersion } from './compute';
 import { ReactiveNode } from './graph';
 
 /**
@@ -85,7 +85,7 @@ class WritableSignalImpl<T> extends ReactiveNode {
   }
 
   protected override onProducerUpdateValueVersion(): void {
-    // Writable signal value versions are always up to date.
+    // Writable signal value versions are always up-to-date.
   }
 
   signal(): T {
@@ -104,10 +104,9 @@ class WritableSignalImpl<T> extends ReactiveNode {
     if (!this.equal(this.value, newValue)) {
       this.value = newValue;
       this.valueVersion++;
-      this.producerMayHaveChanged();
 
-      nextStoreVersion();
-      scheduleNotify(store);
+      // TODO: это может сделать асинхронным?
+      this.producerMayHaveChanged();
     }
   }
 
@@ -139,12 +138,14 @@ class WritableSignalImpl<T> extends ReactiveNode {
   }
 
   notify() {
-    const pinnedState = currentState;
-    subscribers?.forEach((subscriber) => subscriber.next(pinnedState));
+    // TODO: удалить?
+    // TODO: как следать опциональный синхронный notify()?
+    // const pinnedState = currentState;
+    // subscribers?.forEach((subscriber) => subscriber.next(pinnedState));
   }
 
-  destroy() {
-    this.destroyNode();
+  destroy(): void {
+    // this.destroyNode();
 
     // subscribers?.forEach((subscriber) => subscriber.complete());
     // subscribers = [];

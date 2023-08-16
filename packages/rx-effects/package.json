@@ -38,7 +38,9 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsup --clean --dts --format cjs,esm src/index.ts --legacy-output",
+    "build": "npm run build:lib && npm run build:signals",
+    "build:lib": "tsup --clean --dts --format cjs,esm src/index.ts --legacy-output",
+    "build:signals": "tsup --clean --dts --out-dir dist/signals --format cjs,esm src/signals/index.ts --legacy-output",
     "benchmarks": "tsx benchmarks"
   },
   "peerDependencies": {

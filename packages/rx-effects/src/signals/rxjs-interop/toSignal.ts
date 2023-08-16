@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable, Subscribable } from 'rxjs';
 import { Signal } from '../common';
 import { computed } from '../compute';
 import { untracked } from '../graph';
-import { WritableSignal } from '../signal';
+import { signal, WritableSignal } from '../signal';
 
 export type ObservableSignal<T> = Signal<T> & { destroy: () => void };
 

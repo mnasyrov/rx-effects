@@ -61,6 +61,21 @@ export function removeFromArray<T>(
   return clone;
 }
 
+export function isArrayEqual(
+  a: ReadonlyArray<unknown>,
+  b: ReadonlyArray<unknown>,
+): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+
+  return true;
+}
+
 export function nextSafeInteger(currentValue: number): number {
   return currentValue >= Number.MAX_SAFE_INTEGER ? 0 : currentValue + 1;
 }

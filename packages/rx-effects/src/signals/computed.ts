@@ -1,30 +1,29 @@
-import {createSignalFromFunction, defaultEquals, Signal, ValueEqualityFn} from './api';
-import {ReactiveNode, setActiveConsumer} from './graph';
+import {
+  createSignalFromFunction,
+  defaultEquals,
+  Signal,
+  ValueEqualityFn,
+} from './common';
+import { ReactiveNode, setActiveConsumer } from './graph';
 
-/**
- * Options passed to the `computed` creation function.
- *
- * @developerPreview
- */
-export interface CreateComputedOptions<T> {
-  /**
-   * A comparison function which defines equality for computed values.
-   */
+export type Computation<T> = () => T;
+
+export type CreateComputedOptions<T> = {
   equal?: ValueEqualityFn<T>;
-}
-
+};
 
 /**
  * Create a computed `Signal` which derives a reactive value from an expression.
  *
  * @developerPreview
  */
-export function computed<T>(computation: () => T, options?: CreateComputedOptions<T>): Signal<T> {
+export function computed<T>(
+  computation: Computation<T>,
+  options?: CreateComputedOptions<T>,
+): Signal<T> {
   const node = new ComputedImpl(computation, options?.equal ?? defaultEquals);
 
-  // Casting here is required for g3, as TS inference behavior is slightly different between our
-  // version/options and g3's.
-  return createSignalFromFunction(node, node.signal.bind(node)) as unknown as Signal<T>;
+  return createSignalFromFunction<T>(node, node.signal.bind(node));
 }
 
 /**
@@ -52,8 +51,11 @@ const ERRORED: any = Symbol('ERRORED');
  *
  * `Computed`s are both producers and consumers of reactivity.
  */
-class ComputedImpl<T> extends ReactiveNode {
-  constructor(private computation: () => T, private equal: (oldValue: T, newValue: T) => boolean) {
+export class ComputedImpl<T> extends ReactiveNode {
+  constructor(
+    private computation: () => T,
+    private equal: (oldValue: T, newValue: T) => boolean,
+  ) {
     super();
   }
   /**
@@ -78,8 +80,6 @@ class ComputedImpl<T> extends ReactiveNode {
    */
   private stale = true;
 
-  protected override readonly consumerAllowSignalWrites = false;
-
   protected override onConsumerDependencyMayHaveChanged(): void {
     if (this.stale) {
       // We've already notified consumers that this value has potentially changed.
@@ -101,8 +101,11 @@ class ComputedImpl<T> extends ReactiveNode {
 
     // The current value is stale. Check whether we need to produce a new one.
 
-    if (this.value !== UNSET && this.value !== COMPUTING &&
-        !this.consumerPollProducersForChange()) {
+    if (
+      this.value !== UNSET &&
+      this.value !== COMPUTING &&
+      !this.consumerPollProducersForChange()
+    ) {
       // Even though we were previously notified of a potential dependency update, all of
       // our dependencies report that they have not actually changed in value, so we can
       // resolve the stale state without needing to recompute the current value.
@@ -139,8 +142,12 @@ class ComputedImpl<T> extends ReactiveNode {
 
     this.stale = false;
 
-    if (oldValue !== UNSET && oldValue !== ERRORED && newValue !== ERRORED &&
-        this.equal(oldValue, newValue)) {
+    if (
+      oldValue !== UNSET &&
+      oldValue !== ERRORED &&
+      newValue !== ERRORED &&
+      this.equal(oldValue, newValue)
+    ) {
       // No change to `valueVersion` - old and new values are
       // semantically equivalent.
       this.value = oldValue;

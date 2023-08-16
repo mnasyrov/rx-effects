@@ -60,7 +60,7 @@ export class AsyncEffectManager implements EffectManager {
     return {
       destroy: () => {
         this.scheduler.remove(watch);
-        watch.cleanup();
+        watch.destroy();
       },
     };
   }
@@ -78,8 +78,8 @@ export class SyncEffectManager implements EffectManager {
     watch.notify();
 
     return {
-      destroy() {
-        watch.cleanup();
+      destroy: () => {
+        watch.destroy();
       },
     };
   }

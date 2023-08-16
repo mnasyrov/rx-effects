@@ -1,3 +1,5 @@
+import { nextStoreVersion } from '../compute';
+
 /**
  * Counter tracking the next `ProducerId` or `ConsumerId`.
  */
@@ -120,6 +122,28 @@ export abstract class ReactiveNode {
    */
   protected valueVersion = 0;
 
+  // TODO
+  // protected abstract destroy(): void;
+
+  destroy(): void {
+    // makeColdNode() {
+    //   this.hot = false;
+    //
+    //   const { subscriptions } = this;
+    //   if (subscriptions) {
+    //     for (let i = 0; i < subscriptions.length; i++) {
+    //       const unsubscribe = subscriptions[i];
+    //       unsubscribe();
+    //     }
+    //   }
+    //
+    //   this.trackingVersion = undefined;
+    //   this.valueRef = undefined;
+    //   this.subscriptions = undefined;
+    //   this.observers = undefined;
+    // }
+  }
+
   /**
    * Called for consumers whenever one of their dependencies notifies that it might have a new
    * value.
@@ -143,9 +167,7 @@ export abstract class ReactiveNode {
     for (const [producerId, edge] of this.producers) {
       const producer = edge.producerNode.deref();
 
-      // On Safari < 16.1 deref can return null, we need to check for null also.
-      // See https://github.com/WebKit/WebKit/commit/44c15ba58912faab38b534fef909dd9e13e095e0
-      if (producer == null || edge.atTrackingVersion !== this.trackingVersion) {
+      if (!producer || edge.atTrackingVersion !== this.trackingVersion) {
         // This dependency edge is stale, so remove it.
         this.producers.delete(producerId);
         producer?.consumers.delete(this.id);
@@ -167,6 +189,12 @@ export abstract class ReactiveNode {
    * Notify all consumers of this producer that its value may have changed.
    */
   protected producerMayHaveChanged(): void {
+    // nextStoreVersion();
+    // scheduleNotify(store);
+    //
+    // const pinnedState = currentState;
+    // subscribers?.forEach((subscriber) => subscriber.next(pinnedState));
+
     // Prevent signal reads when we're updating the graph
     const prev = inNotificationPhase;
     inNotificationPhase = true;
@@ -174,12 +202,7 @@ export abstract class ReactiveNode {
       for (const [consumerId, edge] of this.consumers) {
         const consumer = edge.consumerNode.deref();
 
-        // On Safari < 16.1 deref can return null, we need to check for null also.
-        // See https://github.com/WebKit/WebKit/commit/44c15ba58912faab38b534fef909dd9e13e095e0
-        if (
-          consumer == null ||
-          consumer.trackingVersion !== edge.atTrackingVersion
-        ) {
+        if (!consumer || consumer.trackingVersion !== edge.atTrackingVersion) {
           this.consumers.delete(consumerId);
           consumer?.producers.delete(this.id);
           continue;
