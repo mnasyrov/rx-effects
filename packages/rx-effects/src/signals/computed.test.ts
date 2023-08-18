@@ -1,7 +1,7 @@
 import { BehaviorSubject, materialize, Subject, Subscription } from 'rxjs';
 import { collectChanges, waitForMicrotask } from '../../test/testUtils';
 import { Signal } from './common';
-import { computed } from './computed';
+import { computed, track } from './computed';
 import { ASYNC_EFFECT_MANAGER, effect } from './effect';
 import { toObservable, toSignal } from './rxjs-interop';
 import { signal } from './signal';
@@ -346,24 +346,15 @@ describe('computed()', () => {
   it('should handle recursion during store updates: Value selector', async () => {
     const store = signal({ a: 0, result: { value: 0 } });
 
-    const nextResult = computed(() => ({ value: store().a }));
+    const nextResult = computed(() => ({ value: track(() => store().a) }));
 
-    // const a = computed(() => store().a);
-    // const nextResult = computed(() => ({ value: a() }));
-
-    let subscription: Subscription | undefined;
-
-    toObservable(nextResult, { onlyChanges: true }).subscribe((result) => {
+    const subscription = toObservable(nextResult, {
+      onlyChanges: true,
+    }).subscribe((result) => {
       store.update((state) => ({ ...state, result }));
     });
 
     const changes = await collectChanges(toObservable(store), async () => {
-      // subscription = toObservable(nextResult, { onlyChanges: true }).subscribe(
-      //   (result) => {
-      //     store.update((state) => ({ ...state, result }));
-      //   },
-      // );
-
       expect(nextResult()).toEqual({ value: 0 });
 
       store.update((state) => ({ ...state, a: 1 }));
@@ -377,7 +368,6 @@ describe('computed()', () => {
 
     expect(changes).toEqual([
       { a: 0, result: { value: 0 } },
-      { a: 1, result: { value: 0 } },
       { a: 1, result: { value: 1 } },
     ]);
   });
