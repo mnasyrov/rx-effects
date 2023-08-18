@@ -53,7 +53,7 @@ const ERRORED: any = Symbol('ERRORED');
  */
 export class ComputedImpl<T> extends ReactiveNode {
   constructor(
-    private computation: () => T,
+    private computation: Computation<T>,
     private equal: (oldValue: T, newValue: T) => boolean,
   ) {
     super();
@@ -95,7 +95,7 @@ export class ComputedImpl<T> extends ReactiveNode {
 
   protected override onProducerUpdateValueVersion(): void {
     if (!this.stale) {
-      // The current value and its version are already up to date.
+      // The current value and its version are already up-to-date.
       return;
     }
 
@@ -156,6 +156,13 @@ export class ComputedImpl<T> extends ReactiveNode {
 
     this.value = newValue;
     this.valueVersion++;
+
+    console.log('!!! recomputed', {
+      id: (this as any).id,
+      value: this.value,
+      valueVersion: this.valueVersion,
+      producers: this.getProducerVersions(),
+    });
   }
 
   signal(): T {

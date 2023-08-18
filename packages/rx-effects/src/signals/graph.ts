@@ -185,6 +185,20 @@ export abstract class ReactiveNode {
     return false;
   }
 
+  // TODO: Remove
+  protected getProducerVersions(): [
+    producerId: number,
+    seenValueVersion: number,
+  ][] {
+    const entries: [producerId: number, seenValueVersion: number][] = [];
+
+    for (const [producerId, { seenValueVersion }] of this.producers) {
+      entries.push([producerId, seenValueVersion]);
+    }
+
+    return entries;
+  }
+
   /**
    * Notify all consumers of this producer that its value may have changed.
    */

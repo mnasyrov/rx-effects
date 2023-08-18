@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable, Subscribable } from 'rxjs';
 import { Signal } from '../common';
-import { computed } from '../compute';
+import { computed } from '../computed';
 import { untracked } from '../graph';
 import { signal, WritableSignal } from '../signal';
 
