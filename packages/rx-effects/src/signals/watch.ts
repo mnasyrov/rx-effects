@@ -56,7 +56,7 @@ export class Watch extends ReactiveNode {
    * `schedule` hook is called by `Watch`.
    */
   run(): void {
-    console.log('!!! watch.run()', this);
+    // console.log('!!! watch.run()', this);
 
     this.dirty = false;
     if (this.trackingVersion !== 0 && !this.consumerPollProducersForChange()) {
