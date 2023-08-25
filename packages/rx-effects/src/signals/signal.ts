@@ -1,10 +1,10 @@
+import { nextSafeInteger } from '../utils';
 import {
   createSignalFromFunction,
   defaultEquals,
   Signal,
   ValueEqualityFn,
 } from './common';
-import { nextGlobalValueVersion } from './compute';
 import { ReactiveNode } from './graph';
 
 /**
@@ -103,7 +103,7 @@ class WritableSignalImpl<T> extends ReactiveNode {
   set(newValue: T): void {
     if (!this.equal(this.value, newValue)) {
       this.value = newValue;
-      this.valueVersion++;
+      this.valueVersion = nextSafeInteger(this.valueVersion);
 
       // TODO: это может сделать асинхронным?
       this.producerMayHaveChanged();

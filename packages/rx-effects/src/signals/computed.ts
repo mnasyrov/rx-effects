@@ -1,3 +1,4 @@
+import { nextSafeInteger } from '../utils';
 import {
   createSignalFromFunction,
   defaultEquals,
@@ -128,7 +129,7 @@ export class ComputedImpl<T> extends ReactiveNode {
     this.value = COMPUTING;
 
     // As we're re-running the computation, update our dependent tracking version number.
-    this.trackingVersion++;
+    this.trackingVersion = nextSafeInteger(this.trackingVersion);
     const prevConsumer = setActiveConsumer(this);
     let newValue: T;
     try {
@@ -155,7 +156,7 @@ export class ComputedImpl<T> extends ReactiveNode {
     }
 
     this.value = newValue;
-    this.valueVersion++;
+    this.valueVersion = nextSafeInteger(this.valueVersion);
 
     // console.log('!!! recomputed', {
     //   id: (this as any).id,

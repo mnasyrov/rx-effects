@@ -1,3 +1,4 @@
+import { nextSafeInteger } from '../utils';
 import { ReactiveNode, setActiveConsumer } from './graph';
 
 /**
@@ -59,12 +60,12 @@ export class Watch extends ReactiveNode {
     // console.log('!!! watch.run()', this);
 
     this.dirty = false;
-    if (this.trackingVersion !== 0 && !this.consumerPollProducersForChange()) {
+    if (this.trackingVersion !== -1 && !this.consumerPollProducersForChange()) {
       return;
     }
 
     const prevConsumer = setActiveConsumer(this);
-    this.trackingVersion++;
+    this.trackingVersion = nextSafeInteger(this.trackingVersion);
     try {
       this.cleanupFn();
       this.cleanupFn = NOOP_CLEANUP_FN;

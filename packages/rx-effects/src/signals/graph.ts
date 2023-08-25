@@ -1,5 +1,3 @@
-import { nextStoreVersion } from '../compute';
-
 /**
  * Counter tracking the next `ProducerId` or `ConsumerId`.
  */
@@ -62,6 +60,16 @@ interface ReactiveEdge {
   seenValueVersion: number;
 }
 
+function mockWeakRef<T extends object>(value: T): WeakRef<T> {
+  return {
+    [Symbol.toStringTag]: 'WeakRef',
+
+    deref() {
+      return value;
+    },
+  };
+}
+
 /**
  * A node in the reactive graph.
  *
@@ -99,6 +107,7 @@ export abstract class ReactiveNode {
    * A cached weak reference to this node, which will be used in `ReactiveEdge`s.
    */
   private readonly ref = new WeakRef(this);
+  // private readonly ref = mockWeakRef(this);
 
   /**
    * Edges to producers on which this node depends (in its consumer capacity).
@@ -114,13 +123,13 @@ export abstract class ReactiveNode {
    * Monotonically increasing counter representing a version of this `Consumer`'s
    * dependencies.
    */
-  protected trackingVersion = 0;
+  protected trackingVersion = -1;
 
   /**
    * Monotonically increasing counter which increases when the value of this `Producer`
    * semantically changes.
    */
-  protected valueVersion = 0;
+  protected valueVersion = -1;
 
   // TODO
   // protected abstract destroy(): void;
@@ -203,12 +212,6 @@ export abstract class ReactiveNode {
    * Notify all consumers of this producer that its value may have changed.
    */
   protected producerMayHaveChanged(): void {
-    // nextStoreVersion();
-    // scheduleNotify(store);
-    //
-    // const pinnedState = currentState;
-    // subscribers?.forEach((subscriber) => subscriber.next(pinnedState));
-
     // Prevent signal reads when we're updating the graph
     const prev = inNotificationPhase;
     inNotificationPhase = true;
@@ -233,9 +236,9 @@ export abstract class ReactiveNode {
    * Mark that this producer node has been accessed in the current reactive context.
    */
   protected producerAccessed(): void {
-    if (inNotificationPhase) {
-      // Assertion error: signal read during notification phase
-    }
+    // if (inNotificationPhase) {
+    //   throw new Error('Assertion error: signal read during notification phase');
+    // }
 
     if (activeConsumer === null) {
       return;
