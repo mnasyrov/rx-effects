@@ -45,6 +45,40 @@ describe('compute()', () => {
     expect(changes).toEqual([10, 18, 26]);
   });
 
+  it('should process dynamic dependencies', async () => {
+    let i = 0;
+    const isA = createStore(true);
+    const a = createStore('a1');
+    const b = createStore('b1');
+
+    const output = compute((get) => (get(isA) ? get(a) : get(b)) + `, i${i}`);
+
+    const results = await collectChanges(output.value$, async () => {
+      i = 1;
+      b.set('b1a');
+      await 0;
+
+      i = 2;
+      a.set('a2');
+      b.set('b2');
+      await 0;
+
+      i = 3;
+      isA.set(false);
+      await 0;
+
+      i = 4;
+      b.set('b3');
+      await 0;
+
+      i = 5;
+      a.set('a4');
+      await 0;
+    });
+
+    expect(results).toEqual(['a1, i0', 'a2, i2', 'b2, i3', 'b3, i4']);
+  });
+
   it('should have typings to return another type', () => {
     const source = createStore<number>(1);
     const query: Query<string> = compute((get) => get(source) + '!');

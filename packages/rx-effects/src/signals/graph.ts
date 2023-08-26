@@ -1,7 +1,14 @@
+import { nextSafeInteger } from '../utils';
+
 /**
  * Counter tracking the next `ProducerId` or `ConsumerId`.
  */
-let _nextReactiveId = 0;
+let _nextReactiveId = -1;
+
+function nextReactiveId(): number {
+  _nextReactiveId = nextSafeInteger(_nextReactiveId);
+  return _nextReactiveId;
+}
 
 /**
  * Tracks the currently active reactive consumer (or `null` if there is no active
@@ -70,6 +77,52 @@ function mockWeakRef<T extends object>(value: T): WeakRef<T> {
   };
 }
 
+// const WEAK_REF_CACHE = new Map<WeakRef<any>, any>();
+// let WEAK_REF_CACHE_TIMER_ID: any;
+//
+// function cacheWeakRef<T extends object>(target: T): WeakRef<T> {
+//   if (!WEAK_REF_CACHE_TIMER_ID) {
+//     WEAK_REF_CACHE_TIMER_ID = setInterval(function () {
+//       WEAK_REF_CACHE.clear();
+//     }, 1000);
+//   }
+//
+//   const ref = new WeakRef(target);
+//
+//   return {
+//     [Symbol.toStringTag]: 'WeakRef',
+//
+//     deref: function () {
+//       let value = WEAK_REF_CACHE.get(ref);
+//       if (!value) {
+//         value = ref.deref();
+//         if (value) {
+//           WEAK_REF_CACHE.set(ref, value);
+//         }
+//       }
+//       return value;
+//     },
+//   };
+// }
+
+const WEAK_NODES = new Map<number, any>();
+const WEAK_NODE_FINALIZER = new FinalizationRegistry<number>((key) =>
+  WEAK_NODES.delete(key),
+);
+
+function cacheWeakRef<T extends object>(target: T, id: number): WeakRef<T> {
+  WEAK_NODES.set(id, target);
+  WEAK_NODE_FINALIZER.register(target, id);
+
+  return {
+    [Symbol.toStringTag]: 'WeakRef',
+
+    deref: function () {
+      return WEAK_NODES.get(id);
+    },
+  };
+}
+
 /**
  * A node in the reactive graph.
  *
@@ -101,13 +154,14 @@ function mockWeakRef<T extends object>(value: T): WeakRef<T> {
  * last observed.
  */
 export abstract class ReactiveNode {
-  private readonly id = _nextReactiveId++;
+  private readonly id: number = nextReactiveId();
 
   /**
    * A cached weak reference to this node, which will be used in `ReactiveEdge`s.
    */
-  private readonly ref = new WeakRef(this);
+  // private readonly ref = new WeakRef(this);
   // private readonly ref = mockWeakRef(this);
+  private readonly ref = cacheWeakRef(this, this.id);
 
   /**
    * Edges to producers on which this node depends (in its consumer capacity).
@@ -194,20 +248,6 @@ export abstract class ReactiveNode {
     return false;
   }
 
-  // TODO: Remove
-  protected getProducerVersions(): [
-    producerId: number,
-    seenValueVersion: number,
-  ][] {
-    const entries: [producerId: number, seenValueVersion: number][] = [];
-
-    for (const [producerId, { seenValueVersion }] of this.producers) {
-      entries.push([producerId, seenValueVersion]);
-    }
-
-    return entries;
-  }
-
   /**
    * Notify all consumers of this producer that its value may have changed.
    */
@@ -246,7 +286,7 @@ export abstract class ReactiveNode {
 
     // Either create or update the dependency `Edge` in both directions.
     let edge = activeConsumer.producers.get(this.id);
-    if (edge === undefined) {
+    if (!edge) {
       edge = {
         consumerNode: activeConsumer.ref,
         producerNode: this.ref,

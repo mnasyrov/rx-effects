@@ -21,7 +21,6 @@ describe('computed()', () => {
 
     const results: number[] = [];
 
-    console.log('!!! effect subscribe', this);
     effect(() => results.push(h()));
     ASYNC_EFFECT_MANAGER.flush();
 
@@ -32,6 +31,43 @@ describe('computed()', () => {
     ASYNC_EFFECT_MANAGER.flush();
 
     expect(results).toEqual([10, 18, 26]);
+  });
+
+  it('should process dynamic dependencies', async () => {
+    let i = 0;
+    const isA = signal(true);
+    const a = signal('a1');
+    const b = signal('b1');
+
+    const output = computed(() => (isA() ? a() : b()) + `, i${i}`);
+
+    const results: any[] = [];
+    effect(() => results.push(output()));
+
+    ASYNC_EFFECT_MANAGER.flush();
+
+    i = 1;
+    b.set('b1a');
+    ASYNC_EFFECT_MANAGER.flush();
+
+    i = 2;
+    a.set('a2');
+    b.set('b2');
+    ASYNC_EFFECT_MANAGER.flush();
+
+    i = 3;
+    isA.set(false);
+    ASYNC_EFFECT_MANAGER.flush();
+
+    i = 4;
+    b.set('b3');
+    ASYNC_EFFECT_MANAGER.flush();
+
+    i = 5;
+    a.set('a4');
+    ASYNC_EFFECT_MANAGER.flush();
+
+    expect(results).toEqual(['a1, i0', 'a2, i2', 'b2, i3', 'b3, i4']);
   });
 
   it('should have typings to return another type', () => {
