@@ -1,4 +1,4 @@
-import { BehaviorSubject, materialize, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, materialize, Subject } from 'rxjs';
 import { collectChanges, waitForMicrotask } from '../../test/testUtils';
 import { Signal } from './common';
 import { computed, track } from './computed';

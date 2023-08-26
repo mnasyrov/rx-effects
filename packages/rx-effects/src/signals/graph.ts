@@ -47,12 +47,12 @@ interface ReactiveEdge {
   /**
    * Weakly held reference to the consumer side of this edge.
    */
-  readonly producerNode: WeakRef<ReactiveNode>;
+  readonly producerId: number;
 
   /**
    * Weakly held reference to the producer side of this edge.
    */
-  readonly consumerNode: WeakRef<ReactiveNode>;
+  readonly consumerId: number;
   /**
    * `trackingVersion` of the consumer at which this dependency edge was last observed.
    *
@@ -67,60 +67,18 @@ interface ReactiveEdge {
   seenValueVersion: number;
 }
 
-function mockWeakRef<T extends object>(value: T): WeakRef<T> {
-  return {
-    [Symbol.toStringTag]: 'WeakRef',
-
-    deref() {
-      return value;
-    },
-  };
-}
-
-// const WEAK_REF_CACHE = new Map<WeakRef<any>, any>();
-// let WEAK_REF_CACHE_TIMER_ID: any;
-//
-// function cacheWeakRef<T extends object>(target: T): WeakRef<T> {
-//   if (!WEAK_REF_CACHE_TIMER_ID) {
-//     WEAK_REF_CACHE_TIMER_ID = setInterval(function () {
-//       WEAK_REF_CACHE.clear();
-//     }, 1000);
-//   }
-//
-//   const ref = new WeakRef(target);
-//
-//   return {
-//     [Symbol.toStringTag]: 'WeakRef',
-//
-//     deref: function () {
-//       let value = WEAK_REF_CACHE.get(ref);
-//       if (!value) {
-//         value = ref.deref();
-//         if (value) {
-//           WEAK_REF_CACHE.set(ref, value);
-//         }
-//       }
-//       return value;
-//     },
-//   };
-// }
-
-const WEAK_NODES = new Map<number, any>();
-const WEAK_NODE_FINALIZER = new FinalizationRegistry<number>((key) =>
-  WEAK_NODES.delete(key),
+const GRAPH_NODES = new Map<number, ReactiveNode>();
+const GRAPH_NODE_FINALIZER = new FinalizationRegistry<number>((key) =>
+  GRAPH_NODES.delete(key),
 );
 
-function cacheWeakRef<T extends object>(target: T, id: number): WeakRef<T> {
-  WEAK_NODES.set(id, target);
-  WEAK_NODE_FINALIZER.register(target, id);
+function registerNode(id: number, node: ReactiveNode): void {
+  GRAPH_NODES.set(id, node);
+  GRAPH_NODE_FINALIZER.register(node, id);
+}
 
-  return {
-    [Symbol.toStringTag]: 'WeakRef',
-
-    deref: function () {
-      return WEAK_NODES.get(id);
-    },
-  };
+function getNode(id: number): ReactiveNode | undefined {
+  return GRAPH_NODES.get(id);
 }
 
 /**
@@ -161,7 +119,7 @@ export abstract class ReactiveNode {
    */
   // private readonly ref = new WeakRef(this);
   // private readonly ref = mockWeakRef(this);
-  private readonly ref = cacheWeakRef(this, this.id);
+  // private readonly ref = cacheWeakRef(this, this.id);
 
   /**
    * Edges to producers on which this node depends (in its consumer capacity).
@@ -184,6 +142,10 @@ export abstract class ReactiveNode {
    * semantically changes.
    */
   protected valueVersion = -1;
+
+  protected constructor() {
+    registerNode(this.id, this);
+  }
 
   // TODO
   // protected abstract destroy(): void;
@@ -228,7 +190,7 @@ export abstract class ReactiveNode {
    */
   protected consumerPollProducersForChange(): boolean {
     for (const [producerId, edge] of this.producers) {
-      const producer = edge.producerNode.deref();
+      const producer = getNode(edge.producerId);
 
       if (!producer || edge.atTrackingVersion !== this.trackingVersion) {
         // This dependency edge is stale, so remove it.
@@ -257,7 +219,7 @@ export abstract class ReactiveNode {
     inNotificationPhase = true;
     try {
       for (const [consumerId, edge] of this.consumers) {
-        const consumer = edge.consumerNode.deref();
+        const consumer = getNode(edge.consumerId);
 
         if (!consumer || consumer.trackingVersion !== edge.atTrackingVersion) {
           this.consumers.delete(consumerId);
@@ -288,8 +250,8 @@ export abstract class ReactiveNode {
     let edge = activeConsumer.producers.get(this.id);
     if (!edge) {
       edge = {
-        consumerNode: activeConsumer.ref,
-        producerNode: this.ref,
+        consumerId: activeConsumer.id,
+        producerId: this.id,
         seenValueVersion: this.valueVersion,
         atTrackingVersion: activeConsumer.trackingVersion,
       };
