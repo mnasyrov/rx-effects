@@ -68,9 +68,11 @@ interface ReactiveEdge {
 }
 
 const GRAPH_NODES = new Map<number, ReactiveNode>();
-const GRAPH_NODE_FINALIZER = new FinalizationRegistry<number>((key) =>
-  GRAPH_NODES.delete(key),
-);
+
+const GRAPH_NODE_FINALIZER = new FinalizationRegistry<number>((key) => {
+  // console.log('!!! GRAPH_NODE_FINALIZER', key, GRAPH_NODES.size);
+  GRAPH_NODES.delete(key);
+});
 
 function registerNode(id: number, node: ReactiveNode): void {
   GRAPH_NODES.set(id, node);
@@ -124,7 +126,7 @@ export abstract class ReactiveNode {
   /**
    * Edges to producers on which this node depends (in its consumer capacity).
    */
-  private readonly producers = new Map<number, ReactiveEdge>();
+  private readonly producers = new Set<ReactiveEdge>();
 
   /**
    * Edges to consumers on which this node depends (in its producer capacity).
@@ -189,13 +191,13 @@ export abstract class ReactiveNode {
    * rerun any reactions.
    */
   protected consumerPollProducersForChange(): boolean {
-    for (const [producerId, edge] of this.producers) {
+    for (const edge of this.producers) {
       const producer = getNode(edge.producerId);
 
       if (!producer || edge.atTrackingVersion !== this.trackingVersion) {
         // This dependency edge is stale, so remove it.
-        this.producers.delete(producerId);
-        producer?.consumers.delete(this.id);
+        this.producers.delete(edge);
+        producer?.consumers.delete(edge.consumerId);
         continue;
       }
 
@@ -218,12 +220,12 @@ export abstract class ReactiveNode {
     const prev = inNotificationPhase;
     inNotificationPhase = true;
     try {
-      for (const [consumerId, edge] of this.consumers) {
+      for (const edge of this.consumers.values()) {
         const consumer = getNode(edge.consumerId);
 
         if (!consumer || consumer.trackingVersion !== edge.atTrackingVersion) {
-          this.consumers.delete(consumerId);
-          consumer?.producers.delete(this.id);
+          this.consumers.delete(edge.consumerId);
+          consumer?.producers.delete(edge);
           continue;
         }
 
@@ -247,7 +249,7 @@ export abstract class ReactiveNode {
     }
 
     // Either create or update the dependency `Edge` in both directions.
-    let edge = activeConsumer.producers.get(this.id);
+    let edge = this.consumers.get(activeConsumer.id);
     if (!edge) {
       edge = {
         consumerId: activeConsumer.id,
@@ -255,7 +257,7 @@ export abstract class ReactiveNode {
         seenValueVersion: this.valueVersion,
         atTrackingVersion: activeConsumer.trackingVersion,
       };
-      activeConsumer.producers.set(this.id, edge);
+      activeConsumer.producers.add(edge);
       this.consumers.set(activeConsumer.id, edge);
     } else {
       edge.seenValueVersion = this.valueVersion;
