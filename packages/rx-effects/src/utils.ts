@@ -77,7 +77,9 @@ export function isArrayEqual(
 }
 
 export function nextSafeInteger(currentValue: number): number {
-  return currentValue >= Number.MAX_SAFE_INTEGER ? 0 : currentValue + 1;
+  return currentValue < Number.MAX_SAFE_INTEGER
+    ? currentValue + 1
+    : Number.MIN_SAFE_INTEGER;
 }
 
 export class MicrotaskScheduler<T> {
