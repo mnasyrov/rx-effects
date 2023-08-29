@@ -167,8 +167,12 @@ export class ComputedImpl<T> extends ReactiveNode {
   }
 
   signal(): T {
-    // Check if the value needs updating before returning it.
-    this.onProducerUpdateValueVersion();
+    if (!this.stale && !this.hasProducers()) {
+      this.recomputeValue();
+    } else {
+      // Check if the value needs updating before returning it.
+      this.onProducerUpdateValueVersion();
+    }
 
     // Record that someone looked at this signal.
     this.producerAccessed();

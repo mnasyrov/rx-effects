@@ -253,7 +253,7 @@ export abstract class ReactiveNode {
   /**
    * Whether this consumer currently has any producers registered.
    */
-  protected get hasProducers(): boolean {
+  protected hasProducers(): boolean {
     return this.producers.size > 0;
   }
 

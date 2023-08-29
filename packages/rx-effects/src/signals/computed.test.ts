@@ -96,8 +96,8 @@ describe('computed()', () => {
 
     destroy();
 
-    expect(subscribed()).toBe(1);
-    expect(notSubscribed()).toBe(1);
+    expect(subscribed()).toBe(4);
+    expect(notSubscribed()).toBe(4);
 
     expect(results).toEqual([1]);
   });
