@@ -410,11 +410,13 @@ describe('computed()', () => {
     expect(onSumChanged).toHaveBeenCalledTimes(0);
   });
 
-  // TODO: Входит в рекурсию
   it('should handle recursion during store updates: Value selector', async () => {
     const store = signal({ a: 0, result: { value: 0 } });
 
-    const nextResult = computed(() => ({ value: track(() => store().a) }));
+    // const nextResult = computed(() => ({ value: track(() => store().a) }));
+    const nextResult = computed(() => ({ value: store().a }), {
+      equal: (a, b) => a.value === b.value,
+    });
 
     const subscription = toObservable(nextResult, {
       onlyChanges: true,
@@ -444,7 +446,9 @@ describe('computed()', () => {
     const store = signal({ a: 0, result: { value: 0 } });
 
     const a = computed(() => store().a);
-    const nextResult = computed(() => ({ value: a() }));
+    const nextResult = computed(() => ({ value: a() }), {
+      equal: (a, b) => a.value === b.value,
+    });
 
     const subscription = toObservable(nextResult, {
       onlyChanges: true,

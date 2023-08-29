@@ -4,7 +4,6 @@ import { Query } from './query';
 import {
   Comparator,
   DEFAULT_COMPARATOR,
-  isArrayEqual,
   isSetEqual,
   nextSafeInteger,
   removeFromArray,
@@ -92,7 +91,7 @@ export function nextStoreVersion() {
   STORE_VERSION = nextSafeInteger(STORE_VERSION);
 }
 
-type ValueRef<T> = { value: T; params?: Array<unknown>; version?: number };
+type ValueRef<T> = { value: T; version?: number };
 
 type ComputationQuery<T> = Query<T> &
   Readonly<{
@@ -305,8 +304,7 @@ class ComputationNode<T> {
     }
 
     const isChanged =
-      !this.valueRef ||
-      isCalculationChanged(this.comparator, this.valueRef, next);
+      !this.valueRef || !this.comparator(this.valueRef.value, next.value);
 
     if (isChanged) {
       this.valueRef = next;
@@ -352,36 +350,19 @@ class ComputationNode<T> {
 }
 
 function calculate<T>(computation: Computation<T>): ValueRef<T> {
-  let params: Array<unknown> | undefined;
-
   const value = computation(
     (query: Query<unknown>, selector?: (value: unknown) => unknown) => {
-      let param = query.get();
+      let value = query.get();
 
-      if (selector) param = selector(param);
+      if (selector) value = selector(value);
 
       DEPS_COLLECTOR?.(query);
 
-      if (!params) params = [];
-      params.push(param);
-
-      return param;
+      return value;
     },
   );
 
-  return { value, params, version: STORE_VERSION };
-}
-
-function isCalculationChanged<T>(
-  comparator: Comparator<T>,
-  a: ValueRef<T>,
-  b: ValueRef<T>,
-): boolean {
-  if (comparator(a.value, b.value)) {
-    return false;
-  }
-
-  return !(a.params && b.params && isArrayEqual(a.params, b.params));
+  return { value, version: STORE_VERSION };
 }
 
 //endregion INTERNAL IMPLEMENTATION

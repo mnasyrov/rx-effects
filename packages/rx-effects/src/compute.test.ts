@@ -5,8 +5,8 @@ import {
   BehaviorSubject,
   firstValueFrom,
   materialize,
+  skip,
   Subject,
-  Subscription,
 } from 'rxjs';
 import { collectChanges, waitForMicrotask } from '../test/testUtils';
 import { compute } from './compute';
@@ -378,20 +378,27 @@ describe('compute()', () => {
   it('should handle recursion during store updates: Value selector', async () => {
     const store = createStore({ a: 0, result: { value: 0 } });
 
-    const $nextResult = compute((get) => ({ value: get(store, ({ a }) => a) }));
+    const $nextResult = compute(
+      (get) => ({
+        value: get(store, ({ a }) => a),
+      }),
+      (a, b) => a.value === b.value,
+    );
 
-    let subscription: Subscription | undefined;
-
-    const changes = await collectChanges(store.value$, () => {
-      subscription = $nextResult.value$.subscribe((result) => {
+    const subscription = $nextResult.value$
+      .pipe(skip(1))
+      .subscribe((result) => {
         store.update((state) => ({ ...state, result }));
       });
 
+    const changes = await collectChanges(store.value$, async () => {
       expect($nextResult.get()).toEqual({ value: 0 });
 
       store.update((state) => ({ ...state, a: 1 }));
 
       expect($nextResult.get()).toEqual({ value: 1 });
+
+      await waitForMicrotask();
     });
 
     subscription?.unsubscribe();
@@ -407,16 +414,23 @@ describe('compute()', () => {
     const store = createStore({ a: 0, result: { value: 0 } });
 
     const $a = compute((get) => get(store).a);
-    const $nextResult = compute((get) => ({ value: get($a) }));
+    const $nextResult = compute(
+      (get) => ({ value: get($a) }),
+      (a, b) => a.value === b.value,
+    );
 
-    let subscription: Subscription | undefined;
-
-    const changes = await collectChanges(store.value$, () => {
-      subscription = $nextResult.value$.subscribe((result) => {
+    const subscription = $nextResult.value$
+      .pipe(skip(1))
+      .subscribe((result) => {
         store.update((state) => ({ ...state, result }));
       });
 
+    const changes = await collectChanges(store.value$, async () => {
+      await waitForMicrotask();
+
       store.update((state) => ({ ...state, a: 1 }));
+
+      await waitForMicrotask();
     });
 
     subscription?.unsubscribe();
