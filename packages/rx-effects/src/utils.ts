@@ -76,6 +76,30 @@ export function isArrayEqual(
   return true;
 }
 
+export function isSetEqual(
+  a: ReadonlySet<unknown>,
+  b: ReadonlySet<unknown>,
+): boolean {
+  if (a.size !== b.size) {
+    return false;
+  }
+
+  const it1 = a.values();
+  const it2 = b.values();
+
+  let r1 = it1.next();
+  let r2 = it2.next();
+
+  while (!r1.done && !r2.done) {
+    if (r1.value !== r2.value) return false;
+
+    r1 = it1.next();
+    r2 = it2.next();
+  }
+
+  return r1.done === r2.done;
+}
+
 export function nextSafeInteger(currentValue: number): number {
   return currentValue < Number.MAX_SAFE_INTEGER
     ? currentValue + 1

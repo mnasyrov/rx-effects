@@ -4,6 +4,8 @@ import { Query } from './query';
 import {
   Comparator,
   DEFAULT_COMPARATOR,
+  isArrayEqual,
+  isSetEqual,
   nextSafeInteger,
   removeFromArray,
 } from './utils';
@@ -71,7 +73,6 @@ let NODE_VERSION = 0;
 let STORE_VERSION = 0;
 
 let DEPS_COLLECTOR: undefined | ((query: Query<unknown>) => void);
-let RECOMPUTE = false;
 
 const FAST_QUERY_GETTER: ComputationResolver = (
   query: Query<unknown>,
@@ -145,7 +146,7 @@ class ComputationNode<T> {
   }
 
   getQueryValue(): T {
-    if (DEPS_COLLECTOR || RECOMPUTE) {
+    if (DEPS_COLLECTOR) {
       if (this.version === NODE_VERSION && this.valueRef) {
         return this.valueRef.value;
       }
@@ -212,7 +213,9 @@ class ComputationNode<T> {
 
     if (this.resolvedDeps.size > 0) {
       this.valueRef = valueRef;
+    }
 
+    if (this.resolvedDeps.size > 0) {
       this.resolvedDeps.forEach((parentQuery) => {
         if (!this.depObserver) {
           this.depObserver = {
@@ -289,12 +292,16 @@ class ComputationNode<T> {
     if (!this.hot || !this.observers || this.version === NODE_VERSION) return;
     this.version = NODE_VERSION;
 
-    RECOMPUTE = true;
+    const visitedDeps: Set<Query<unknown>> = new Set();
+    DEPS_COLLECTOR = (query) => {
+      if (!isComputationQuery(query)) visitedDeps.add(query);
+    };
+
     let next;
     try {
       next = calculate(this.computation);
     } finally {
-      RECOMPUTE = false;
+      DEPS_COLLECTOR = undefined;
     }
 
     const isChanged =
@@ -312,6 +319,34 @@ class ComputationNode<T> {
       }
     } else if (this.valueRef) {
       this.valueRef.version = STORE_VERSION;
+    }
+
+    if (this.resolvedDeps && !isSetEqual(this.resolvedDeps, visitedDeps)) {
+      const { subscriptions } = this;
+      if (subscriptions) {
+        for (let i = 0; i < subscriptions.length; i++) {
+          const unsubscribe = subscriptions[i];
+          unsubscribe();
+        }
+      }
+
+      this.resolvedDeps = visitedDeps;
+      this.subscriptions = [];
+
+      this.resolvedDeps.forEach((parentQuery) => {
+        if (!this.depObserver) {
+          this.depObserver = {
+            next: () => this.onSourceChanged(),
+            error: (error: any) => this.onSourceError(error),
+            complete: () => this.onSourceComplete(),
+          };
+        }
+        const subscription = parentQuery.value$.subscribe(
+          this.depObserver as any,
+        );
+
+        this.subscriptions?.push(() => subscription.unsubscribe());
+      });
     }
   }
 }
@@ -347,13 +382,6 @@ function isCalculationChanged<T>(
   }
 
   return !(a.params && b.params && isArrayEqual(a.params, b.params));
-}
-
-function isArrayEqual(
-  a: ReadonlyArray<unknown>,
-  b: ReadonlyArray<unknown>,
-): boolean {
-  return a.length === b.length && a.every((value, index) => b[index] === value);
 }
 
 //endregion INTERNAL IMPLEMENTATION
