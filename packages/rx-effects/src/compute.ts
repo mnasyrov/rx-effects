@@ -195,7 +195,7 @@ class ComputationNode<T> {
     let valueRef = this.valueRef;
     if (this.resolvedDeps) {
       if (!valueRef) {
-        valueRef = this.valueRef = calculate(this.computation);
+        valueRef = calculate(this.computation);
       }
     } else {
       const visitedDeps: Set<Query<unknown>> = new Set();
@@ -206,11 +206,13 @@ class ComputationNode<T> {
       const next = calculate(this.computation);
       DEPS_COLLECTOR = undefined;
 
-      valueRef = this.valueRef = next;
+      valueRef = next;
       this.resolvedDeps = visitedDeps;
     }
 
     if (this.resolvedDeps.size > 0) {
+      this.valueRef = valueRef;
+
       this.resolvedDeps.forEach((parentQuery) => {
         if (!this.depObserver) {
           this.depObserver = {

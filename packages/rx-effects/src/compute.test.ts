@@ -79,6 +79,35 @@ describe('compute()', () => {
     expect(results).toEqual(['a1, i0', 'a2, i2', 'b2, i3', 'b3, i4']);
   });
 
+  it('should compute external dependencies', async () => {
+    let value = 1;
+    const subscribed = compute(() => value);
+    const notSubscribed = compute(() => value);
+
+    expect(subscribed.get()).toBe(1);
+    expect(notSubscribed.get()).toBe(1);
+
+    const results = await collectChanges(subscribed.value$, async () => {
+      await 0;
+
+      value = 2;
+      await 0;
+
+      value = 3;
+      await 0;
+
+      value = 4;
+      await 0;
+      expect(subscribed.get()).toBe(4);
+      await 0;
+    });
+
+    expect(subscribed.get()).toBe(4);
+    expect(notSubscribed.get()).toBe(4);
+
+    expect(results).toEqual([1]);
+  });
+
   it('should have typings to return another type', () => {
     const source = createStore<number>(1);
     const query: Query<string> = compute((get) => get(source) + '!');

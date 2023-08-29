@@ -70,6 +70,38 @@ describe('computed()', () => {
     expect(results).toEqual(['a1, i0', 'a2, i2', 'b2, i3', 'b3, i4']);
   });
 
+  it('should compute external dependencies', async () => {
+    let value = 1;
+    const subscribed = computed(() => value);
+    const notSubscribed = computed(() => value);
+
+    expect(subscribed()).toBe(1);
+    expect(notSubscribed()).toBe(1);
+
+    const results: any[] = [];
+    const { destroy } = effect(() => results.push(subscribed()));
+
+    ASYNC_EFFECT_MANAGER.flush();
+
+    value = 2;
+    ASYNC_EFFECT_MANAGER.flush();
+
+    value = 3;
+    ASYNC_EFFECT_MANAGER.flush();
+
+    value = 4;
+    ASYNC_EFFECT_MANAGER.flush();
+    expect(subscribed()).toBe(4);
+    ASYNC_EFFECT_MANAGER.flush();
+
+    destroy();
+
+    expect(subscribed()).toBe(1);
+    expect(notSubscribed()).toBe(1);
+
+    expect(results).toEqual([1]);
+  });
+
   it('should have typings to return another type', () => {
     const source = signal<number>(1);
     const query: Signal<string> = computed(() => source() + '!');
