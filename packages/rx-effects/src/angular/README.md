@@ -18,7 +18,7 @@ The `signal()` function produces a specific type of signal known as a `WritableS
 const counter = signal(0);
 
 counter.set(2);
-counter.update(count => count + 1);
+counter.update((count) => count + 1);
 ```
 
 The signal value can be also updated in-place, using the dedicated `.mutate` method:
@@ -26,8 +26,8 @@ The signal value can be also updated in-place, using the dedicated `.mutate` met
 ```typescript
 const todoList = signal<Todo[]>([]);
 
-todoList.mutate(list => {
-  list.push({title: 'One more task', completed: false});
+todoList.mutate((list) => {
+  list.push({ title: 'One more task', completed: false });
 });
 ```
 
@@ -36,8 +36,9 @@ todoList.mutate(list => {
 The signal creation function one can, optionally, specify an equality comparator function. The comparator is used to decide whether the new supplied value is the same, or different, as compared to the current signal’s value.
 
 If the equality function determines that 2 values are equal it will:
-* block update of signal’s value;
-* skip change propagation.
+
+- block update of signal’s value;
+- skip change propagation.
 
 ### Declarative derived values: `computed()`
 
@@ -52,7 +53,7 @@ const isEven = computed(() => counter() % 2 === 0);
 
 Because the calculation function used to create the `computed` is executed in a reactive context, any signals read by that calculation will be tracked as dependencies, and the value of the computed signal recalculated whenever any of those dependencies changes.
 
-Similarly to signals, the `computed` can (optionally) specify an equality comparator function. 
+Similarly to signals, the `computed` can (optionally) specify an equality comparator function.
 
 ### Side effects: `effect()`
 
@@ -95,7 +96,7 @@ Consider the following setup:
 
 ```typescript
 const counter = signal(0);
-const evenOrOdd = computed(() => counter() % 2 === 0 ? 'even' : 'odd');
+const evenOrOdd = computed(() => (counter() % 2 === 0 ? 'even' : 'odd'));
 effect(() => console.log(counter() + ' is ' + evenOrOdd()));
 
 counter.set(1);
@@ -122,7 +123,7 @@ We refer to this as the "push/pull" algorithm: "dirtiness" is eagerly _pushed_ t
 When a reactive context operation (for example, an `effect`'s side effect function) is executed, the signals that it reads are tracked as dependencies. However, this may not be the same set of signals from one execution to the next. For example, this computed signal:
 
 ```typescript
-const dynamic = computed(() => useA() ? dataA() : dataB());
+const dynamic = computed(() => (useA() ? dataA() : dataB()));
 ```
 
 reads either `dataA` or `dataB` depending on the value of the `useA` signal. At any given point, it will have a dependency set of either `[useA, dataA]` or `[useA, dataB]`, and it can never depend on `dataA` and `dataB` at the same time.

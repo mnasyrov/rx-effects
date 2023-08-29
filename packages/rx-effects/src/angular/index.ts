@@ -21,3 +21,11 @@ export { untracked } from './src/untracked';
 
 export { Watch } from './src/watch';
 export type { WatchCleanupFn } from './src/watch';
+
+export { effect, getEffectManager } from './reactivity/effect';
+export type {
+  CreateEffectOptions,
+  EffectCleanupFn,
+  EffectCleanupRegisterFn,
+  EffectRef,
+} from './reactivity/effect';

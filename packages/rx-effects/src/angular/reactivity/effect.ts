@@ -97,9 +97,9 @@ export interface EffectRef {
  */
 export interface CreateEffectOptions {
   /**
-   * Whether the `effect` should allow writing to angular-signals.
+   * Whether the `effect` should allow writing to angular.
    *
-   * Using effects to synchronize data by writing to angular-signals can lead to confusing and potentially
+   * Using effects to synchronize data by writing to angular can lead to confusing and potentially
    * incorrect behavior, and should be enabled only when necessary.
    */
   allowSignalWrites?: boolean;

@@ -4,7 +4,7 @@ import { ReactiveNode } from './graph';
 /**
  * Symbol used to tell `Signal`s apart from other functions.
  *
- * This can be used to auto-unwrap angular-signals in various cases, or to auto-wrap non-signal values.
+ * This can be used to auto-unwrap angular in various cases, or to auto-wrap non-signal values.
  */
 const SIGNAL = Symbol('SIGNAL');
 

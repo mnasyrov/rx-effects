@@ -12,7 +12,7 @@ import { ReactiveNode } from './graph';
 /**
  * Symbol used to tell `Signal`s apart from other functions.
  *
- * This can be used to auto-unwrap angular-signals in various cases, or to auto-wrap non-signal values.
+ * This can be used to auto-unwrap angular in various cases, or to auto-wrap non-signal values.
  */
 const SIGNAL = Symbol('SIGNAL');
 
@@ -90,7 +90,7 @@ export type ValueEqualityFn<T> = (a: T, b: T) => boolean;
  * The default equality function used for `signal` and `computed`, which treats objects and arrays
  * as never equal, and all other primitive values using identity semantics.
  *
- * This allows angular-signals to hold non-primitive values (arrays, objects, other collections) and still
+ * This allows angular to hold non-primitive values (arrays, objects, other collections) and still
  * propagate change notification upon explicit mutation without identity change.
  *
  * @developerPreview

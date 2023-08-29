@@ -31,8 +31,8 @@ export interface WritableSignal<T> extends Signal<T> {
   // mutate(mutatorFn: (value: T) => void): void;
 
   /**
-   * Returns a readonly version of this signal. Readonly angular-signals can be accessed to read their value
-   * but can't be changed using set, update or mutate methods. The readonly angular-signals do _not_ have
+   * Returns a readonly version of this signal. Readonly angular can be accessed to read their value
+   * but can't be changed using set, update or mutate methods. The readonly angular do _not_ have
    * any built-in mechanism that would prevent deep-mutation of their value.
    */
   asReadonly(): Signal<T>;
@@ -81,7 +81,7 @@ class WritableSignalImpl<T> extends ReactiveNode {
   }
 
   protected override onConsumerDependencyMayHaveChanged(): void {
-    // This never happens for writable angular-signals as they're not consumers.
+    // This never happens for writable angular as they're not consumers.
   }
 
   protected override onProducerUpdateValueVersion(): void {

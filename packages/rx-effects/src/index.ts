@@ -53,12 +53,3 @@ export { declareStore } from './declareStore';
 
 export type { Computation, ComputationResolver } from './compute';
 export { compute } from './compute';
-
-export * from './angular-signals';
-export { effect, getEffectManager } from './angular-signals/reactivity/effect';
-export type {
-  CreateEffectOptions,
-  EffectCleanupFn,
-  EffectCleanupRegisterFn,
-  EffectRef,
-} from './angular-signals/reactivity/effect';
