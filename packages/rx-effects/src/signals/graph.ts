@@ -14,7 +14,7 @@ function nextReactiveId(): number {
  * Tracks the currently active reactive consumer (or `null` if there is no active
  * consumer).
  */
-let activeConsumer: ReactiveNode | null = null;
+let activeConsumer: ReactiveNode | undefined = undefined;
 
 /**
  * Whether the graph is currently propagating change notifications.
@@ -22,15 +22,15 @@ let activeConsumer: ReactiveNode | null = null;
 let inNotificationPhase = false;
 
 export function setActiveConsumer(
-  consumer: ReactiveNode | null,
-): ReactiveNode | null {
+  consumer: ReactiveNode | undefined,
+): ReactiveNode | undefined {
   const prev = activeConsumer;
   activeConsumer = consumer;
   return prev;
 }
 
 export function untracked<T>(nonReactiveReadsFn: () => T): T {
-  const prevConsumer = setActiveConsumer(null);
+  const prevConsumer = setActiveConsumer(undefined);
   // We are not trying to catch any particular errors here, just making sure that the consumers
   // stack is restored in case of errors.
   try {
@@ -244,7 +244,7 @@ export abstract class ReactiveNode {
     //   throw new Error('Assertion error: signal read during notification phase');
     // }
 
-    if (activeConsumer === null) {
+    if (!activeConsumer) {
       return;
     }
 
