@@ -6,7 +6,7 @@ import { ReactiveNode } from './graph';
  *
  * This can be used to auto-unwrap angular in various cases, or to auto-wrap non-signal values.
  */
-const SIGNAL = Symbol('SIGNAL');
+const SIGNAL = Symbol.for('rx-effects.signal');
 
 /**
  * A reactive value which notifies consumers of any changes.

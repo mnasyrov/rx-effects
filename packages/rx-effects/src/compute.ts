@@ -145,17 +145,7 @@ class ComputationNode<T> {
   }
 
   getQueryValue(): T {
-    if (DEPS_COLLECTOR) {
-      if (this.version === NODE_VERSION && this.valueRef) {
-        return this.valueRef.value;
-      }
-
-      this.version = NODE_VERSION;
-      this.valueRef = calculate(this.computation);
-      return this.valueRef.value;
-    }
-
-    if (RECOMPUTE) {
+    if (DEPS_COLLECTOR || RECOMPUTE) {
       if (this.version === NODE_VERSION && this.valueRef) {
         return this.valueRef.value;
       }

@@ -16,11 +16,6 @@ function nextReactiveId(): number {
  */
 let activeConsumer: ReactiveNode | undefined = undefined;
 
-/**
- * Whether the graph is currently propagating change notifications.
- */
-let inNotificationPhase = false;
-
 export function setActiveConsumer(
   consumer: ReactiveNode | undefined,
 ): ReactiveNode | undefined {
@@ -217,22 +212,16 @@ export abstract class ReactiveNode {
    */
   protected producerMayHaveChanged(): void {
     // Prevent signal reads when we're updating the graph
-    const prev = inNotificationPhase;
-    inNotificationPhase = true;
-    try {
-      for (const edge of this.consumers.values()) {
-        const consumer = getNode(edge.consumerId);
+    for (const edge of this.consumers.values()) {
+      const consumer = getNode(edge.consumerId);
 
-        if (!consumer || consumer.trackingVersion !== edge.atTrackingVersion) {
-          this.consumers.delete(edge.consumerId);
-          consumer?.producers.delete(edge);
-          continue;
-        }
-
-        consumer.onConsumerDependencyMayHaveChanged();
+      if (!consumer || consumer.trackingVersion !== edge.atTrackingVersion) {
+        this.consumers.delete(edge.consumerId);
+        consumer?.producers.delete(edge);
+        continue;
       }
-    } finally {
-      inNotificationPhase = prev;
+
+      consumer.onConsumerDependencyMayHaveChanged();
     }
   }
 
@@ -240,10 +229,6 @@ export abstract class ReactiveNode {
    * Mark that this producer node has been accessed in the current reactive context.
    */
   protected producerAccessed(): void {
-    // if (inNotificationPhase) {
-    //   throw new Error('Assertion error: signal read during notification phase');
-    // }
-
     if (!activeConsumer) {
       return;
     }
