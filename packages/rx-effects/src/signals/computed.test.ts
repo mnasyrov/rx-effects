@@ -1,13 +1,13 @@
 import { BehaviorSubject, materialize, Subject } from 'rxjs';
 import { collectChanges, waitForMicrotask } from '../../test/testUtils';
 import { Signal } from './common';
-import { computed, track } from './computed';
-import { ASYNC_EFFECT_MANAGER, effect } from './effect';
+import { computed } from './computed';
+import { effect } from './effect';
 import { toObservable, toSignal } from './rxjs-interop';
 import { signal } from './signal';
 
 describe('computed()', () => {
-  it('should calculate the benchmark', () => {
+  it('should calculate the benchmark with async effect', async () => {
     const entry = signal(0); // 0
 
     const a = computed(() => entry()); // [0] -> 0
@@ -22,13 +22,35 @@ describe('computed()', () => {
     const results: number[] = [];
 
     effect(() => results.push(h()));
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     entry.set(1);
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     entry.set(2);
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
+
+    expect(results).toEqual([10, 18, 26]);
+  });
+
+  it('should calculate the benchmark with sync effect', () => {
+    const entry = signal(0); // 0
+
+    const a = computed(() => entry()); // [0] -> 0
+    const b = computed(() => a() + 1); // [0] -> 1
+    const c = computed(() => a() + 1); // [0] -> 1
+    const d = computed(() => b() + c()); // [1, 1] -> 2
+    const e = computed(() => d() + 1); // [2] -> 3
+    const f = computed(() => d() + e()); // [2, 3] -> 5
+    const g = computed(() => d() + e()); // [2, 3] -> 5
+    const h = computed(() => f() + g()); // [5, 5] -> 10
+
+    const results: number[] = [];
+
+    effect(() => results.push(h()), { sync: true });
+
+    entry.set(1);
+    entry.set(2);
 
     expect(results).toEqual([10, 18, 26]);
   });
@@ -44,28 +66,28 @@ describe('computed()', () => {
     const results: any[] = [];
     effect(() => results.push(output()));
 
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     i = 1;
     b.set('b1a');
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     i = 2;
     a.set('a2');
     b.set('b2');
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     i = 3;
     isA.set(false);
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     i = 4;
     b.set('b3');
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     i = 5;
     a.set('a4');
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     expect(results).toEqual(['a1, i0', 'a2, i2', 'b2, i3', 'b3, i4']);
   });
@@ -81,18 +103,18 @@ describe('computed()', () => {
     const results: any[] = [];
     const { destroy } = effect(() => results.push(subscribed()));
 
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     value = 2;
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     value = 3;
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     value = 4;
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
     expect(subscribed()).toBe(4);
-    ASYNC_EFFECT_MANAGER.flush();
+    await 0;
 
     destroy();
 

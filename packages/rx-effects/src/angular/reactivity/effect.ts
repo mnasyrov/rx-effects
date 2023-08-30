@@ -163,7 +163,6 @@ export class MyEffectManager {
 
     const destroy = () => {
       watch.cleanup();
-      this.scheduler.remove(watch);
     };
 
     return {

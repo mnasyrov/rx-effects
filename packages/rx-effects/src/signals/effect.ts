@@ -1,5 +1,13 @@
-import { MicrotaskScheduler } from '../utils';
+import { MicrotaskScheduler, SyncTaskScheduler } from '../utils';
 import { Watch } from './watch';
+
+export const ASYNC_EFFECT_SCHEDULER = new MicrotaskScheduler<Watch>((entry) =>
+  entry.run(),
+);
+
+export const SYNC_EFFECT_SCHEDULER = new SyncTaskScheduler<Watch>((entry) =>
+  entry.run(),
+);
 
 /**
  * An effect can, optionally, register a cleanup function. If registered, the cleanup is executed
@@ -34,60 +42,16 @@ export function effect(
   effectFn: (onCleanup: EffectCleanupRegisterFn) => void,
   options?: CreateEffectOptions,
 ): EffectRef {
-  const manager = options?.sync ? SYNC_EFFECT_MANAGER : ASYNC_EFFECT_MANAGER;
-  return manager.create(effectFn);
+  const scheduler = options?.sync
+    ? SYNC_EFFECT_SCHEDULER
+    : ASYNC_EFFECT_SCHEDULER;
+
+  const watch = new Watch(effectFn, scheduler.schedule);
+
+  // Effects start dirty.
+  watch.notify();
+
+  return {
+    destroy: () => watch.destroy(),
+  };
 }
-
-export type EffectManager = Readonly<{
-  create: (effectFn: (onCleanup: EffectCleanupRegisterFn) => void) => EffectRef;
-
-  flush: () => void;
-}>;
-
-export class AsyncEffectManager implements EffectManager {
-  private readonly scheduler = new MicrotaskScheduler<Watch>((entry) => {
-    entry.run();
-  });
-
-  create(effectFn: (onCleanup: EffectCleanupRegisterFn) => void): EffectRef {
-    const watch = new Watch(effectFn, (watch) =>
-      this.scheduler.schedule(watch),
-    );
-
-    // Effects start dirty.
-    watch.notify();
-
-    return {
-      destroy: () => {
-        this.scheduler.remove(watch);
-        watch.destroy();
-      },
-    };
-  }
-
-  flush(): void {
-    this.scheduler.execute();
-  }
-}
-
-export class SyncEffectManager implements EffectManager {
-  create(effectFn: (onCleanup: EffectCleanupRegisterFn) => void): EffectRef {
-    const watch = new Watch(effectFn, (watch) => watch.run());
-
-    // Effects start dirty.
-    watch.notify();
-
-    return {
-      destroy: () => {
-        watch.destroy();
-      },
-    };
-  }
-
-  flush() {
-    // Do nothing
-  }
-}
-
-export const ASYNC_EFFECT_MANAGER: EffectManager = new AsyncEffectManager();
-export const SYNC_EFFECT_MANAGER: EffectManager = new SyncEffectManager();

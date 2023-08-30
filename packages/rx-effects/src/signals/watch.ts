@@ -22,6 +22,7 @@ const NOOP_CLEANUP_FN: WatchCleanupFn = () => undefined;
  * scheduling operation to coordinate calling `Watch.run()`.
  */
 export class Watch extends ReactiveNode {
+  private isDestroyed = false;
   private dirty = false;
   private cleanupFn = NOOP_CLEANUP_FN;
   private registerOnCleanup = (cleanupFn: WatchCleanupFn) => {
@@ -36,10 +37,12 @@ export class Watch extends ReactiveNode {
   }
 
   notify(): void {
-    if (!this.dirty) {
+    const needsSchedule = !this.dirty;
+    this.dirty = true;
+
+    if (needsSchedule) {
       this.schedule(this);
     }
-    this.dirty = true;
   }
 
   protected override onConsumerDependencyMayHaveChanged(): void {
@@ -57,9 +60,12 @@ export class Watch extends ReactiveNode {
    * `schedule` hook is called by `Watch`.
    */
   run(): void {
-    // console.log('!!! watch.run()', this);
-
     this.dirty = false;
+
+    if (this.isDestroyed) {
+      return;
+    }
+
     if (this.trackingVersion !== -1 && !this.consumerPollProducersForChange()) {
       return;
     }
@@ -76,6 +82,7 @@ export class Watch extends ReactiveNode {
   }
 
   override destroy(): void {
+    this.isDestroyed = true;
     try {
       this.cleanupFn();
     } finally {

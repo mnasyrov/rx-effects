@@ -106,29 +106,29 @@ export function nextSafeInteger(currentValue: number): number {
     : Number.MIN_SAFE_INTEGER;
 }
 
-export class MicrotaskScheduler<T> {
+export type TaskScheduler<T> = Readonly<{
+  isEmpty(): boolean;
+  schedule(entry: T): void;
+  execute(): void;
+}>;
+
+export class MicrotaskScheduler<T> implements TaskScheduler<T> {
   private readonly queue = new Set<T>();
 
   constructor(private readonly action: (entry: T) => void) {}
 
-  isEmpty(): boolean {
-    return this.queue.size === 0;
-  }
+  isEmpty = (): boolean => this.queue.size === 0;
 
-  schedule(entry: T): void {
+  schedule = (entry: T): void => {
     const prevSize = this.queue.size;
     this.queue.add(entry);
 
     if (prevSize === 0) {
       Promise.resolve().then(() => this.execute());
     }
-  }
+  };
 
-  remove(entry: T): void {
-    this.queue.delete(entry);
-  }
-
-  execute(): void {
+  execute = (): void => {
     if (this.queue.size === 0) {
       return;
     }
@@ -139,5 +139,40 @@ export class MicrotaskScheduler<T> {
     for (const entry of list) {
       this.action(entry);
     }
-  }
+  };
+}
+
+export class SyncTaskScheduler<T> implements TaskScheduler<T> {
+  private queue: T[] = [];
+  private isActive = false;
+
+  constructor(private readonly action: (entry: T) => void) {}
+
+  isEmpty = (): boolean => this.queue.length === 0;
+
+  schedule = (entry: T): void => {
+    this.queue.push(entry);
+    this.execute();
+  };
+
+  execute = (): void => {
+    if (this.isActive) {
+      return;
+    }
+
+    this.isActive = true;
+
+    try {
+      while (this.queue.length > 0) {
+        const list = this.queue;
+        this.queue = [];
+
+        for (const entry of list) {
+          this.action(entry);
+        }
+      }
+    } finally {
+      this.isActive = false;
+    }
+  };
 }
