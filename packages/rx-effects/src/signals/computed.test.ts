@@ -33,7 +33,7 @@ describe('computed()', () => {
     expect(results).toEqual([10, 18, 26]);
   });
 
-  it('should calculate the benchmark with sync effect', () => {
+  it('should got all results in case the result effect is sync', () => {
     const entry = signal(0); // 0
 
     const a = computed(() => entry()); // [0] -> 0
@@ -52,7 +52,9 @@ describe('computed()', () => {
     entry.set(1);
     entry.set(2);
 
-    expect(results).toEqual([10, 18, 26]);
+    expect(results).toEqual([
+      10, 11, 12, 14, 15, 16, 18, 19, 20, 22, 23, 24, 26,
+    ]);
   });
 
   it('should process dynamic dependencies', async () => {

@@ -185,10 +185,10 @@ export class ComputedImpl<T> extends ReactiveNode {
   }
 }
 
-export function track<T>(
-  computation: Computation<T>,
-  options?: CreateComputedOptions<T>,
-): T {
-  const proxy = computed<T>(computation, options);
-  return proxy();
-}
+// export function track<T>(
+//   computation: Computation<T>,
+//   options?: CreateComputedOptions<T>,
+// ): T {
+//   const proxy = computed<T>(computation, options);
+//   return proxy();
+// }

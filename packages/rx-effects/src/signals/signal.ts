@@ -37,11 +37,6 @@ export interface WritableSignal<T> extends Signal<T> {
    */
   asReadonly(): Signal<T>;
 
-  /**
-   * Immediately notifies dependents if there is a pending changes
-   */
-  notify(): void;
-
   destroy(): void;
 }
 
@@ -137,13 +132,6 @@ class WritableSignalImpl<T> extends ReactiveNode {
     return this.readonlySignal;
   }
 
-  notify() {
-    // TODO: удалить?
-    // TODO: как следать опциональный синхронный notify()?
-    // const pinnedState = currentState;
-    // subscribers?.forEach((subscriber) => subscriber.next(pinnedState));
-  }
-
   destroy(): void {
     // this.destroyNode();
 
@@ -172,7 +160,6 @@ export function signal<T>(
       // mutate: signalNode.mutate.bind(signalNode),
       asReadonly: signalNode.asReadonly.bind(signalNode),
 
-      notify: signalNode.notify.bind(signalNode),
       destroy: signalNode.destroy.bind(signalNode),
     },
   );
