@@ -38,10 +38,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run build:lib && npm run build:signals && npm run build:angular",
-    "build:lib": "tsup --clean --dts --format cjs,esm src/index.ts --legacy-output",
-    "build:signals": "tsup --clean --dts --out-dir dist/signals --format cjs,esm src/signals/index.ts --legacy-output",
-    "build:angular": "tsup --clean --dts --out-dir dist/angular --format cjs,esm src/angular/index.ts --legacy-output",
+    "build": "tsup --clean --dts --format cjs,esm src/index.ts src/signals/index.ts --legacy-output",
     "benchmarks": "tsx benchmarks"
   },
   "peerDependencies": {
