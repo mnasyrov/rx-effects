@@ -132,13 +132,12 @@ class WritableSignalImpl<T> extends ReactiveNode {
     return this.readonlySignal;
   }
 
-  destroy(): void {
-    // this.destroyNode();
-
-    // subscribers?.forEach((subscriber) => subscriber.complete());
-    // subscribers = [];
-
-    this.onDestroy?.();
+  override destroy() {
+    try {
+      this.onDestroy?.();
+    } finally {
+      super.destroy();
+    }
   }
 }
 

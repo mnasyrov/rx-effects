@@ -41,6 +41,9 @@ export function untracked<T>(nonReactiveReadsFn: () => T): T {
  * A bidirectional edge in the dependency graph of `ReactiveNode`s.
  */
 type ReactiveEdge = {
+  producer: ReactiveNode;
+  consumer: ReactiveNode;
+
   /**
    * `trackingVersion` of the consumer at which this dependency edge was last observed.
    *
@@ -127,7 +130,7 @@ export abstract class ReactiveNode {
   /**
    * Edges to producers on which this node depends (in its consumer capacity).
    */
-  private readonly producers = new Map<ReactiveNode, ReactiveEdge>();
+  private readonly producers = new Set<ReactiveEdge>();
 
   /**
    * Edges to consumers on which this node depends (in its producer capacity).
@@ -150,10 +153,10 @@ export abstract class ReactiveNode {
   // protected abstract destroy(): void;
 
   destroy(): void {
-    this.producers.forEach((edge, producer) => producer.consumers.delete(this));
+    this.producers.forEach((edge) => edge.producer.consumers.delete(this));
     this.producers.clear();
 
-    this.consumers.forEach((edge, consumer) => consumer.producers.delete(this));
+    this.consumers.forEach((edge) => edge.consumer.producers.delete(edge));
     this.consumers.clear();
   }
 
@@ -177,15 +180,15 @@ export abstract class ReactiveNode {
    * rerun any reactions.
    */
   protected consumerPollProducersForChange(): boolean {
-    for (const [producer, edge] of this.producers) {
+    for (const edge of this.producers) {
       if (edge.atTrackingVersion !== this.trackingVersion) {
         // This dependency edge is stale, so remove it.
-        this.producers.delete(producer);
-        producer.consumers.delete(this);
+        this.producers.delete(edge);
+        edge.producer.consumers.delete(this);
         continue;
       }
 
-      if (producer.producerPollStatus(edge.seenValueVersion)) {
+      if (edge.producer.producerPollStatus(edge.seenValueVersion)) {
         // One of the dependencies reports a real value change.
         return true;
       }
@@ -204,11 +207,11 @@ export abstract class ReactiveNode {
     for (const [consumer, edge] of this.consumers) {
       if (consumer.trackingVersion !== edge.atTrackingVersion) {
         this.consumers.delete(consumer);
-        consumer.producers.delete(this);
+        consumer.producers.delete(edge);
         continue;
       }
 
-      consumer.onConsumerDependencyMayHaveChanged();
+      edge.consumer.onConsumerDependencyMayHaveChanged();
     }
   }
 
@@ -224,10 +227,12 @@ export abstract class ReactiveNode {
     let edge = this.consumers.get(activeConsumer);
     if (!edge) {
       edge = {
+        producer: this,
+        consumer: activeConsumer,
         seenValueVersion: this.valueVersion,
         atTrackingVersion: activeConsumer.trackingVersion,
       };
-      activeConsumer.producers.set(this, edge);
+      activeConsumer.producers.add(edge);
       this.consumers.set(activeConsumer, edge);
     } else {
       edge.seenValueVersion = this.valueVersion;

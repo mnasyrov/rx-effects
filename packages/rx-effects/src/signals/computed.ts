@@ -157,13 +157,6 @@ export class ComputedImpl<T> extends ReactiveNode {
 
     this.value = newValue;
     this.valueVersion = nextSafeInteger(this.valueVersion);
-
-    // console.log('!!! recomputed', {
-    //   id: (this as any).id,
-    //   value: this.value,
-    //   valueVersion: this.valueVersion,
-    //   producers: this.getProducerVersions(),
-    // });
   }
 
   signal(): T {
