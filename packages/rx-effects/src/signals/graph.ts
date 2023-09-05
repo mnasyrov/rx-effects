@@ -1,17 +1,3 @@
-import { nextSafeInteger } from '../utils';
-
-type ReactiveNodeId = number;
-
-/**
- * Counter tracking the next `ProducerId` or `ConsumerId`.
- */
-let _nextReactiveId: ReactiveNodeId = -1;
-
-function nextReactiveId(): ReactiveNodeId {
-  _nextReactiveId = nextSafeInteger(_nextReactiveId);
-  return _nextReactiveId;
-}
-
 /**
  * Tracks the currently active reactive consumer (or `null` if there is no active
  * consumer).
@@ -58,35 +44,6 @@ type ReactiveEdge = {
   seenValueVersion: number;
 };
 
-// const GRAPH_NODES = new Map<number, ReactiveNode>();
-//
-// const GRAPH_NODE_FINALIZER = new FinalizationRegistry<number>((key) => {
-//   // console.log('!!! GRAPH_NODE_FINALIZER', key, GRAPH_NODES.size);
-//   GRAPH_NODES.delete(key);
-// });
-//
-// function registerNode(id: number, node: ReactiveNode): void {
-//   GRAPH_NODES.set(id, node);
-//   GRAPH_NODE_FINALIZER.register(node, id);
-// }
-//
-// function getNode(id: number): ReactiveNode | undefined {
-//   return GRAPH_NODES.get(id);
-// }
-
-// const GRAPH_NODES = new Map<number, WeakRef<ReactiveNode>>();
-//
-// function registerNode(id: number, node: ReactiveNode): void {
-//   const ref = new WeakRef(node);
-//   GRAPH_NODES.set(id, ref);
-// }
-//
-// function getNode(id: number): ReactiveNode | undefined {
-//   const result = GRAPH_NODES.get(id)?.deref();
-//   if (!result) GRAPH_NODES.delete(id);
-//   return result;
-// }
-
 /**
  * A node in the reactive graph.
  *
@@ -118,15 +75,6 @@ type ReactiveEdge = {
  * last observed.
  */
 export abstract class ReactiveNode {
-  // private readonly id: ReactiveNodeId = nextReactiveId();
-
-  /**
-   * A cached weak reference to this node, which will be used in `ReactiveEdge`s.
-   */
-  // private readonly ref = new WeakRef(this);
-  // private readonly ref = mockWeakRef(this);
-  // private readonly ref = cacheWeakRef(this, this.id);
-
   /**
    * Edges to producers on which this node depends (in its consumer capacity).
    */
@@ -135,7 +83,7 @@ export abstract class ReactiveNode {
   /**
    * Edges to consumers on which this node depends (in its producer capacity).
    */
-  private readonly consumers = new Map<ReactiveNode, ReactiveEdge>();
+  private readonly consumers = new Set<ReactiveEdge>();
 
   /**
    * Monotonically increasing counter representing a version of this `Consumer`'s
@@ -149,11 +97,8 @@ export abstract class ReactiveNode {
    */
   protected valueVersion = -1;
 
-  // TODO
-  // protected abstract destroy(): void;
-
   destroy(): void {
-    this.producers.forEach((edge) => edge.producer.consumers.delete(this));
+    this.producers.forEach((edge) => edge.producer.consumers.delete(edge));
     this.producers.clear();
 
     this.consumers.forEach((edge) => edge.consumer.producers.delete(edge));
@@ -184,7 +129,7 @@ export abstract class ReactiveNode {
       if (edge.atTrackingVersion !== this.trackingVersion) {
         // This dependency edge is stale, so remove it.
         this.producers.delete(edge);
-        edge.producer.consumers.delete(this);
+        edge.producer.consumers.delete(edge);
         continue;
       }
 
@@ -204,10 +149,10 @@ export abstract class ReactiveNode {
    */
   protected producerMayHaveChanged(): void {
     // Prevent signal reads when we're updating the graph
-    for (const [consumer, edge] of this.consumers) {
-      if (consumer.trackingVersion !== edge.atTrackingVersion) {
-        this.consumers.delete(consumer);
-        consumer.producers.delete(edge);
+    for (const edge of this.consumers) {
+      if (edge.consumer.trackingVersion !== edge.atTrackingVersion) {
+        this.consumers.delete(edge);
+        edge.consumer.producers.delete(edge);
         continue;
       }
 
@@ -224,7 +169,7 @@ export abstract class ReactiveNode {
     }
 
     // Either create or update the dependency `Edge` in both directions.
-    let edge = this.consumers.get(activeConsumer);
+    let edge = findEdgeByConsumer(this.consumers, activeConsumer);
     if (!edge) {
       edge = {
         producer: this,
@@ -233,7 +178,7 @@ export abstract class ReactiveNode {
         atTrackingVersion: activeConsumer.trackingVersion,
       };
       activeConsumer.producers.add(edge);
-      this.consumers.set(activeConsumer, edge);
+      this.consumers.add(edge);
     } else {
       edge.seenValueVersion = this.valueVersion;
       edge.atTrackingVersion = activeConsumer.trackingVersion;
@@ -265,4 +210,17 @@ export abstract class ReactiveNode {
     // At this point, we can trust `producer.valueVersion`.
     return this.valueVersion !== lastSeenValueVersion;
   }
+}
+
+function findEdgeByConsumer(
+  edges: ReadonlySet<ReactiveEdge>,
+  consumer: ReactiveNode,
+): ReactiveEdge | undefined {
+  for (const edge of edges) {
+    if (edge.consumer === consumer) {
+      return edge;
+    }
+  }
+
+  return undefined;
 }
