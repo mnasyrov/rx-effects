@@ -1,11 +1,17 @@
 import { Bench } from 'tinybench';
 import { compute, createStore } from '../src/index';
+import {
+  ASYNC_EFFECT_SCHEDULER,
+  computed,
+  effect,
+  signal,
+} from '../src/signals';
 
 const ITERATION_COUNT = 100;
 
 const bench = new Bench();
 
-bench.add('reactive-computed-bench', () => {
+bench.add('lagacy compute', () => {
   const entry = createStore(0);
 
   const a = compute((get) => get(entry));
@@ -22,6 +28,26 @@ bench.add('reactive-computed-bench', () => {
   for (let i = 0; i < ITERATION_COUNT; i++) {
     entry.set(i);
     entry.notify();
+  }
+});
+
+bench.add('signal computed', () => {
+  const entry = signal(0);
+
+  const a = computed(() => entry());
+  const b = computed(() => a() + 1);
+  const c = computed(() => a() + 1);
+  const d = computed(() => b() + c());
+  const e = computed(() => d() + 1);
+  const f = computed(() => d() + e());
+  const g = computed(() => d() + e());
+  const h = computed(() => f() + g());
+
+  effect(() => h());
+
+  for (let i = 0; i < ITERATION_COUNT; i++) {
+    entry.set(i);
+    ASYNC_EFFECT_SCHEDULER.execute();
   }
 });
 

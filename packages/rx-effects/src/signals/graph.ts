@@ -12,17 +12,6 @@ export function setActiveConsumer(
   return prev;
 }
 
-export function untracked<T>(nonReactiveReadsFn: () => T): T {
-  const prevConsumer = setActiveConsumer(undefined);
-  // We are not trying to catch any particular errors here, just making sure that the consumers
-  // stack is restored in case of errors.
-  try {
-    return nonReactiveReadsFn();
-  } finally {
-    setActiveConsumer(prevConsumer);
-  }
-}
-
 /**
  * A bidirectional edge in the dependency graph of `ReactiveNode`s.
  */

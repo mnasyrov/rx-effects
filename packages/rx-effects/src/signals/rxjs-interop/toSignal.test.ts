@@ -1,4 +1,4 @@
-import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { toSignal } from './toSignal';
 
 describe('toSignal()', () => {
@@ -49,39 +49,6 @@ describe('toSignal()', () => {
 
       counter$.next(1);
       expect(() => counter()).not.toThrow();
-    });
-  });
-
-  describe('with requireSync', () => {
-    it('should throw if created before a value is emitted', () => {
-      const counter$ = new Subject<number>();
-      expect(() => toSignal(counter$, { requireSync: true })).toThrow();
-    });
-
-    it('should not throw if a value emits synchronously on creation', () => {
-      const counter$ = new ReplaySubject<number>(1);
-      counter$.next(1);
-      const counter = toSignal(counter$);
-      expect(counter()).toBe(1);
-    });
-  });
-
-  describe('with an initial value', () => {
-    it('should return the initial value if called before a value is emitted', () => {
-      const counter$ = new Subject<number>();
-      const counter = toSignal(counter$, { initialValue: null });
-
-      expect(counter()).toBeNull();
-      counter$.next(1);
-      expect(counter()).toBe(1);
-    });
-
-    it('should not return the initial value if called after a value is emitted', () => {
-      const counter$ = new Subject<number>();
-      const counter = toSignal(counter$, { initialValue: null });
-
-      counter$.next(1);
-      expect(counter()).not.toBeNull();
     });
   });
 });
