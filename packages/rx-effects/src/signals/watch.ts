@@ -22,7 +22,6 @@ const NOOP_CLEANUP_FN: WatchCleanupFn = () => undefined;
  * scheduling operation to coordinate calling `Watch.run()`.
  */
 export class Watch extends ReactiveNode {
-  private isDestroyed = false;
   private dirty = false;
   private cleanupFn = NOOP_CLEANUP_FN;
   private registerOnCleanup = (cleanupFn: WatchCleanupFn) => {
@@ -82,7 +81,6 @@ export class Watch extends ReactiveNode {
   }
 
   override destroy(): void {
-    this.isDestroyed = true;
     try {
       this.cleanupFn();
     } finally {

@@ -24,12 +24,12 @@ export type EffectCleanupRegisterFn = (cleanupFn: EffectCleanupFn) => void;
 /**
  * A global reactive effect, which can be manually destroyed.
  */
-export interface EffectRef {
+export type EffectRef = Readonly<{
   /**
    * Shut down the effect, removing it from any upcoming scheduled executions.
    */
   destroy(): void;
-}
+}>;
 
 /**
  * Options passed to the `effect` function.

@@ -18,9 +18,12 @@ const SIGNAL = Symbol.for('rx-effects.signal');
  *
  * @developerPreview
  */
-export type Signal<T> = (() => T) & {
-  [SIGNAL]: unknown;
-};
+export type Signal<T> = (() => T) &
+  Readonly<{
+    [SIGNAL]: unknown;
+
+    destroy(): void;
+  }>;
 
 /**
  * Checks if the given `value` is a reactive `Signal`.

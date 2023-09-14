@@ -81,6 +81,11 @@ export class ComputedImpl<T> extends ReactiveNode {
    */
   private stale = true;
 
+  destroy() {
+    super.destroy();
+    this.value = UNSET;
+  }
+
   protected override onConsumerDependencyMayHaveChanged(): void {
     if (this.stale) {
       // We've already notified consumers that this value has potentially changed.
@@ -160,6 +165,8 @@ export class ComputedImpl<T> extends ReactiveNode {
   }
 
   signal(): T {
+    if (this.isDestroyed) throw new Error('Signal was destroyed');
+
     if (!this.stale && !this.hasProducers()) {
       this.recomputeValue();
     } else {

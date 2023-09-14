@@ -84,6 +84,8 @@ class WritableSignalImpl<T> extends ReactiveNode {
   }
 
   signal(): T {
+    if (this.isDestroyed) throw new Error('Signal was destroyed');
+
     this.producerAccessed();
     return this.value;
   }
@@ -127,7 +129,11 @@ class WritableSignalImpl<T> extends ReactiveNode {
 
   asReadonly(): Signal<T> {
     if (this.readonlySignal === undefined) {
-      this.readonlySignal = createSignalFromFunction(this, () => this.signal());
+      this.readonlySignal = createSignalFromFunction(
+        this,
+        () => this.signal(),
+        { destroy: () => this.destroy() },
+      );
     }
     return this.readonlySignal;
   }
@@ -137,6 +143,7 @@ class WritableSignalImpl<T> extends ReactiveNode {
       this.onDestroy?.();
     } finally {
       super.destroy();
+      this.value = undefined as any;
     }
   }
 }

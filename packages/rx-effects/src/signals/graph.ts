@@ -86,7 +86,11 @@ export abstract class ReactiveNode {
    */
   protected valueVersion = -1;
 
+  protected isDestroyed = false;
+
   destroy(): void {
+    this.isDestroyed = true;
+
     this.producers.forEach((edge) => edge.producer.consumers.delete(edge));
     this.producers.clear();
 
