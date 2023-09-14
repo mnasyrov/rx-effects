@@ -73,7 +73,7 @@ describe('toObservable()', () => {
     expect(counterRead).toBe(false);
   });
 
-  it('should still monitor the signal if the Observable has no active subscribers', async () => {
+  it('should not monitor the signal if the Observable has no active subscribers', async () => {
     const counter = signal(0);
 
     // Tracks how many reads of `counter()` there have been.
@@ -103,7 +103,7 @@ describe('toObservable()', () => {
     // Now, setting the signal still triggers additional reads
     counter.set(2);
     await 0;
-    expect(readCount).toBe(3);
+    expect(readCount).toBe(2);
   });
 
   it('stops monitoring the signal once injector is destroyed', async () => {
