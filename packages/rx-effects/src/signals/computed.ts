@@ -24,7 +24,9 @@ export function computed<T>(
 ): Signal<T> {
   const node = new ComputedImpl(computation, options?.equal ?? defaultEquals);
 
-  return createSignalFromFunction<T>(node, node.signal.bind(node));
+  return createSignalFromFunction(node, node.signal.bind(node), {
+    destroy: node.destroy.bind(node),
+  });
 }
 
 /**
@@ -80,11 +82,6 @@ export class ComputedImpl<T> extends ReactiveNode {
    * state can be resolved without recomputing the value.
    */
   private stale = true;
-
-  destroy() {
-    super.destroy();
-    this.value = UNSET;
-  }
 
   protected override onConsumerDependencyMayHaveChanged(): void {
     if (this.stale) {
@@ -184,11 +181,3 @@ export class ComputedImpl<T> extends ReactiveNode {
     return this.value;
   }
 }
-
-// export function track<T>(
-//   computation: Computation<T>,
-//   options?: CreateComputedOptions<T>,
-// ): T {
-//   const proxy = computed<T>(computation, options);
-//   return proxy();
-// }

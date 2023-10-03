@@ -27,8 +27,8 @@ export function untracked<T>(nonReactiveReadsFn: () => T): T {
  * A bidirectional edge in the dependency graph of `ReactiveNode`s.
  */
 type ReactiveEdge = {
-  producer: ReactiveNode;
-  consumer: ReactiveNode;
+  producer: WeakRef<ReactiveNode>;
+  consumer: WeakRef<ReactiveNode>;
 
   /**
    * `trackingVersion` of the consumer at which this dependency edge was last observed.
@@ -75,6 +75,8 @@ type ReactiveEdge = {
  * last observed.
  */
 export abstract class ReactiveNode {
+  private readonly ref = new WeakRef<ReactiveNode>(this);
+
   /**
    * Edges to producers on which this node depends (in its consumer capacity).
    */
@@ -83,7 +85,7 @@ export abstract class ReactiveNode {
   /**
    * Edges to consumers on which this node depends (in its producer capacity).
    */
-  private readonly consumers = new Set<ReactiveEdge>();
+  private readonly consumers = new Map<WeakRef<ReactiveNode>, ReactiveEdge>();
 
   /**
    * Monotonically increasing counter representing a version of this `Consumer`'s
@@ -102,10 +104,9 @@ export abstract class ReactiveNode {
   destroy(): void {
     this.isDestroyed = true;
 
-    this.producers.forEach((edge) => edge.producer.consumers.delete(edge));
     this.producers.clear();
 
-    this.consumers.forEach((edge) => edge.consumer.producers.delete(edge));
+    this.consumers.forEach((edge) => edge.consumer.deref()?.destroy());
     this.consumers.clear();
   }
 
@@ -130,14 +131,16 @@ export abstract class ReactiveNode {
    */
   protected consumerPollProducersForChange(): boolean {
     for (const edge of this.producers) {
-      if (edge.atTrackingVersion !== this.trackingVersion) {
+      const producer = edge.producer.deref();
+
+      if (!producer || edge.atTrackingVersion !== this.trackingVersion) {
         // This dependency edge is stale, so remove it.
         this.producers.delete(edge);
-        edge.producer.consumers.delete(edge);
+        producer?.consumers.delete(edge.consumer);
         continue;
       }
 
-      if (edge.producer.producerPollStatus(edge.seenValueVersion)) {
+      if (producer.producerPollStatus(edge.seenValueVersion)) {
         // One of the dependencies reports a real value change.
         return true;
       }
@@ -153,14 +156,16 @@ export abstract class ReactiveNode {
    */
   protected producerMayHaveChanged(): void {
     // Prevent signal reads when we're updating the graph
-    for (const edge of this.consumers) {
-      if (edge.consumer.trackingVersion !== edge.atTrackingVersion) {
-        this.consumers.delete(edge);
-        edge.consumer.producers.delete(edge);
+    for (const edge of this.consumers.values()) {
+      const consumer = edge.consumer.deref();
+
+      if (!consumer || consumer.trackingVersion !== edge.atTrackingVersion) {
+        this.consumers.delete(edge.consumer);
+        consumer?.producers.delete(edge);
         continue;
       }
 
-      edge.consumer.onConsumerDependencyMayHaveChanged();
+      consumer?.onConsumerDependencyMayHaveChanged();
     }
   }
 
@@ -173,16 +178,16 @@ export abstract class ReactiveNode {
     }
 
     // Either create or update the dependency `Edge` in both directions.
-    let edge = findEdgeByConsumer(this.consumers, activeConsumer);
+    let edge = this.consumers.get(activeConsumer.ref);
     if (!edge) {
       edge = {
-        producer: this,
-        consumer: activeConsumer,
+        producer: this.ref,
+        consumer: activeConsumer.ref,
         seenValueVersion: this.valueVersion,
         atTrackingVersion: activeConsumer.trackingVersion,
       };
       activeConsumer.producers.add(edge);
-      this.consumers.add(edge);
+      this.consumers.set(edge.consumer, edge);
     } else {
       edge.seenValueVersion = this.valueVersion;
       edge.atTrackingVersion = activeConsumer.trackingVersion;
@@ -214,17 +219,4 @@ export abstract class ReactiveNode {
     // At this point, we can trust `producer.valueVersion`.
     return this.valueVersion !== lastSeenValueVersion;
   }
-}
-
-function findEdgeByConsumer(
-  edges: ReadonlySet<ReactiveEdge>,
-  consumer: ReactiveNode,
-): ReactiveEdge | undefined {
-  for (const edge of edges) {
-    if (edge.consumer === consumer) {
-      return edge;
-    }
-  }
-
-  return undefined;
 }

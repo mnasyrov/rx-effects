@@ -138,12 +138,11 @@ class WritableSignalImpl<T> extends ReactiveNode {
     return this.readonlySignal;
   }
 
-  override destroy() {
+  destroy() {
     try {
       this.onDestroy?.();
     } finally {
       super.destroy();
-      this.value = undefined as any;
     }
   }
 }

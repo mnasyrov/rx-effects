@@ -1,9 +1,10 @@
 import { BehaviorSubject, Observable, Subscribable } from 'rxjs';
+import { Mutable } from '../../utils';
 import { Signal } from '../common';
 import { computed } from '../computed';
 import { signal, WritableSignal } from '../signal';
 
-export type ObservableSignal<T> = Signal<T> & { destroy: () => void };
+export type ObservableSignal<T> = Signal<T>;
 
 /**
  * Options for `toSignal`.
@@ -107,7 +108,7 @@ export function toSignal<T, U = undefined>(
 
   // The actual returned signal is a `computed` of the `State` signal, which maps the various states
   // to either values or errors.
-  const computedSignal: Signal<T | U> = computed(() => {
+  const result: Signal<T | U> = computed(() => {
     const current = state();
     switch (current.kind) {
       case StateKind.Value:
@@ -117,10 +118,13 @@ export function toSignal<T, U = undefined>(
     }
   });
 
-  const result = computedSignal as ObservableSignal<T | U>;
+  const mutable = result as Mutable<typeof result>;
 
   // Unsubscribe when the current context is destroyed, if requested.
-  result.destroy = () => sub.unsubscribe();
+  mutable.destroy = () => {
+    state.destroy();
+    sub.unsubscribe();
+  };
 
   return result;
 }

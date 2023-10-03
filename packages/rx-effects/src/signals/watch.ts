@@ -23,24 +23,34 @@ const NOOP_CLEANUP_FN: WatchCleanupFn = () => undefined;
  */
 export class Watch extends ReactiveNode {
   private dirty = false;
+
+  private action: undefined | ((onCleanup: WatchCleanupRegisterFn) => void);
+  private schedule: undefined | ((watch: Watch) => void);
   private cleanupFn = NOOP_CLEANUP_FN;
+
   private registerOnCleanup = (cleanupFn: WatchCleanupFn) => {
     this.cleanupFn = cleanupFn;
   };
 
   constructor(
-    private action: (onCleanup: WatchCleanupRegisterFn) => void,
-    private schedule: (watch: Watch) => void,
+    action: (onCleanup: WatchCleanupRegisterFn) => void,
+    schedule: (watch: Watch) => void,
   ) {
     super();
+    this.action = action;
+    this.schedule = schedule;
   }
 
   notify(): void {
+    if (this.isDestroyed) {
+      return;
+    }
+
     const needsSchedule = !this.dirty;
     this.dirty = true;
 
     if (needsSchedule) {
-      this.schedule(this);
+      this.schedule?.(this);
     }
   }
 
@@ -74,7 +84,7 @@ export class Watch extends ReactiveNode {
     try {
       this.cleanupFn();
       this.cleanupFn = NOOP_CLEANUP_FN;
-      this.action(this.registerOnCleanup);
+      this.action?.(this.registerOnCleanup);
     } finally {
       setActiveConsumer(prevConsumer);
     }
@@ -84,7 +94,13 @@ export class Watch extends ReactiveNode {
     try {
       this.cleanupFn();
     } finally {
-      super.destroy();
+      this.action = undefined;
+      this.schedule = undefined;
+      this.cleanupFn = NOOP_CLEANUP_FN;
+
+      if (!this.isDestroyed) {
+        super.destroy();
+      }
     }
   }
 }
