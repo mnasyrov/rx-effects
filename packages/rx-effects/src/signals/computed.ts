@@ -3,9 +3,10 @@ import {
   createSignalFromFunction,
   defaultEquals,
   Signal,
+  SIGNAL_CLOCK,
   ValueEqualityFn,
 } from './common';
-import { ReactiveNode, setActiveConsumer } from './graph';
+import { getActiveEffect, ReactiveNode } from './graph';
 
 export type Computation<T> = () => T;
 
@@ -55,6 +56,8 @@ const ERRORED: any = Symbol('ERRORED');
  * `Computed`s are both producers and consumers of reactivity.
  */
 export class ComputedImpl<T> extends ReactiveNode {
+  private clock = SIGNAL_CLOCK;
+
   constructor(
     private computation: Computation<T>,
     private equal: (oldValue: T, newValue: T) => boolean,
@@ -81,44 +84,8 @@ export class ComputedImpl<T> extends ReactiveNode {
    * It's possible that no dependency has _actually_ changed, in which case the `stale`
    * state can be resolved without recomputing the value.
    */
-  private stale = true;
-
-  protected override onConsumerDependencyMayHaveChanged(): void {
-    if (this.stale) {
-      // We've already notified consumers that this value has potentially changed.
-      return;
-    }
-
-    // Record that the currently cached value may be stale.
-    this.stale = true;
-
-    // Notify any consumers about the potential change.
-    this.producerMayHaveChanged();
-  }
-
-  protected override onProducerUpdateValueVersion(): void {
-    if (!this.stale) {
-      // The current value and its version are already up-to-date.
-      return;
-    }
-
-    // The current value is stale. Check whether we need to produce a new one.
-
-    if (
-      this.value !== UNSET &&
-      this.value !== COMPUTING &&
-      !this.consumerPollProducersForChange()
-    ) {
-      // Even though we were previously notified of a potential dependency update, all of
-      // our dependencies report that they have not actually changed in value, so we can
-      // resolve the stale state without needing to recompute the current value.
-      this.stale = false;
-      return;
-    }
-
-    // The current value is stale, and needs to be recomputed. It still may not change -
-    // that depends on whether the newly computed value is equal to the old.
-    this.recomputeValue();
+  private get stale(): boolean {
+    return this.value === UNSET || this.clock !== SIGNAL_CLOCK;
   }
 
   private recomputeValue(): void {
@@ -131,19 +98,16 @@ export class ComputedImpl<T> extends ReactiveNode {
     this.value = COMPUTING;
 
     // As we're re-running the computation, update our dependent tracking version number.
-    this.trackingVersion = nextSafeInteger(this.trackingVersion);
-    const prevConsumer = setActiveConsumer(this);
     let newValue: T;
     try {
       newValue = this.computation();
     } catch (err) {
       newValue = ERRORED;
       this.error = err;
-    } finally {
-      setActiveConsumer(prevConsumer);
     }
 
-    this.stale = false;
+    // this.stale = false;
+    this.clock = SIGNAL_CLOCK;
 
     if (
       oldValue !== UNSET &&
@@ -164,11 +128,8 @@ export class ComputedImpl<T> extends ReactiveNode {
   signal(): T {
     if (this.isDestroyed) throw new Error('Signal was destroyed');
 
-    if (!this.stale && !this.hasProducers()) {
+    if (this.stale || !getActiveEffect()) {
       this.recomputeValue();
-    } else {
-      // Check if the value needs updating before returning it.
-      this.onProducerUpdateValueVersion();
     }
 
     // Record that someone looked at this signal.

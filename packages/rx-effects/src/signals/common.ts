@@ -1,4 +1,4 @@
-import { AnyObject } from '../utils';
+import { AnyObject, nextSafeInteger } from '../utils';
 import { ReactiveNode } from './graph';
 
 /**
@@ -7,6 +7,13 @@ import { ReactiveNode } from './graph';
  * This can be used to auto-unwrap angular in various cases, or to auto-wrap non-signal values.
  */
 const SIGNAL = Symbol.for('rx-effects.signal');
+
+export let SIGNAL_CLOCK = -1;
+
+export function updateSignalClock(): number {
+  SIGNAL_CLOCK = nextSafeInteger(SIGNAL_CLOCK);
+  return SIGNAL_CLOCK;
+}
 
 /**
  * A reactive value which notifies consumers of any changes.

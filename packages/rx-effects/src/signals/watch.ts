@@ -1,5 +1,5 @@
 import { nextSafeInteger } from '../utils';
-import { ReactiveNode, setActiveConsumer } from './graph';
+import { ReactiveNode, setActiveEffect } from './graph';
 
 /**
  * A cleanup function that can be optionally registered from the watch logic. If registered, the
@@ -41,7 +41,7 @@ export class Watch extends ReactiveNode {
     this.schedule = schedule;
   }
 
-  notify(): void {
+  notify = (): void => {
     if (this.isDestroyed) {
       return;
     }
@@ -50,17 +50,10 @@ export class Watch extends ReactiveNode {
     this.dirty = true;
 
     if (needsSchedule) {
+      this.effectClock = nextSafeInteger(this.effectClock);
       this.schedule?.(this);
     }
-  }
-
-  protected override onConsumerDependencyMayHaveChanged(): void {
-    this.notify();
-  }
-
-  protected override onProducerUpdateValueVersion(): void {
-    // Watches are not producers.
-  }
+  };
 
   /**
    * Execute the reactive expression in the context of this `Watch` consumer.
@@ -75,18 +68,14 @@ export class Watch extends ReactiveNode {
       return;
     }
 
-    if (this.trackingVersion !== -1 && !this.consumerPollProducersForChange()) {
-      return;
-    }
+    const prevEffect = setActiveEffect(this);
 
-    const prevConsumer = setActiveConsumer(this);
-    this.trackingVersion = nextSafeInteger(this.trackingVersion);
     try {
       this.cleanupFn();
       this.cleanupFn = NOOP_CLEANUP_FN;
       this.action?.(this.registerOnCleanup);
     } finally {
-      setActiveConsumer(prevConsumer);
+      setActiveEffect(prevEffect);
     }
   }
 

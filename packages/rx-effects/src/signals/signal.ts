@@ -3,6 +3,7 @@ import {
   createSignalFromFunction,
   defaultEquals,
   Signal,
+  updateSignalClock,
   ValueEqualityFn,
 } from './common';
 import { ReactiveNode } from './graph';
@@ -75,14 +76,6 @@ class WritableSignalImpl<T> extends ReactiveNode {
     this.onDestroy = options?.onDestroy;
   }
 
-  protected override onConsumerDependencyMayHaveChanged(): void {
-    // This never happens for writable angular as they're not consumers.
-  }
-
-  protected override onProducerUpdateValueVersion(): void {
-    // Writable signal value versions are always up-to-date.
-  }
-
   signal(): T {
     if (this.isDestroyed) throw new Error('Signal was destroyed');
 
@@ -101,8 +94,8 @@ class WritableSignalImpl<T> extends ReactiveNode {
     if (!this.equal(this.value, newValue)) {
       this.value = newValue;
       this.valueVersion = nextSafeInteger(this.valueVersion);
+      updateSignalClock();
 
-      // TODO: это может сделать асинхронным?
       this.producerMayHaveChanged();
     }
   }

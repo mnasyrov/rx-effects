@@ -33,7 +33,7 @@ describe('computed()', () => {
     expect(results).toEqual([10, 18, 26]);
   });
 
-  it('should got all results in case the result effect is sync', () => {
+  it('should calculate the benchmark with synchronous effect', () => {
     const entry = signal(0); // 0
 
     const a = computed(() => entry()); // [0] -> 0
@@ -52,9 +52,7 @@ describe('computed()', () => {
     entry.set(1);
     entry.set(2);
 
-    expect(results).toEqual([
-      10, 11, 12, 14, 15, 16, 18, 19, 20, 22, 23, 24, 26,
-    ]);
+    expect(results).toEqual([10, 18, 26]);
   });
 
   it('should process dynamic dependencies', async () => {
@@ -400,11 +398,14 @@ describe('computed()', () => {
   });
 
   it('should notify an observer only once on subscribe', async () => {
-    const store = signal<{ v1: string; v2: string; sum?: string }>({
-      v1: 'a',
-      v2: 'b',
-      sum: undefined,
-    });
+    const store = signal<{ v1: string; v2: string; sum?: string }>(
+      {
+        v1: 'a',
+        v2: 'b',
+        sum: undefined,
+      },
+      // { equal: (a, b) => a.v1 === b.v1 && a.v2 === b.v2 && a.sum === b.sum },
+    );
 
     const v1 = computed(() => store().v1);
     const v2 = computed(() => store().v2);

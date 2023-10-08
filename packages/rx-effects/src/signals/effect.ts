@@ -50,6 +50,7 @@ export function effect(
 
   // Effects start dirty.
   watch.notify();
+  // watch.run();
 
   return {
     destroy: () => watch.destroy(),
