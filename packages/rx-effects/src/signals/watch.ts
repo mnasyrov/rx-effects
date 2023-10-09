@@ -1,5 +1,5 @@
 import { nextSafeInteger } from '../utils';
-import { ReactiveNode, setActiveEffect } from './graph';
+import { EffectNode, setActiveEffect } from './common';
 
 /**
  * A cleanup function that can be optionally registered from the watch logic. If registered, the
@@ -21,8 +21,12 @@ const NOOP_CLEANUP_FN: WatchCleanupFn = () => undefined;
  * `Watch` doesn't run reactive expressions itself, but relies on a consumer-provided
  * scheduling operation to coordinate calling `Watch.run()`.
  */
-export class Watch extends ReactiveNode {
+export class Watch implements EffectNode {
+  readonly ref: WeakRef<EffectNode> = new WeakRef(this);
+  clock = -1;
+
   private dirty = false;
+  private isDestroyed = false;
 
   private action: undefined | ((onCleanup: WatchCleanupRegisterFn) => void);
   private schedule: undefined | ((watch: Watch) => void);
@@ -36,7 +40,6 @@ export class Watch extends ReactiveNode {
     action: (onCleanup: WatchCleanupRegisterFn) => void,
     schedule: (watch: Watch) => void,
   ) {
-    super();
     this.action = action;
     this.schedule = schedule;
   }
@@ -50,7 +53,7 @@ export class Watch extends ReactiveNode {
     this.dirty = true;
 
     if (needsSchedule) {
-      this.effectClock = nextSafeInteger(this.effectClock);
+      this.clock = nextSafeInteger(this.clock);
       this.schedule?.(this);
     }
   };
@@ -79,17 +82,15 @@ export class Watch extends ReactiveNode {
     }
   }
 
-  override destroy(): void {
+  destroy(): void {
+    this.action = undefined;
+    this.schedule = undefined;
+    this.isDestroyed = true;
+
     try {
       this.cleanupFn();
     } finally {
-      this.action = undefined;
-      this.schedule = undefined;
       this.cleanupFn = NOOP_CLEANUP_FN;
-
-      if (!this.isDestroyed) {
-        super.destroy();
-      }
     }
   }
 }

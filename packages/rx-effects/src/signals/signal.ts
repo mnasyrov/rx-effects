@@ -1,12 +1,13 @@
-import { nextSafeInteger } from '../utils';
 import {
   createSignalFromFunction,
   defaultEquals,
+  EffectNode,
+  getActiveEffects,
+  ReactiveNode,
   Signal,
   updateSignalClock,
   ValueEqualityFn,
 } from './common';
-import { ReactiveNode } from './graph';
 
 /**
  * A `Signal` with a value that can be mutated via a setter interface.
@@ -61,23 +62,26 @@ export type SignalOptions<T> = {
   onDestroy?: () => void;
 };
 
-class WritableSignalImpl<T> extends ReactiveNode {
+class WritableSignalImpl<T> implements ReactiveNode {
   private readonlySignal: Signal<T> | undefined;
 
   private readonly name?: string;
   private readonly equal: ValueEqualityFn<T>;
   private readonly onDestroy?: () => void;
+  private readonly consumerEffects = new Map<WeakRef<EffectNode>, number>();
+
+  private isDestroyed = false;
 
   constructor(private value: T, options?: SignalOptions<T>) {
-    super();
-
     this.name = options?.name;
     this.equal = options?.equal ?? defaultEquals;
     this.onDestroy = options?.onDestroy;
   }
 
   signal(): T {
-    if (this.isDestroyed) throw new Error('Signal was destroyed');
+    if (this.isDestroyed) {
+      throw new Error('Signal was destroyed');
+    }
 
     this.producerAccessed();
     return this.value;
@@ -91,13 +95,14 @@ class WritableSignalImpl<T> extends ReactiveNode {
    * a no-op.
    */
   set(newValue: T): void {
-    if (!this.equal(this.value, newValue)) {
-      this.value = newValue;
-      this.valueVersion = nextSafeInteger(this.valueVersion);
-      updateSignalClock();
-
-      this.producerMayHaveChanged();
+    if (this.equal(this.value, newValue)) {
+      return;
     }
+
+    this.value = newValue;
+    updateSignalClock();
+
+    this.producerChanged();
   }
 
   /**
@@ -132,10 +137,37 @@ class WritableSignalImpl<T> extends ReactiveNode {
   }
 
   destroy() {
-    try {
-      this.onDestroy?.();
-    } finally {
-      super.destroy();
+    this.consumerEffects.clear();
+    this.isDestroyed = true;
+    this.onDestroy?.();
+  }
+
+  /**
+   * Notify all consumers of this producer that its value is changed.
+   */
+  protected producerChanged(): void {
+    for (const [effectRef, atEffectClock] of this.consumerEffects) {
+      const effect = effectRef.deref();
+
+      if (!effect || effect.clock !== atEffectClock) {
+        // if (!effect) {
+        this.consumerEffects.delete(effectRef);
+        continue;
+      }
+
+      effect?.notify?.();
+    }
+  }
+
+  /**
+   * Mark that this producer node has been accessed in the current reactive context.
+   */
+  protected producerAccessed(): void {
+    const effects = getActiveEffects();
+    if (effects.length > 0) {
+      effects.forEach((effect) => {
+        this.consumerEffects.set(effect.ref, effect.clock);
+      });
     }
   }
 }

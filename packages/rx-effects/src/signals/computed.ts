@@ -1,12 +1,12 @@
-import { nextSafeInteger } from '../utils';
 import {
   createSignalFromFunction,
   defaultEquals,
   Signal,
   SIGNAL_CLOCK,
   ValueEqualityFn,
+  getActiveEffect,
+  ReactiveNode,
 } from './common';
-import { getActiveEffect, ReactiveNode } from './graph';
 
 export type Computation<T> = () => T;
 
@@ -55,15 +55,9 @@ const ERRORED: any = Symbol('ERRORED');
  *
  * `Computed`s are both producers and consumers of reactivity.
  */
-export class ComputedImpl<T> extends ReactiveNode {
+export class ComputedImpl<T> implements ReactiveNode {
   private clock = SIGNAL_CLOCK;
 
-  constructor(
-    private computation: Computation<T>,
-    private equal: (oldValue: T, newValue: T) => boolean,
-  ) {
-    super();
-  }
   /**
    * Current value of the computation.
    *
@@ -75,7 +69,16 @@ export class ComputedImpl<T> extends ReactiveNode {
    * If `value` is `ERRORED`, the error caught from the last computation attempt which will
    * be re-thrown.
    */
-  private error: unknown = null;
+  private error: unknown = undefined;
+
+  constructor(
+    private computation: Computation<T>,
+    private equal: (oldValue: T, newValue: T) => boolean,
+  ) {}
+
+  destroy(): void {
+    this.value = UNSET;
+  }
 
   /**
    * Flag indicating that the computation is currently stale, meaning that one of the
@@ -122,18 +125,12 @@ export class ComputedImpl<T> extends ReactiveNode {
     }
 
     this.value = newValue;
-    this.valueVersion = nextSafeInteger(this.valueVersion);
   }
 
   signal(): T {
-    if (this.isDestroyed) throw new Error('Signal was destroyed');
-
     if (this.stale || !getActiveEffect()) {
       this.recomputeValue();
     }
-
-    // Record that someone looked at this signal.
-    this.producerAccessed();
 
     if (this.value === ERRORED) {
       throw this.error;

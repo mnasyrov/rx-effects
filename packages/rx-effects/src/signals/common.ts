@@ -1,5 +1,4 @@
 import { AnyObject, nextSafeInteger } from '../utils';
-import { ReactiveNode } from './graph';
 
 /**
  * Symbol used to tell `Signal`s apart from other functions.
@@ -89,4 +88,65 @@ export function createSignalFromFunction<
   (fn as any)[SIGNAL] = node;
   // Copy properties from `extraApi` to `fn` to complete the desired API of the `Signal`.
   return Object.assign(fn, extraApi) as Signal<T> & U;
+}
+
+export type ReactiveNode = Readonly<{
+  destroy: () => void;
+}>;
+
+export type EffectNode = ReactiveNode &
+  Readonly<{
+    ref: WeakRef<EffectNode>;
+
+    /**
+     * Monotonically increasing counter representing a version of this `Consumer`'s
+     * dependencies.
+     */
+    clock: number;
+
+    notify: () => void;
+  }>;
+
+/**
+ * Tracks the currently active effects
+ */
+let activeEffect: EffectNode | undefined = undefined;
+let activeEffects: EffectNode[] = [];
+
+export function getActiveEffect(): EffectNode | undefined {
+  return activeEffect;
+}
+
+export function getActiveEffects(): EffectNode[] {
+  return activeEffects;
+}
+
+export function setActiveEffect(
+  effect: EffectNode | undefined,
+): EffectNode | undefined {
+  const prev = activeEffect;
+  activeEffect = effect;
+
+  if (effect) {
+    activeEffects.push(effect);
+  } else {
+    activeEffects = [];
+  }
+
+  return prev;
+}
+
+export function untracked<T>(nonReactiveReadsFn: () => T): T {
+  const prevActiveEffect = activeEffect;
+  const prevActiveEffects = activeEffects;
+
+  activeEffect = undefined;
+  activeEffects = [];
+
+  try {
+    return nonReactiveReadsFn();
+  } finally {
+    activeEffect = prevActiveEffect;
+    activeEffects = prevActiveEffects;
+  }
 }
