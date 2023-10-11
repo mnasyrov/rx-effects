@@ -6,6 +6,7 @@ import {
   ValueEqualityFn,
   getActiveEffect,
   ReactiveNode,
+  EffectNode,
 } from './common';
 
 export type Computation<T> = () => T;
@@ -71,6 +72,8 @@ export class ComputedImpl<T> implements ReactiveNode {
    */
   private error: unknown = undefined;
 
+  private lastEffectRef: WeakRef<EffectNode> | undefined;
+
   constructor(
     private computation: Computation<T>,
     private equal: (oldValue: T, newValue: T) => boolean,
@@ -78,6 +81,7 @@ export class ComputedImpl<T> implements ReactiveNode {
 
   destroy(): void {
     this.value = UNSET;
+    this.lastEffectRef = undefined;
   }
 
   /**
@@ -128,7 +132,14 @@ export class ComputedImpl<T> implements ReactiveNode {
   }
 
   signal(): T {
-    if (this.stale || !getActiveEffect()) {
+    const activeEffect = getActiveEffect();
+
+    if (
+      this.stale ||
+      !activeEffect ||
+      this.lastEffectRef !== activeEffect.ref
+    ) {
+      this.lastEffectRef = activeEffect?.ref;
       this.recomputeValue();
     }
 
