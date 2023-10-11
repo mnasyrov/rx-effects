@@ -253,9 +253,7 @@ describe('computed()', () => {
 
     const result = computed(() => c());
 
-    expect(() => result()).toThrow(
-      new Error('Detected cycle in computations.'),
-    );
+    expect(() => result()).toThrow(new Error('Detected cycle in computations'));
 
     const subject = new Subject();
     const changes = await collectChanges(subject.pipe(materialize()), () => {
@@ -263,7 +261,7 @@ describe('computed()', () => {
     });
     expect(changes).toEqual([
       {
-        error: new Error('Detected cycle in computations.'),
+        error: new Error('Detected cycle in computations'),
         hasValue: false,
         kind: 'E',
         value: undefined,

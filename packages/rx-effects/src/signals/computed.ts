@@ -1,12 +1,12 @@
 import {
   createSignalFromFunction,
   defaultEquals,
+  EffectNode,
+  getActiveEffect,
+  ReactiveNode,
   Signal,
   SIGNAL_CLOCK,
   ValueEqualityFn,
-  getActiveEffect,
-  ReactiveNode,
-  EffectNode,
 } from './common';
 
 export type Computation<T> = () => T;
@@ -84,23 +84,33 @@ export class ComputedImpl<T> implements ReactiveNode {
     this.lastEffectRef = undefined;
   }
 
-  /**
-   * Flag indicating that the computation is currently stale, meaning that one of the
-   * dependencies has notified of a potential change.
-   *
-   * It's possible that no dependency has _actually_ changed, in which case the `stale`
-   * state can be resolved without recomputing the value.
-   */
-  private get stale(): boolean {
-    return this.value === UNSET || this.clock !== SIGNAL_CLOCK;
+  signal(): T {
+    if (this.value === COMPUTING) {
+      // Our computation somehow led to a cyclic read of itself.
+      throw new Error('Detected cycle in computations');
+    }
+
+    const activeEffect = getActiveEffect();
+
+    const isStale =
+      this.clock !== SIGNAL_CLOCK ||
+      this.value === UNSET ||
+      !activeEffect ||
+      this.lastEffectRef !== activeEffect.ref;
+
+    if (isStale) {
+      this.lastEffectRef = activeEffect?.ref;
+      this.recomputeValue();
+    }
+
+    if (this.value === ERRORED) {
+      throw this.error;
+    }
+
+    return this.value;
   }
 
   private recomputeValue(): void {
-    if (this.value === COMPUTING) {
-      // Our computation somehow led to a cyclic read of itself.
-      throw new Error('Detected cycle in computations.');
-    }
-
     const oldValue = this.value;
     this.value = COMPUTING;
 
@@ -113,7 +123,6 @@ export class ComputedImpl<T> implements ReactiveNode {
       this.error = err;
     }
 
-    // this.stale = false;
     this.clock = SIGNAL_CLOCK;
 
     if (
@@ -129,24 +138,5 @@ export class ComputedImpl<T> implements ReactiveNode {
     }
 
     this.value = newValue;
-  }
-
-  signal(): T {
-    const activeEffect = getActiveEffect();
-
-    if (
-      this.stale ||
-      !activeEffect ||
-      this.lastEffectRef !== activeEffect.ref
-    ) {
-      this.lastEffectRef = activeEffect?.ref;
-      this.recomputeValue();
-    }
-
-    if (this.value === ERRORED) {
-      throw this.error;
-    }
-
-    return this.value;
   }
 }
