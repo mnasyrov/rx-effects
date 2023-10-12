@@ -520,13 +520,4 @@ describe('computed()', () => {
     const query = computed(() => source());
     expect(query()).toEqual({ key: 1, val: 'a' });
   });
-
-  // TODO: Not applicable
-  // it('should return internal ComputationQuery', async () => {
-  //   const query = computed(() => 1);
-  //
-  //   expect((query as any)._computed).toEqual(true);
-  //   expect(query.get()).toBe(1);
-  //   expect(await firstValueFrom(query.value$)).toBe(1);
-  // });
 });

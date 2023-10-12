@@ -150,7 +150,6 @@ class WritableSignalImpl<T> implements ReactiveNode {
       const effect = effectRef.deref();
 
       if (!effect || effect.clock !== atEffectClock) {
-        // if (!effect) {
         this.consumerEffects.delete(effectRef);
         continue;
       }

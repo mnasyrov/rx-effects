@@ -49,11 +49,12 @@ export class Watch implements EffectNode {
       return;
     }
 
+    this.clock = nextSafeInteger(this.clock);
     const needsSchedule = !this.dirty;
     this.dirty = true;
 
     if (needsSchedule) {
-      this.clock = nextSafeInteger(this.clock);
+      // this.clock = nextSafeInteger(this.clock);
       this.schedule?.(this);
     }
   };
