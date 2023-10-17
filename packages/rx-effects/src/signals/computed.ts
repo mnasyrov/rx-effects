@@ -1,11 +1,11 @@
+import { nextSafeInteger } from '../utils';
 import {
+  ComputedNode,
   createSignalFromFunction,
   defaultEquals,
   EffectNode,
-  getActiveEffect,
-  ReactiveNode,
   Signal,
-  SIGNAL_CLOCK,
+  SIGNAL_CONTEXT,
   ValueEqualityFn,
 } from './common';
 
@@ -56,8 +56,9 @@ const ERRORED: any = Symbol('ERRORED');
  *
  * `Computed`s are both producers and consumers of reactivity.
  */
-export class ComputedImpl<T> implements ReactiveNode {
-  private clock = SIGNAL_CLOCK;
+export class ComputedImpl<T> implements ComputedNode<T> {
+  clock = SIGNAL_CONTEXT.clock - 1;
+  version = 0;
 
   /**
    * Current value of the computation.
@@ -65,6 +66,7 @@ export class ComputedImpl<T> implements ReactiveNode {
    * This can also be one of the special values `UNSET`, `COMPUTING`, or `ERRORED`.
    */
   private value: T = UNSET;
+  private changed = false;
 
   /**
    * If `value` is `ERRORED`, the error caught from the last computation attempt which will
@@ -84,16 +86,41 @@ export class ComputedImpl<T> implements ReactiveNode {
     this.lastEffectRef = undefined;
   }
 
+  isChanged(): boolean {
+    if (this.clock === SIGNAL_CONTEXT.clock && this.value === UNSET) {
+      return this.changed;
+    }
+
+    const prevVersion = this.version;
+    this.accessValue(false);
+
+    return this.version !== prevVersion;
+  }
+
   signal(): T {
+    this.accessValue(true);
+
+    if (this.value === ERRORED) {
+      throw this.error;
+    }
+
+    return this.value;
+  }
+
+  private accessValue(trackNode: boolean): void {
     if (this.value === COMPUTING) {
       // Our computation somehow led to a cyclic read of itself.
       throw new Error('Detected cycle in computations');
     }
 
-    const activeEffect = getActiveEffect();
+    if (trackNode) {
+      SIGNAL_CONTEXT.visitComputedNode(this);
+    }
+
+    const activeEffect = SIGNAL_CONTEXT.getCurrentEffect();
 
     const isStale =
-      this.clock !== SIGNAL_CLOCK ||
+      this.clock !== SIGNAL_CONTEXT.clock ||
       this.value === UNSET ||
       !activeEffect ||
       this.lastEffectRef !== activeEffect.ref;
@@ -102,12 +129,6 @@ export class ComputedImpl<T> implements ReactiveNode {
       this.lastEffectRef = activeEffect?.ref;
       this.recomputeValue();
     }
-
-    if (this.value === ERRORED) {
-      throw this.error;
-    }
-
-    return this.value;
   }
 
   private recomputeValue(): void {
@@ -123,20 +144,22 @@ export class ComputedImpl<T> implements ReactiveNode {
       this.error = err;
     }
 
-    this.clock = SIGNAL_CLOCK;
+    this.clock = SIGNAL_CONTEXT.clock;
 
     if (
-      oldValue !== UNSET &&
-      oldValue !== ERRORED &&
-      newValue !== ERRORED &&
-      this.equal(oldValue, newValue)
+      oldValue === UNSET ||
+      oldValue === ERRORED ||
+      newValue === ERRORED ||
+      !this.equal(oldValue, newValue)
     ) {
+      this.value = newValue;
+      this.version = nextSafeInteger(this.version);
+      this.changed = true;
+    } else {
       // No change to `valueVersion` - old and new values are
       // semantically equivalent.
       this.value = oldValue;
-      return;
+      this.changed = false;
     }
-
-    this.value = newValue;
   }
 }

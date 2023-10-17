@@ -1,5 +1,5 @@
 import { Observable, share, shareReplay, skip } from 'rxjs';
-import { Signal, untracked } from '../common';
+import { Signal, SIGNAL_CONTEXT } from '../common';
 import { effect } from '../effect';
 
 export type ToObservableOptions = {
@@ -23,10 +23,10 @@ export function toObservable<T>(
         try {
           value = source();
         } catch (err) {
-          untracked(() => subscriber.error(err));
+          SIGNAL_CONTEXT.untracked(() => subscriber.error(err));
           return;
         }
-        untracked(() => subscriber.next(value));
+        SIGNAL_CONTEXT.untracked(() => subscriber.next(value));
       },
       { sync: options?.sync },
     );

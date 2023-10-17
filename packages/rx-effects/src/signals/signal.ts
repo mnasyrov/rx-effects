@@ -2,10 +2,9 @@ import {
   createSignalFromFunction,
   defaultEquals,
   EffectNode,
-  getActiveEffects,
   ReactiveNode,
   Signal,
-  updateSignalClock,
+  SIGNAL_CONTEXT,
   ValueEqualityFn,
 } from './common';
 
@@ -100,7 +99,7 @@ class WritableSignalImpl<T> implements ReactiveNode {
     }
 
     this.value = newValue;
-    updateSignalClock();
+    SIGNAL_CONTEXT.updateSignalClock();
 
     this.producerChanged();
   }
@@ -162,7 +161,7 @@ class WritableSignalImpl<T> implements ReactiveNode {
    * Mark that this producer node has been accessed in the current reactive context.
    */
   protected producerAccessed(): void {
-    const effects = getActiveEffects();
+    const effects = SIGNAL_CONTEXT.getTrackedEffects();
     if (effects.length > 0) {
       effects.forEach((effect) => {
         this.consumerEffects.set(effect.ref, effect.clock);

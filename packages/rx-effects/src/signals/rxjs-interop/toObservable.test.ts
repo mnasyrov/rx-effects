@@ -1,5 +1,6 @@
 import { firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
+import { waitForMicrotask } from '../../../test/testUtils';
 import { computed } from '../computed';
 import { signal } from '../signal';
 import { toObservable } from './toObservable';
@@ -12,16 +13,16 @@ describe('toObservable()', () => {
     );
 
     // Initial effect execution, emits 0.
-    await 0;
+    await waitForMicrotask();
 
     counter.set(1);
     // Emits 1.
-    await 0;
+    await waitForMicrotask();
 
     counter.set(2);
     counter.set(3);
     // Emits 3 (ignores 2 as it was batched by the effect).
-    await 0;
+    await waitForMicrotask();
 
     expect(await counterValues).toEqual([0, 1, 3]);
   });
@@ -47,11 +48,11 @@ describe('toObservable()', () => {
       error: (err) => (currentError = err),
     });
 
-    await 0;
+    await waitForMicrotask();
     expect(currentValue).toBe(1);
 
     source.set(2);
-    await 0;
+    await waitForMicrotask();
     expect(currentError).toBe('fail');
 
     sub.unsubscribe();
@@ -69,7 +70,7 @@ describe('toObservable()', () => {
     // Simply creating the Observable shouldn't trigger a signal read.
     expect(counterRead).toBe(false);
 
-    await 0;
+    await waitForMicrotask();
     expect(counterRead).toBe(false);
   });
 
@@ -88,13 +89,13 @@ describe('toObservable()', () => {
     const sub = counter$.subscribe();
     expect(readCount).toBe(0);
 
-    await 0;
+    await waitForMicrotask();
     expect(readCount).toBe(1);
 
     // Sanity check of the read tracker - updating the counter should cause it to be read again
     // by the active effect.
     counter.set(1);
-    await 0;
+    await waitForMicrotask();
     expect(readCount).toBe(2);
 
     // Tear down the only subscription.
@@ -102,7 +103,7 @@ describe('toObservable()', () => {
 
     // Now, setting the signal still triggers additional reads
     counter.set(2);
-    await 0;
+    await waitForMicrotask();
     expect(readCount).toBe(2);
   });
 
@@ -121,28 +122,31 @@ describe('toObservable()', () => {
 
     expect(readCount).toBe(0);
 
-    await 0;
+    await waitForMicrotask();
     expect(readCount).toBe(0);
 
     // Now, setting the signal shouldn't trigger any additional reads, as the Injector was destroyed
     // childInjector.destroy();
     counter.set(2);
-    await 0;
+    await waitForMicrotask();
     expect(readCount).toBe(0);
   });
 
   it('does not track downstream signal reads in the effect', async () => {
     const counter = signal(0);
     const emits = signal(0);
+
     toObservable(counter).subscribe(() => {
-      // Read emits. If we are still tracked in the effect, this will cause an infinite loop by
-      // triggering the effect again.
+      // Read emits. If we are still tracked in the effect, this will cause
+      // an infinite loop by triggering the effect again.
       emits();
       emits.update((v) => v + 1);
     });
-    await 0;
+
+    await waitForMicrotask();
     expect(emits()).toBe(1);
-    await 0;
+
+    await waitForMicrotask();
     expect(emits()).toBe(1);
   });
 });

@@ -1,7 +1,7 @@
 import { BehaviorSubject, materialize, Subject } from 'rxjs';
-import { collectChanges, waitForMicrotask } from '../../test/testUtils';
-import { Signal } from './common';
-import { computed } from './computed';
+import { collectChanges, dump, waitForMicrotask } from '../../test/testUtils';
+import { defaultEquals, Signal, SIGNAL_CONTEXT } from './common';
+import { computed, ComputedImpl } from './computed';
 import { effect } from './effect';
 import { toObservable, toSignal } from './rxjs-interop';
 import { signal } from './signal';
@@ -143,6 +143,63 @@ describe('computed()', () => {
     expect(a()).toEqual(30);
   });
 
+  it('should work with a simple sync effect', () => {
+    const source = signal(0);
+    const a = computed(() => source() + 1);
+    const b = computed(() => a() + 1);
+
+    const results: number[] = [];
+    const fx = effect(() => results.push(b()), { sync: true });
+    source.set(1);
+    source.set(2);
+    fx.destroy();
+
+    expect(results).toEqual([2, 3, 4]);
+  });
+
+  it('should work with a simple async effect', async () => {
+    const source = signal(0);
+    const a = computed(() => source() + 1);
+    const b = computed(() => a() + 1);
+
+    const results: number[] = [];
+
+    const fx = effect(() => results.push(b()));
+    await waitForMicrotask();
+
+    source.set(1);
+    await waitForMicrotask();
+
+    source.set(2);
+    await waitForMicrotask();
+
+    fx.destroy();
+
+    expect(results).toEqual([2, 3, 4]);
+  });
+
+  it('should work with an untracked effect', async () => {
+    const source = signal(0);
+    const a = computed(() => source() + 1);
+    const b = computed(() => a() + 1);
+
+    const results: number[] = [];
+
+    const fx = effect(() => {
+      SIGNAL_CONTEXT.untracked(() => results.push(b()));
+    });
+    await waitForMicrotask();
+
+    source.set(1);
+    await waitForMicrotask();
+
+    fx.destroy();
+
+    dump('SIGNAL_CONTEXT', SIGNAL_CONTEXT);
+
+    expect(results).toEqual([2, 3]);
+  });
+
   it('should compute "entry -> a -> observer" chain', async () => {
     const source = signal(1);
 
@@ -171,7 +228,7 @@ describe('computed()', () => {
       entry.set(1);
       expect(b()).toEqual(3);
 
-      await 0;
+      await waitForMicrotask();
 
       entry.set(2);
       expect(b()).toEqual(4);
@@ -436,7 +493,6 @@ describe('computed()', () => {
   it('should handle recursion during store updates: Value selector', async () => {
     const store = signal({ a: 0, result: { value: 0 } });
 
-    // const nextResult = computed(() => ({ value: track(() => store().a) }));
     const nextResult = computed(() => ({ value: store().a }), {
       equal: (a, b) => a.value === b.value,
     });
@@ -466,6 +522,11 @@ describe('computed()', () => {
   });
 
   it('should handle recursion during store updates: Intermediate computed', async () => {
+    console.log(
+      '!!! SIGNAL_CONTEXT',
+      JSON.parse(JSON.stringify(SIGNAL_CONTEXT)),
+    );
+
     const store = signal({ a: 0, result: { value: 0 } });
 
     const a = computed(() => store().a);
@@ -519,5 +580,54 @@ describe('computed()', () => {
 
     const query = computed(() => source());
     expect(query()).toEqual({ key: 1, val: 'a' });
+  });
+});
+
+describe('ComputedImpl()', () => {
+  it('should tell about a changed state', () => {
+    const source = signal('a');
+    const other = signal('something 1');
+    const result = new ComputedImpl(() => source(), defaultEquals);
+
+    // Case 1: recalculation is triggered by result.isChanged()
+    expect(result.version).toBe(0);
+
+    expect(result.isChanged()).toBe(true);
+    expect(result.version).toBe(1);
+
+    expect(result.isChanged()).toBe(true);
+    expect(result.version).toBe(1);
+
+    expect(result.signal()).toBe('a');
+    expect(result.version).toBe(1);
+
+    // Case 2: recalculation is triggered by result.signal()
+    source.set('b');
+    expect(result.version).toBe(1);
+
+    expect(result.signal()).toBe('b');
+    expect(result.version).toBe(2);
+
+    expect(result.isChanged()).toBe(true);
+    expect(result.version).toBe(2);
+
+    expect(result.signal()).toBe('b');
+    expect(result.version).toBe(2);
+
+    /*
+    Case 3: other signal increases SIGNAL_CLOCK, the result makes recalculation,
+    but its value remains the same.
+    */
+    other.set('something 2');
+    expect(result.version).toBe(2);
+
+    expect(result.isChanged()).toBe(false);
+    expect(result.version).toBe(2);
+
+    expect(result.signal()).toBe('b');
+    expect(result.version).toBe(2);
+
+    expect(result.isChanged()).toBe(false);
+    expect(result.version).toBe(2);
   });
 });

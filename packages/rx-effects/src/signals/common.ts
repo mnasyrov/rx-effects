@@ -1,3 +1,4 @@
+import { dump } from '../../test/testUtils';
 import { AnyObject, nextSafeInteger } from '../utils';
 
 /**
@@ -5,14 +6,7 @@ import { AnyObject, nextSafeInteger } from '../utils';
  *
  * This can be used to auto-unwrap angular in various cases, or to auto-wrap non-signal values.
  */
-const SIGNAL = Symbol.for('rx-effects.signal');
-
-export let SIGNAL_CLOCK = -1;
-
-export function updateSignalClock(): number {
-  SIGNAL_CLOCK = nextSafeInteger(SIGNAL_CLOCK);
-  return SIGNAL_CLOCK;
-}
+const SIGNAL_SYMBOL = Symbol.for('rx-effects.signal');
 
 /**
  * A reactive value which notifies consumers of any changes.
@@ -26,7 +20,7 @@ export function updateSignalClock(): number {
  */
 export type Signal<T> = (() => T) &
   Readonly<{
-    [SIGNAL]: unknown;
+    [SIGNAL_SYMBOL]: unknown;
 
     destroy(): void;
   }>;
@@ -39,7 +33,7 @@ export type Signal<T> = (() => T) &
 export function isSignal(value: unknown): value is Signal<unknown> {
   return (
     typeof value === 'function' &&
-    (value as Signal<unknown>)[SIGNAL] !== undefined
+    (value as Signal<unknown>)[SIGNAL_SYMBOL] !== undefined
   );
 }
 
@@ -85,7 +79,7 @@ export function createSignalFromFunction<
   T,
   U extends Record<string, unknown> = AnyObject,
 >(node: ReactiveNode, fn: () => T, extraApi: U = {} as U): Signal<T> & U {
-  (fn as any)[SIGNAL] = node;
+  (fn as any)[SIGNAL_SYMBOL] = node;
   // Copy properties from `extraApi` to `fn` to complete the desired API of the `Signal`.
   return Object.assign(fn, extraApi) as Signal<T> & U;
 }
@@ -94,8 +88,18 @@ export type ReactiveNode = Readonly<{
   destroy: () => void;
 }>;
 
+export type ComputedNode<T> = ReactiveNode &
+  Readonly<{
+    clock: number;
+    version: number;
+    signal: () => T;
+    isChanged: () => boolean;
+  }>;
+
 export type EffectNode = ReactiveNode &
   Readonly<{
+    id: number;
+
     ref: WeakRef<EffectNode>;
 
     /**
@@ -107,46 +111,117 @@ export type EffectNode = ReactiveNode &
     notify: () => void;
   }>;
 
-/**
- * Tracks the currently active effects
- */
-let activeEffect: EffectNode | undefined = undefined;
-let activeEffects: EffectNode[] = [];
+export class SignalContext {
+  private untrackedMutex = 0;
+  private currentEffect: EffectNode | undefined = undefined;
+  private trackedEffects: EffectNode[] = [];
+  private visitedComputedNodes: ComputedNode<any>[] = [];
 
-export function getActiveEffect(): EffectNode | undefined {
-  return activeEffect;
-}
+  clock = -1;
 
-export function getActiveEffects(): EffectNode[] {
-  return activeEffects;
-}
+  updateSignalClock(): void {
+    const prevClock = this.clock;
 
-export function setActiveEffect(
-  effect: EffectNode | undefined,
-): EffectNode | undefined {
-  const prev = activeEffect;
-  activeEffect = effect;
+    this.clock = nextSafeInteger(this.clock);
 
-  if (effect) {
-    activeEffects.push(effect);
-  } else {
-    activeEffects = [];
+    dump('updateSignalClock()', { prev: prevClock, next: this.clock });
   }
 
-  return prev;
-}
+  getCurrentEffect(): EffectNode | undefined {
+    if (this.untrackedMutex > 0) return undefined;
 
-export function untracked<T>(nonReactiveReadsFn: () => T): T {
-  const prevActiveEffect = activeEffect;
-  const prevActiveEffects = activeEffects;
+    dump('getCurrentEffect()', { currentEffect: this.currentEffect });
 
-  activeEffect = undefined;
-  activeEffects = [];
-
-  try {
-    return nonReactiveReadsFn();
-  } finally {
-    activeEffect = prevActiveEffect;
-    activeEffects = prevActiveEffects;
+    return this.currentEffect;
   }
+
+  getTrackedEffects(): EffectNode[] {
+    if (this.untrackedMutex > 0) return [];
+
+    dump('getTrackedEffects()', { trackedEffects: this.trackedEffects });
+
+    return this.trackedEffects;
+  }
+
+  setCurrentEffect(effect: EffectNode | undefined): EffectNode | undefined {
+    const prev = this.currentEffect;
+    this.currentEffect = effect;
+
+    if (this.untrackedMutex === 0) {
+      if (effect) {
+        this.trackedEffects.push(effect);
+      } else {
+        this.trackedEffects = [];
+      }
+    }
+
+    dump('setCurrentEffect()', {
+      prev,
+      effect,
+      trackedEffects: this.trackedEffects,
+    });
+
+    return prev;
+  }
+
+  getVisitedComputedNodes(): ComputedNode<any>[] {
+    dump('getVisitedComputedNodes()', {
+      visitedComputedNodes: this.visitedComputedNodes,
+    });
+
+    return this.visitedComputedNodes;
+  }
+
+  resetVisitedComputedNodes() {
+    dump('resetVisitedComputedNodes()');
+
+    this.visitedComputedNodes = [];
+  }
+
+  visitComputedNode(node: ComputedNode<any>) {
+    if (this.untrackedMutex > 0) return;
+
+    dump('visitComputedNode()', {
+      currentEffect: this.currentEffect,
+      visitedComputedNodes: this.visitedComputedNodes,
+    });
+
+    if (this.currentEffect) {
+      this.visitedComputedNodes.push(node);
+    }
+  }
+
+  untracked<T>(nonReactiveReadsFn: () => T): T {
+    this.untrackedMutex++;
+
+    dump('untracked() begin', { untrackMutex: this.untrackedMutex });
+
+    try {
+      return nonReactiveReadsFn();
+    } finally {
+      this.untrackedMutex--;
+
+      dump('untracked() end', { untrackMutex: this.untrackedMutex });
+    }
+  }
+
+  // untracked<T>(nonReactiveReadsFn: () => T): T {
+  //   const prevActiveEffect = this.activeEffect;
+  //   const prevActiveEffects = this.activeEffects;
+  //   const prevVisitedComputedNodes = this.visitedComputedNodes;
+  //
+  //   this.activeEffect = undefined;
+  //   this.activeEffects = [];
+  //   this.visitedComputedNodes = [];
+  //
+  //   try {
+  //     return nonReactiveReadsFn();
+  //   } finally {
+  //     this.activeEffect = prevActiveEffect;
+  //     this.activeEffects = prevActiveEffects;
+  //     this.visitedComputedNodes = prevVisitedComputedNodes;
+  //   }
+  // }
 }
+
+export const SIGNAL_CONTEXT = new SignalContext();

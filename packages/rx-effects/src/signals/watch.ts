@@ -1,5 +1,5 @@
 import { nextSafeInteger } from '../utils';
-import { EffectNode, setActiveEffect } from './common';
+import { ComputedNode, EffectNode, SIGNAL_CONTEXT } from './common';
 
 /**
  * A cleanup function that can be optionally registered from the watch logic. If registered, the
@@ -13,7 +13,7 @@ export type WatchCleanupFn = () => void;
 export type WatchCleanupRegisterFn = (cleanupFn: WatchCleanupFn) => void;
 
 const NOOP_CLEANUP_FN: WatchCleanupFn = () => undefined;
-
+let WATCH_ID = 0;
 /**
  * Watches a reactive expression and allows it to be scheduled to re-run
  * when any dependencies notify of a change.
@@ -22,6 +22,7 @@ const NOOP_CLEANUP_FN: WatchCleanupFn = () => undefined;
  * scheduling operation to coordinate calling `Watch.run()`.
  */
 export class Watch implements EffectNode {
+  readonly id: number = (WATCH_ID = nextSafeInteger(WATCH_ID));
   readonly ref: WeakRef<EffectNode> = new WeakRef(this);
   clock = -1;
 
@@ -31,6 +32,8 @@ export class Watch implements EffectNode {
   private action: undefined | ((onCleanup: WatchCleanupRegisterFn) => void);
   private schedule: undefined | ((watch: Watch) => void);
   private cleanupFn = NOOP_CLEANUP_FN;
+
+  private seenComputedNodes: undefined | ComputedNode<any>[];
 
   private registerOnCleanup = (cleanupFn: WatchCleanupFn) => {
     this.cleanupFn = cleanupFn;
@@ -72,21 +75,35 @@ export class Watch implements EffectNode {
       return;
     }
 
-    const prevEffect = setActiveEffect(this);
+    const prevEffect = SIGNAL_CONTEXT.setCurrentEffect(this);
+
+    const isChanged =
+      !this.seenComputedNodes || isComputedNodesChanged(this.seenComputedNodes);
+
+    if (!isChanged) {
+      return;
+    }
 
     try {
       this.cleanupFn();
       this.cleanupFn = NOOP_CLEANUP_FN;
       this.action?.(this.registerOnCleanup);
     } finally {
-      setActiveEffect(prevEffect);
+      SIGNAL_CONTEXT.setCurrentEffect(prevEffect);
+
+      this.seenComputedNodes = SIGNAL_CONTEXT.getVisitedComputedNodes();
+
+      if (!prevEffect) {
+        SIGNAL_CONTEXT.resetVisitedComputedNodes();
+      }
     }
   }
 
   destroy(): void {
+    this.isDestroyed = true;
     this.action = undefined;
     this.schedule = undefined;
-    this.isDestroyed = true;
+    this.seenComputedNodes = undefined;
 
     try {
       this.cleanupFn();
@@ -94,4 +111,18 @@ export class Watch implements EffectNode {
       this.cleanupFn = NOOP_CLEANUP_FN;
     }
   }
+}
+
+function isComputedNodesChanged(nodes: ComputedNode<any>[]): boolean {
+  if (nodes.length === 0) {
+    return true;
+  }
+
+  for (const node of nodes) {
+    if (node.isChanged()) {
+      return true;
+    }
+  }
+
+  return false;
 }
