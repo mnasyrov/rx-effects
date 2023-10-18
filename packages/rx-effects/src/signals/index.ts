@@ -3,7 +3,30 @@ export { isSignal, defaultEquals } from './common';
 
 export { flushAsyncEffects } from './runtime';
 
-export * from './computed';
-export * from './effect';
-export * from './signal';
-export * from './store';
+export type { Computation, CreateComputedOptions } from './computed';
+export { computed } from './computed';
+
+export type {
+  CreateEffectOptions,
+  EffectRef,
+  EffectCleanupFn,
+  EffectCleanupRegisterFn,
+} from './effect';
+export { effect } from './effect';
+
+export type { SignalOptions, WritableSignal } from './signal';
+export { signal } from './signal';
+
+export type {
+  Store,
+  StoreUpdate,
+  StoreUpdates,
+  StateUpdates,
+  StateMutation,
+} from './store';
+export {
+  createStore,
+  createSignalUpdates,
+  declareStateUpdates,
+  pipeStateMutations,
+} from './store';

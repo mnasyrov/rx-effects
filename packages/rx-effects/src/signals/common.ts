@@ -14,8 +14,6 @@ const SIGNAL_SYMBOL = Symbol.for('rx-effects.signal');
  * call it.
  *
  * Ordinary values can be turned into `Signal`s with the `signal` function.
- *
- * @developerPreview
  */
 export type Signal<T> = (() => T) &
   Readonly<{
@@ -26,8 +24,6 @@ export type Signal<T> = (() => T) &
 
 /**
  * Checks if the given `value` is a reactive `Signal`.
- *
- * @developerPreview
  */
 export function isSignal(value: unknown): value is Signal<unknown> {
   return (

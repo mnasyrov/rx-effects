@@ -10,8 +10,6 @@ import { SIGNAL_RUNTIME } from './runtime';
 
 /**
  * A `Signal` with a value that can be mutated via a setter interface.
- *
- * @developerPreview
  */
 export interface WritableSignal<T> extends Signal<T> {
   /**

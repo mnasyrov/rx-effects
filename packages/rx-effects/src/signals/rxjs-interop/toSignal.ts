@@ -49,8 +49,6 @@ export function toSignal<T>(
  * by the given `Observable`, by subscribing to that `Observable`. The returned `Signal` will always
  * have the most recent value emitted by the subscription, and will throw an error if the
  * `Observable` errors.
- *
- * @developerPreview
  */
 export function toSignal<T>(
   source: Observable<T> | Subscribable<T>,
@@ -64,8 +62,6 @@ export function toSignal<T>(
  * by the given `Observable`, by subscribing to that `Observable`. The returned `Signal` will always
  * have the most recent value emitted by the subscription, and will throw an error if the
  * `Observable` errors.
- *
- * @developerPreview
  */
 export function toSignal<T, U extends T | null | undefined>(
   source: Observable<T> | Subscribable<T>,
@@ -79,8 +75,6 @@ export function toSignal<T, U extends T | null | undefined>(
  * by the given `Observable`, by subscribing to that `Observable`. The returned `Signal` will always
  * have the most recent value emitted by the subscription, and will throw an error if the
  * `Observable` errors.
- *
- * @developerPreview
  */
 export function toSignal<T>(
   source: Observable<T> | Subscribable<T>,

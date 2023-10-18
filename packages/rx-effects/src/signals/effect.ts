@@ -40,7 +40,7 @@ export function effect(
 
   const watch = new Watch(effectFn, scheduler.schedule);
 
-  // Effects start dirty.
+  // Effect starts dirty.
   watch.notify();
 
   return {

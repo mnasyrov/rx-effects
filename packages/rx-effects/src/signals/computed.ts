@@ -17,8 +17,6 @@ export type CreateComputedOptions<T> = {
 
 /**
  * Create a computed `Signal` which derives a reactive value from an expression.
- *
- * @developerPreview
  */
 export function computed<T>(
   computation: Computation<T>,
