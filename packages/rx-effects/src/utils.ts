@@ -114,6 +114,12 @@ export type TaskScheduler<T> = Readonly<{
   execute(): void;
 }>;
 
+export type Runnable = Readonly<{ run: () => void }>;
+
+export function defaultRunnableAction(task: Runnable): void {
+  task.run();
+}
+
 export class MicrotaskScheduler<T> implements TaskScheduler<T> {
   private readonly queue = new Set<T>();
 

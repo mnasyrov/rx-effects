@@ -1,11 +1,7 @@
 import { Bench } from 'tinybench';
 import { compute, createStore } from '../src/index';
-import {
-  ASYNC_EFFECT_SCHEDULER,
-  computed,
-  effect,
-  signal,
-} from '../src/signals';
+import { computed, effect, signal } from '../src/signals';
+import { SIGNAL_RUNTIME } from '../src/signals/runtime';
 
 const ITERATION_COUNT = 100;
 
@@ -47,7 +43,7 @@ bench.add('signal computed', () => {
 
   for (let i = 0; i < ITERATION_COUNT; i++) {
     entry.set(i);
-    ASYNC_EFFECT_SCHEDULER.execute();
+    SIGNAL_RUNTIME.asyncScheduler.execute();
   }
 });
 

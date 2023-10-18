@@ -1,5 +1,6 @@
-import { nextSafeInteger } from '../utils';
-import { ComputedNode, EffectNode, SIGNAL_CONTEXT } from './common';
+import { nextSafeInteger, Runnable } from '../utils';
+import { ComputedNode, EffectNode } from './common';
+import { SIGNAL_RUNTIME } from './runtime';
 
 /**
  * A cleanup function that can be optionally registered from the watch logic. If registered, the
@@ -21,13 +22,13 @@ let WATCH_ID = 0;
  * `Watch` doesn't run reactive expressions itself, but relies on a consumer-provided
  * scheduling operation to coordinate calling `Watch.run()`.
  */
-export class Watch implements EffectNode {
+export class Watch implements EffectNode, Runnable {
   readonly id: number = (WATCH_ID = nextSafeInteger(WATCH_ID));
   readonly ref: WeakRef<EffectNode> = new WeakRef(this);
-  clock = -1;
+  clock = 0;
 
   private dirty = false;
-  private isDestroyed = false;
+  isDestroyed = false;
 
   private action: undefined | ((onCleanup: WatchCleanupRegisterFn) => void);
   private schedule: undefined | ((watch: Watch) => void);
@@ -75,12 +76,13 @@ export class Watch implements EffectNode {
       return;
     }
 
-    const prevEffect = SIGNAL_CONTEXT.setCurrentEffect(this);
+    const prevEffect = SIGNAL_RUNTIME.setCurrentEffect(this);
 
     const isChanged =
       !this.seenComputedNodes || isComputedNodesChanged(this.seenComputedNodes);
 
     if (!isChanged) {
+      SIGNAL_RUNTIME.setCurrentEffect(prevEffect);
       return;
     }
 
@@ -89,12 +91,12 @@ export class Watch implements EffectNode {
       this.cleanupFn = NOOP_CLEANUP_FN;
       this.action?.(this.registerOnCleanup);
     } finally {
-      SIGNAL_CONTEXT.setCurrentEffect(prevEffect);
+      SIGNAL_RUNTIME.setCurrentEffect(prevEffect);
 
-      this.seenComputedNodes = SIGNAL_CONTEXT.getVisitedComputedNodes();
+      this.seenComputedNodes = SIGNAL_RUNTIME.getVisitedComputedNodes();
 
       if (!prevEffect) {
-        SIGNAL_CONTEXT.resetVisitedComputedNodes();
+        SIGNAL_RUNTIME.resetVisitedComputedNodes();
       }
     }
   }

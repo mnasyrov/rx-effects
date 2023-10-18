@@ -5,9 +5,9 @@ import {
   defaultEquals,
   EffectNode,
   Signal,
-  SIGNAL_CONTEXT,
   ValueEqualityFn,
 } from './common';
+import { SIGNAL_RUNTIME } from './runtime';
 
 export type Computation<T> = () => T;
 
@@ -57,7 +57,7 @@ const ERRORED: any = Symbol('ERRORED');
  * `Computed`s are both producers and consumers of reactivity.
  */
 export class ComputedImpl<T> implements ComputedNode<T> {
-  clock = SIGNAL_CONTEXT.clock - 1;
+  clock: number | undefined = undefined;
   version = 0;
 
   /**
@@ -87,7 +87,11 @@ export class ComputedImpl<T> implements ComputedNode<T> {
   }
 
   isChanged(): boolean {
-    if (this.clock === SIGNAL_CONTEXT.clock && this.value === UNSET) {
+    if (
+      this.clock === SIGNAL_RUNTIME.clock &&
+      this.value !== UNSET &&
+      this.value !== COMPUTING
+    ) {
       return this.changed;
     }
 
@@ -114,13 +118,13 @@ export class ComputedImpl<T> implements ComputedNode<T> {
     }
 
     if (trackNode) {
-      SIGNAL_CONTEXT.visitComputedNode(this);
+      SIGNAL_RUNTIME.visitComputedNode(this);
     }
 
-    const activeEffect = SIGNAL_CONTEXT.getCurrentEffect();
+    const activeEffect = SIGNAL_RUNTIME.getCurrentEffect();
 
     const isStale =
-      this.clock !== SIGNAL_CONTEXT.clock ||
+      this.clock !== SIGNAL_RUNTIME.clock ||
       this.value === UNSET ||
       !activeEffect ||
       this.lastEffectRef !== activeEffect.ref;
@@ -144,7 +148,7 @@ export class ComputedImpl<T> implements ComputedNode<T> {
       this.error = err;
     }
 
-    this.clock = SIGNAL_CONTEXT.clock;
+    this.clock = SIGNAL_RUNTIME.clock;
 
     if (
       oldValue === UNSET ||

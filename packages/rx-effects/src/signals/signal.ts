@@ -4,9 +4,9 @@ import {
   EffectNode,
   ReactiveNode,
   Signal,
-  SIGNAL_CONTEXT,
   ValueEqualityFn,
 } from './common';
+import { SIGNAL_RUNTIME } from './runtime';
 
 /**
  * A `Signal` with a value that can be mutated via a setter interface.
@@ -99,7 +99,7 @@ class WritableSignalImpl<T> implements ReactiveNode {
     }
 
     this.value = newValue;
-    SIGNAL_CONTEXT.updateSignalClock();
+    SIGNAL_RUNTIME.updateSignalClock();
 
     this.producerChanged();
   }
@@ -148,7 +148,7 @@ class WritableSignalImpl<T> implements ReactiveNode {
     for (const [effectRef, atEffectClock] of this.consumerEffects) {
       const effect = effectRef.deref();
 
-      if (!effect || effect.clock !== atEffectClock) {
+      if (!effect || effect.clock !== atEffectClock || effect.isDestroyed) {
         this.consumerEffects.delete(effectRef);
         continue;
       }
@@ -161,10 +161,13 @@ class WritableSignalImpl<T> implements ReactiveNode {
    * Mark that this producer node has been accessed in the current reactive context.
    */
   protected producerAccessed(): void {
-    const effects = SIGNAL_CONTEXT.getTrackedEffects();
+    const effects = SIGNAL_RUNTIME.getTrackedEffects();
+
     if (effects.length > 0) {
       effects.forEach((effect) => {
-        this.consumerEffects.set(effect.ref, effect.clock);
+        if (!effect.isDestroyed) {
+          this.consumerEffects.set(effect.ref, effect.clock);
+        }
       });
     }
   }

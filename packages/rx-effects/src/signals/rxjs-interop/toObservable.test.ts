@@ -136,9 +136,15 @@ describe('toObservable()', () => {
     const counter = signal(0);
     const emits = signal(0);
 
+    let hits = 0;
+
     toObservable(counter).subscribe(() => {
       // Read emits. If we are still tracked in the effect, this will cause
       // an infinite loop by triggering the effect again.
+
+      if (hits > 2) return;
+      hits++;
+
       emits();
       emits.update((v) => v + 1);
     });
@@ -148,5 +154,7 @@ describe('toObservable()', () => {
 
     await waitForMicrotask();
     expect(emits()).toBe(1);
+
+    expect(hits).toBe(1);
   });
 });

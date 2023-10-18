@@ -1,13 +1,5 @@
-import { MicrotaskScheduler, SyncTaskScheduler } from '../utils';
+import { SIGNAL_RUNTIME } from './runtime';
 import { Watch } from './watch';
-
-export const ASYNC_EFFECT_SCHEDULER = new MicrotaskScheduler<Watch>((entry) =>
-  entry.run(),
-);
-
-export const SYNC_EFFECT_SCHEDULER = new SyncTaskScheduler<Watch>((entry) =>
-  entry.run(),
-);
 
 /**
  * An effect can, optionally, register a cleanup function. If registered, the cleanup is executed
@@ -43,8 +35,8 @@ export function effect(
   options?: CreateEffectOptions,
 ): EffectRef {
   const scheduler = options?.sync
-    ? SYNC_EFFECT_SCHEDULER
-    : ASYNC_EFFECT_SCHEDULER;
+    ? SIGNAL_RUNTIME.syncScheduler
+    : SIGNAL_RUNTIME.asyncScheduler;
 
   const watch = new Watch(effectFn, scheduler.schedule);
 

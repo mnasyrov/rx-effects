@@ -1,8 +1,9 @@
 import { BehaviorSubject, materialize, Subject } from 'rxjs';
-import { collectChanges, dump, waitForMicrotask } from '../../test/testUtils';
-import { defaultEquals, Signal, SIGNAL_CONTEXT } from './common';
+import { collectChanges, waitForMicrotask } from '../../test/testUtils';
+import { defaultEquals, Signal } from './common';
 import { computed, ComputedImpl } from './computed';
 import { effect } from './effect';
+import { SIGNAL_RUNTIME } from './runtime';
 import { toObservable, toSignal } from './rxjs-interop';
 import { signal } from './signal';
 
@@ -176,28 +177,6 @@ describe('computed()', () => {
     fx.destroy();
 
     expect(results).toEqual([2, 3, 4]);
-  });
-
-  it('should work with an untracked effect', async () => {
-    const source = signal(0);
-    const a = computed(() => source() + 1);
-    const b = computed(() => a() + 1);
-
-    const results: number[] = [];
-
-    const fx = effect(() => {
-      SIGNAL_CONTEXT.untracked(() => results.push(b()));
-    });
-    await waitForMicrotask();
-
-    source.set(1);
-    await waitForMicrotask();
-
-    fx.destroy();
-
-    dump('SIGNAL_CONTEXT', SIGNAL_CONTEXT);
-
-    expect(results).toEqual([2, 3]);
   });
 
   it('should compute "entry -> a -> observer" chain', async () => {
@@ -517,15 +496,64 @@ describe('computed()', () => {
 
     expect(changes).toEqual([
       { a: 0, result: { value: 0 } },
+      { a: 1, result: { value: 0 } },
       { a: 1, result: { value: 1 } },
     ]);
   });
 
   it('should handle recursion during store updates: Intermediate computed', async () => {
-    console.log(
-      '!!! SIGNAL_CONTEXT',
-      JSON.parse(JSON.stringify(SIGNAL_CONTEXT)),
-    );
+    const store = signal({ a: 0, result: { value: 0 } });
+
+    const a = computed(() => store().a);
+    const nextResult = computed(() => ({ value: a() }), {
+      equal: (a, b) => a.value === b.value,
+    });
+
+    const subscription = toObservable(nextResult, {
+      onlyChanges: true,
+    }).subscribe((result) => {
+      store.update((state) => ({ ...state, result }));
+    });
+
+    const changes = await collectChanges(toObservable(store), async () => {
+      await waitForMicrotask();
+
+      store.update((state) => ({ ...state, a: 1 }));
+
+      await waitForMicrotask();
+    });
+
+    subscription?.unsubscribe();
+
+    expect(changes).toEqual([
+      { a: 0, result: { value: 0 } },
+      { a: 1, result: { value: 0 } },
+      { a: 1, result: { value: 1 } },
+    ]);
+  });
+
+  it('should correctly clean tracked effects', async () => {
+    const store1 = signal({ a: 0, result: { value: 0 } });
+
+    const nextResult1 = computed(() => ({ value: store1().a }), {
+      equal: (a, b) => a.value === b.value,
+    });
+
+    const subscription1 = toObservable(nextResult1, {}).subscribe((result) => {
+      store1.update((state) => ({ ...state, result }));
+    });
+
+    await collectChanges(toObservable(store1), async () => {
+      store1.update((state) => ({ ...state, a: 1 }));
+    });
+
+    subscription1?.unsubscribe();
+
+    // Expect that the runtime in empty
+    expect(SIGNAL_RUNTIME.getTrackedEffects().length).toBe(0);
+    expect(SIGNAL_RUNTIME.getVisitedComputedNodes().length).toBe(0);
+    expect(SIGNAL_RUNTIME.asyncScheduler.isEmpty()).toBe(true);
+    expect(SIGNAL_RUNTIME.syncScheduler.isEmpty()).toBe(true);
 
     const store = signal({ a: 0, result: { value: 0 } });
 
@@ -552,6 +580,7 @@ describe('computed()', () => {
 
     expect(changes).toEqual([
       { a: 0, result: { value: 0 } },
+      { a: 1, result: { value: 0 } },
       { a: 1, result: { value: 1 } },
     ]);
   });

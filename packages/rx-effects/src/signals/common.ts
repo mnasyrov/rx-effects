@@ -1,5 +1,4 @@
-import { dump } from '../../test/testUtils';
-import { AnyObject, nextSafeInteger } from '../utils';
+import { AnyObject } from '../utils';
 
 /**
  * Symbol used to tell `Signal`s apart from other functions.
@@ -90,7 +89,7 @@ export type ReactiveNode = Readonly<{
 
 export type ComputedNode<T> = ReactiveNode &
   Readonly<{
-    clock: number;
+    clock: number | undefined;
     version: number;
     signal: () => T;
     isChanged: () => boolean;
@@ -99,8 +98,8 @@ export type ComputedNode<T> = ReactiveNode &
 export type EffectNode = ReactiveNode &
   Readonly<{
     id: number;
-
     ref: WeakRef<EffectNode>;
+    isDestroyed: boolean;
 
     /**
      * Monotonically increasing counter representing a version of this `Consumer`'s
@@ -110,118 +109,3 @@ export type EffectNode = ReactiveNode &
 
     notify: () => void;
   }>;
-
-export class SignalContext {
-  private untrackedMutex = 0;
-  private currentEffect: EffectNode | undefined = undefined;
-  private trackedEffects: EffectNode[] = [];
-  private visitedComputedNodes: ComputedNode<any>[] = [];
-
-  clock = -1;
-
-  updateSignalClock(): void {
-    const prevClock = this.clock;
-
-    this.clock = nextSafeInteger(this.clock);
-
-    dump('updateSignalClock()', { prev: prevClock, next: this.clock });
-  }
-
-  getCurrentEffect(): EffectNode | undefined {
-    if (this.untrackedMutex > 0) return undefined;
-
-    dump('getCurrentEffect()', { currentEffect: this.currentEffect });
-
-    return this.currentEffect;
-  }
-
-  getTrackedEffects(): EffectNode[] {
-    if (this.untrackedMutex > 0) return [];
-
-    dump('getTrackedEffects()', { trackedEffects: this.trackedEffects });
-
-    return this.trackedEffects;
-  }
-
-  setCurrentEffect(effect: EffectNode | undefined): EffectNode | undefined {
-    const prev = this.currentEffect;
-    this.currentEffect = effect;
-
-    if (this.untrackedMutex === 0) {
-      if (effect) {
-        this.trackedEffects.push(effect);
-      } else {
-        this.trackedEffects = [];
-      }
-    }
-
-    dump('setCurrentEffect()', {
-      prev,
-      effect,
-      trackedEffects: this.trackedEffects,
-    });
-
-    return prev;
-  }
-
-  getVisitedComputedNodes(): ComputedNode<any>[] {
-    dump('getVisitedComputedNodes()', {
-      visitedComputedNodes: this.visitedComputedNodes,
-    });
-
-    return this.visitedComputedNodes;
-  }
-
-  resetVisitedComputedNodes() {
-    dump('resetVisitedComputedNodes()');
-
-    this.visitedComputedNodes = [];
-  }
-
-  visitComputedNode(node: ComputedNode<any>) {
-    if (this.untrackedMutex > 0) return;
-
-    dump('visitComputedNode()', {
-      currentEffect: this.currentEffect,
-      visitedComputedNodes: this.visitedComputedNodes,
-    });
-
-    if (this.currentEffect) {
-      this.visitedComputedNodes.push(node);
-    }
-  }
-
-  untracked<T>(nonReactiveReadsFn: () => T): T {
-    this.untrackedMutex++;
-
-    dump('untracked() begin', { untrackMutex: this.untrackedMutex });
-
-    try {
-      return nonReactiveReadsFn();
-    } finally {
-      this.untrackedMutex--;
-
-      dump('untracked() end', { untrackMutex: this.untrackedMutex });
-    }
-  }
-
-  // untracked<T>(nonReactiveReadsFn: () => T): T {
-  //   const prevActiveEffect = this.activeEffect;
-  //   const prevActiveEffects = this.activeEffects;
-  //   const prevVisitedComputedNodes = this.visitedComputedNodes;
-  //
-  //   this.activeEffect = undefined;
-  //   this.activeEffects = [];
-  //   this.visitedComputedNodes = [];
-  //
-  //   try {
-  //     return nonReactiveReadsFn();
-  //   } finally {
-  //     this.activeEffect = prevActiveEffect;
-  //     this.activeEffects = prevActiveEffects;
-  //     this.visitedComputedNodes = prevVisitedComputedNodes;
-  //   }
-  // }
-}
-
-export const SIGNAL_CONTEXT = new SignalContext();
