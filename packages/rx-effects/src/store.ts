@@ -7,7 +7,7 @@ import { setInternalStoreFlag, setStateMutationName } from './storeMetadata';
 import {
   DEFAULT_COMPARATOR,
   isReadonlyArray,
-  MicrotaskScheduler,
+  LegacyMicrotaskScheduler,
   removeFromArray,
 } from './utils';
 
@@ -180,8 +180,8 @@ export type InternalStoreOptions<State> = Readonly<
   StoreOptions<State> & { internal?: boolean }
 >;
 
-const NOTIFICATION_SCHEDULER = new MicrotaskScheduler<Store<any>>((store) =>
-  store.notify(),
+const NOTIFICATION_SCHEDULER = new LegacyMicrotaskScheduler<Store<any>>(
+  (store) => store.notify(),
 );
 
 /**
