@@ -93,7 +93,7 @@ describe('computed()', () => {
     expect(results).toEqual(['a1, i0', 'a2, i2', 'b2, i3', 'b3, i4']);
   });
 
-  it('should compute external dependencies', async () => {
+  it('should not compute external dependencies in a signal was not changed', async () => {
     let value = 1;
     const subscribed = computed(() => value);
     const notSubscribed = computed(() => value);
@@ -114,11 +114,16 @@ describe('computed()', () => {
 
     value = 4;
     await 0;
-    expect(subscribed()).toBe(4);
+    expect(subscribed()).toBe(1);
     await 0;
 
     destroy();
 
+    expect(subscribed()).toBe(1);
+    expect(notSubscribed()).toBe(1);
+
+    // Trigger recalculations
+    signal(10).set(11);
     expect(subscribed()).toBe(4);
     expect(notSubscribed()).toBe(4);
 
@@ -609,6 +614,32 @@ describe('computed()', () => {
 
     const query = computed(() => source());
     expect(query()).toEqual({ key: 1, val: 'a' });
+  });
+
+  it('should do extra computing after reading by an effect', async () => {
+    const counter = signal(0);
+
+    // Tracks how many reads of `counter()` there have been.
+    let readCount = 0;
+    const result = computed(() => {
+      readCount++;
+      return { value: counter() };
+    });
+
+    const result$ = toObservable(result, { sync: true });
+
+    const subscription = result$.subscribe();
+    expect(readCount).toBe(1);
+
+    counter.set(1);
+    expect(readCount).toBe(2);
+
+    // Should not do extra computing here
+    result();
+    expect(readCount).toBe(2);
+
+    // Tear down the only subscription.
+    subscription.unsubscribe();
   });
 });
 

@@ -126,8 +126,7 @@ export class ComputedImpl<T> implements ComputedNode<T> {
     const isStale =
       this.clock !== SIGNAL_RUNTIME.clock ||
       this.value === UNSET ||
-      !activeEffect ||
-      this.lastEffectRef !== activeEffect.ref;
+      (activeEffect && this.lastEffectRef !== activeEffect.ref);
 
     if (isStale) {
       this.lastEffectRef = activeEffect?.ref;
