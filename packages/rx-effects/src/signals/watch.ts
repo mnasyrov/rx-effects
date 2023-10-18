@@ -58,7 +58,6 @@ export class Watch implements EffectNode, Runnable {
     this.dirty = true;
 
     if (needsSchedule) {
-      // this.clock = nextSafeInteger(this.clock);
       this.schedule?.(this);
     }
   };
@@ -70,6 +69,10 @@ export class Watch implements EffectNode, Runnable {
    * `schedule` hook is called by `Watch`.
    */
   run(): void {
+    if (!this.dirty) {
+      return;
+    }
+
     this.dirty = false;
 
     if (this.isDestroyed) {

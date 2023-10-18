@@ -77,7 +77,7 @@ class WritableSignalImpl<T> implements ReactiveNode {
 
   signal(): T {
     if (this.isDestroyed) {
-      throw new Error('Signal was destroyed');
+      throw new Error('Signal is destroyed');
     }
 
     this.producerAccessed();
